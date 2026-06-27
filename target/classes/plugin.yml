@@ -1,0 +1,18 @@
+name: RPGPlugin
+version: '1.0-SNAPSHOT'
+main: com.project.rpgplugin.RPGPlugin
+api-version: '1.21'
+author: Developer
+description: High-performance Minecraft plugin implementing custom RPG classes.
+commands:
+  class:
+    description: Open the RPG class selection visual GUI.
+    usage: /class
+  rpg:
+    description: Core command for administrating the RPG Classes plugin.
+    usage: /rpg reload
+    permission: rpg.admin
+permissions:
+  rpg.admin:
+    description: Allows reloading the RPG plugin configuration.
+    default: op
