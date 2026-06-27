@@ -1,11 +1,15 @@
 package com.project.rpgplugin;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.Arrays;
 
 public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
@@ -59,9 +63,39 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                boolean hasBook = false;
+                for (ItemStack invItem : player.getInventory().getContents()) {
+                    if (invItem != null && invItem.getType() == Material.BOOK) {
+                        ItemMeta m = invItem.getItemMeta();
+                        if (m != null && m.hasDisplayName() && m.getDisplayName().contains("Livro de RPG")) {
+                            hasBook = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasBook) {
+                    ItemStack rpgBook = new ItemStack(Material.BOOK, 1);
+                    ItemMeta meta = rpgBook.getItemMeta();
+                    if (meta != null) {
+                        meta.setDisplayName("§6§lLivro de RPG");
+                        meta.setLore(Arrays.asList(
+                            "§7Use para abrir o Menu de Classes e Skills!",
+                            "§eClique com o botão direito para abrir."
+                        ));
+                        rpgBook.setItemMeta(meta);
+                    }
+                    player.getInventory().addItem(rpgBook);
+                    player.sendMessage(ChatColor.GREEN + "[RPGPlugin] Você recebeu o Livro de RPG fixo!");
+                    return true;
+                }
+            }
+
             // Command /rpg or /rpg help - show beautiful in-game guide
             sender.sendMessage(ChatColor.GOLD + "=================== RPG CLASSES HELP ===================");
             sender.sendMessage(ChatColor.YELLOW + "/class " + ChatColor.WHITE + "- Abre o menu visual para escolher sua classe.");
+            sender.sendMessage(ChatColor.YELLOW + "/rpg " + ChatColor.WHITE + "- Recebe o Livro de RPG se não tiver, ou abre o menu.");
             sender.sendMessage(ChatColor.YELLOW + "/rpg reload " + ChatColor.WHITE + "- Recarrega as configurações do plugin (Admin).");
             sender.sendMessage(ChatColor.YELLOW + "/rpg help " + ChatColor.WHITE + "- Exibe esta lista de ajuda com todos os poderes.");
             sender.sendMessage("");
