@@ -16,25 +16,35 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     private PlayerManager playerManager;
     private ClassListeners classListeners;
+    private AuraSkillsIntegration auraSkillsIntegration;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
         this.playerManager = new PlayerManager(this);
-        this.classListeners = new ClassListeners(this, playerManager);
+        this.auraSkillsIntegration = new AuraSkillsIntegration(this, playerManager);
+        this.classListeners = new ClassListeners(this, playerManager, auraSkillsIntegration);
 
         getServer().getPluginManager().registerEvents(classListeners, this);
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
 
-        getLogger().info("RogueLata Plugin ativado com sucesso!");
+        if (auraSkillsIntegration.isEnabled()) {
+            getLogger().info("RogueLata + AuraSkills integrado com sucesso!");
+        } else {
+            getLogger().info("RogueLata ativado em modo standalone (sem AuraSkills).");
+        }
     }
 
     @Override
     public void onDisable() {
         getLogger().info("RogueLata Plugin desativado.");
+    }
+
+    public AuraSkillsIntegration getAuraSkillsIntegration() {
+        return auraSkillsIntegration;
     }
 
     @Override

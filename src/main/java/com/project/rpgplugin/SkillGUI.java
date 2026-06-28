@@ -1,5 +1,6 @@
 package com.project.rpgplugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -208,6 +209,7 @@ public class SkillGUI {
             .setName(tierColor + legacyToMiniMessage(displayName));
 
         builder.addLoreLines("<gray>" + desc);
+        builder.addLoreLines("<dark_gray>✦ roguelata/" + skillKey);
         builder.addLoreLines(typeColor + typeDisplay);
         builder.addLoreLines("");
 
@@ -254,6 +256,10 @@ public class SkillGUI {
             }
             player.setLevel(player.getLevel() - cost);
             playerManager.unlockSkill(player, skillKey);
+            RPGPlugin rpg = (RPGPlugin) Bukkit.getPluginManager().getPlugin("RogueLata");
+            if (rpg != null && rpg.getAuraSkillsIntegration().isEnabled()) {
+                rpg.getAuraSkillsIntegration().syncAuraSkillLevel(player, skillKey, 1);
+            }
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
             player.sendMessage("§a§l[RogueLata] §aHabilidade desbloqueada: " + playerManager.getSkillDisplayName(skillKey) + "! Gastou " + cost + " XP.");
             return;

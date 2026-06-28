@@ -52,6 +52,7 @@ public class ClassListeners implements Listener {
     private final RPGPlugin plugin;
     private final PlayerManager playerManager;
     private final SkillGUI skillGUI;
+    private final AuraSkillsIntegration auraSkills;
 
     // Cooldown Maps (UUID -> Timestamp in millis)
     private final Map<UUID, Long> explorerDashCooldown = new HashMap<>();
@@ -76,9 +77,10 @@ public class ClassListeners implements Listener {
     private final Set<Location> reinforcedBlocks = new HashSet<>();
     private final Map<UUID, Long> moltenTouchActiveUntil = new HashMap<>();
 
-    public ClassListeners(RPGPlugin plugin, PlayerManager playerManager) {
+    public ClassListeners(RPGPlugin plugin, PlayerManager playerManager, AuraSkillsIntegration auraSkills) {
         this.plugin = plugin;
         this.playerManager = playerManager;
+        this.auraSkills = auraSkills;
         this.skillGUI = new SkillGUI(playerManager);
         startHUDUpdater();
     }
@@ -809,6 +811,7 @@ public class ClassListeners implements Listener {
         if (unlocked.isEmpty()) return;
 
         playerManager.clearAllSkills(player);
+        auraSkills.resetPlayerSkills(player);
         player.sendMessage(Component.text("§4§l╔══════════════════════════════════╗"));
         player.sendMessage(Component.text("§4§l║   VOCE MORREU!                  ║"));
         player.sendMessage(Component.text("§4§l║   Todas as habilidades foram     ║"));

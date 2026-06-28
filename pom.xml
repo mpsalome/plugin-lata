@@ -6,7 +6,7 @@
 
     <groupId>com.project</groupId>
     <artifactId>RogueLata</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>RogueLata</name>
@@ -43,6 +43,13 @@
             <groupId>xyz.xenondevs.invui</groupId>
             <artifactId>invui</artifactId>
             <version>2.2.0</version>
+        </dependency>
+        <!-- AuraSkills API -->
+        <dependency>
+            <groupId>dev.aurelium</groupId>
+            <artifactId>auraskills-api-bukkit</artifactId>
+            <version>2.3.12</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

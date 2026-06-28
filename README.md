@@ -117,12 +117,29 @@ Quando voce equipa **4+ habilidades do mesmo tipo**, uma passiva global e ativad
 
 1. Baixe o JAR mais recente
 2. Coloque em `plugins/` do seu servidor Paper 1.21+
-3. Reinicie o servidor
-4. Use `/skills` para comecar
+3. **(Opcional)** Coloque `AuraSkills.jar` e `AuraMobs.jar` em `plugins/` para integracao completa
+4. Reinicie o servidor
+5. Use `/skills` para comecar
+
+> **Nota**: RogueLata funciona standalone sem AuraSkills. Com AuraSkills, as 35 habilidades custom sao registradas sob o namespace `roguelata/` e desbloqueadas automaticamente ao atingir certos niveis nas skills padrao (Agility, Mining, Foraging, etc.).
 
 ## Configuracao
 
 O plugin possui configuracao padrao via `config.yml` (gerado na primeira execucao). Use `/rpg reload` para recarregar.
+
+### AuraSkills (Recomendado)
+
+Para reset completo na morte, configure em `plugins/AuraSkills/config.yml`:
+```yaml
+on_death:
+  reset_skills: true
+  reset_xp: true
+  reset_xp_ratio: 0.0
+```
+
+### AuraMobs
+
+Adicione `AuraMobs.jar` em `plugins/` para mobs com nivel baseado nas skills dos jogadores. Baixe em: https://wiki.aurelium.dev/auramobs/
 
 ## Permissoes
 
@@ -132,6 +149,16 @@ rpg.admin:
   default: op
 ```
 
+## Marcador de Skills Custom
+
+Todas as habilidades do RogueLata sao registradas no AuraSkills sob o namespace `roguelata/` (ex: `roguelata/dash`, `roguelata/stone_smash`).
+Isso serve como marcador visual para identificar quais skills sao nossas vs. as padrao do AuraSkills.
+
+**Progression Gates** - Skills sao desbloqueadas ao atingir certos niveis:
+- Explorador: Agility level 2-16
+- Minerador: Mining level 2-20 + Enchanting 15
+- Construtor: Foraging level 2-26
+
 ## Desenvolvimento
 
 ### Build
@@ -140,11 +167,12 @@ rpg.admin:
 mvn clean package
 ```
 
-O JAR sera gerado em `target/RogueLata-1.0-SNAPSHOT.jar`.
+O JAR sera gerado em `target/RogueLata-1.1-SNAPSHOT.jar`.
 
 ### Dependencias
 
 - Paper API 1.21
+- AuraSkills API 2.3.12 (optional, compile-only)
 - Java 21
 - Maven 3.9+
 
@@ -152,9 +180,11 @@ O JAR sera gerado em `target/RogueLata-1.0-SNAPSHOT.jar`.
 
 ```
 src/main/java/com/project/rpgplugin/
-├── RPGPlugin.java         # Entry point e comandos
-├── PlayerManager.java     # Dados persistentes dos jogadores
-└── ClassListeners.java    # Eventos e mecanicas do jogo
+├── RPGPlugin.java              # Entry point e comandos
+├── PlayerManager.java          # Dados persistentes e metadados das skills
+├── SkillGUI.java               # GUI InvUI de selecao de habilidades
+├── ClassListeners.java         # Eventos, ativacao de skills e HUD
+└── AuraSkillsIntegration.java  # Ponte com AuraSkills (namespace roguelata/)
 ```
 
 ## Licenca

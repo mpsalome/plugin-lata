@@ -22,6 +22,8 @@ import java.util.Map;
 
 public class PlayerManager {
 
+    public static final String SKILL_NAMESPACE = "roguelata";
+
     private final RPGPlugin plugin;
     private final NamespacedKey skillsKey;
     private final NamespacedKey equippedKey;
@@ -30,6 +32,14 @@ public class PlayerManager {
         this.plugin = plugin;
         this.skillsKey = new NamespacedKey(plugin, "rpg_skills");
         this.equippedKey = new NamespacedKey(plugin, "rpg_equipped");
+    }
+
+    public static String namespacedKey(String skillKey) {
+        return SKILL_NAMESPACE + "/" + skillKey.toLowerCase();
+    }
+
+    public static boolean isRogueLataKey(String fullKey) {
+        return fullKey.startsWith(SKILL_NAMESPACE + "/");
     }
 
     public List<String> getUnlockedSkills(Player player) {
