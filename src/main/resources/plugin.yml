@@ -1,18 +1,18 @@
-name: RPGPlugin
+name: RogueLata
 version: '${project.version}'
 main: com.project.rpgplugin.RPGPlugin
 api-version: '1.21'
 author: Developer
-description: High-performance Minecraft plugin implementing custom RPG classes.
+description: Plugin Rogue-Like com sistema de habilidades em 3 tiers (Bronze/Prata/Ouro).
 commands:
-  class:
-    description: Open the RPG class selection visual GUI.
-    usage: /class
+  skills:
+    description: Abre o menu visual de selecao de habilidades.
+    usage: /skills
   rpg:
-    description: Core command for administrating the RPG Classes plugin.
-    usage: /rpg reload
+    description: Comando principal do RogueLata.
+    usage: /rpg [reload|reset]
     permission: rpg.admin
 permissions:
   rpg.admin:
-    description: Allows reloading the RPG plugin configuration.
+    description: Permite recarregar/resetar o plugin RogueLata.
     default: op

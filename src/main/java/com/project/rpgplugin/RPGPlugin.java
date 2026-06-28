@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.Arrays;
 
 public class RPGPlugin extends JavaPlugin implements CommandExecutor {
@@ -18,33 +19,29 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     @Override
     public void onEnable() {
-        // Save default config.yml
         saveDefaultConfig();
 
-        // Initialize Managers and Listeners
         this.playerManager = new PlayerManager(this);
         this.classListeners = new ClassListeners(this, playerManager);
 
-        // Register Event Listeners
         getServer().getPluginManager().registerEvents(classListeners, this);
 
-        // Register Commands
-        getCommand("class").setExecutor(this);
+        getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
 
-        getLogger().info("RPG Classes Plugin has been enabled successfully!");
+        getLogger().info("RogueLata Plugin ativado com sucesso!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("RPG Classes Plugin has been disabled.");
+        getLogger().info("RogueLata Plugin desativado.");
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("class")) {
+        if (command.getName().equalsIgnoreCase("skills")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "Only players can choose an RPG class!");
+                sender.sendMessage(ChatColor.RED + "Apenas jogadores podem usar /skills!");
                 return true;
             }
             Player player = (Player) sender;
@@ -55,11 +52,22 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         if (command.getName().equalsIgnoreCase("rpg")) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("rpg.admin")) {
-                    sender.sendMessage(ChatColor.RED + "You do not have permission to reload the config.");
+                    sender.sendMessage(ChatColor.RED + "Voce nao tem permissao para recarregar.");
                     return true;
                 }
                 reloadConfig();
-                sender.sendMessage(ChatColor.GREEN + "[RPGPlugin] Configuration reloaded successfully!");
+                sender.sendMessage(ChatColor.GREEN + "[RogueLata] Configuracao recarregada!");
+                return true;
+            }
+
+            if (args.length > 0 && args[0].equalsIgnoreCase("reset") && sender.hasPermission("rpg.admin")) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.RED + "Apenas jogadores podem resetar.");
+                    return true;
+                }
+                Player player = (Player) sender;
+                playerManager.clearPlayerData(player);
+                player.sendMessage(ChatColor.RED + "[RogueLata] Todos os dados RPG foram resetados!");
                 return true;
             }
 
@@ -81,42 +89,28 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                     if (meta != null) {
                         meta.setDisplayName("§6§lLivro de RPG");
                         meta.setLore(Arrays.asList(
-                            "§7Use para abrir o Menu de Classes e Skills!",
-                            "§eClique com o botão direito para abrir."
+                            "§7Use para abrir o Menu de Habilidades!",
+                            "§eClique com o direito para abrir."
                         ));
                         rpgBook.setItemMeta(meta);
                     }
                     player.getInventory().addItem(rpgBook);
-                    player.sendMessage(ChatColor.GREEN + "[RPGPlugin] Você recebeu o Livro de RPG fixo!");
+                    player.sendMessage(ChatColor.GREEN + "[RogueLata] Voce recebeu o Livro de RPG!");
                     return true;
                 }
             }
 
-            // Command /rpg or /rpg help - show beautiful in-game guide
-            sender.sendMessage(ChatColor.GOLD + "=================== RPG CLASSES HELP ===================");
-            sender.sendMessage(ChatColor.YELLOW + "/class " + ChatColor.WHITE + "- Abre o menu visual para escolher sua classe.");
-            sender.sendMessage(ChatColor.YELLOW + "/rpg " + ChatColor.WHITE + "- Recebe o Livro de RPG se não tiver, ou abre o menu.");
-            sender.sendMessage(ChatColor.YELLOW + "/rpg reload " + ChatColor.WHITE + "- Recarrega as configurações do plugin (Admin).");
-            sender.sendMessage(ChatColor.YELLOW + "/rpg help " + ChatColor.WHITE + "- Exibe esta lista de ajuda com todos os poderes.");
+            sender.sendMessage(ChatColor.GOLD + "=========== RogueLata HELP ===========");
+            sender.sendMessage(ChatColor.YELLOW + "/skills " + ChatColor.WHITE + "- Abre o menu de habilidades (3 tiers).");
+            sender.sendMessage(ChatColor.YELLOW + "/rpg " + ChatColor.WHITE + "- Recebe o Livro de RPG se necessario.");
+            sender.sendMessage(ChatColor.YELLOW + "/rpg reload " + ChatColor.WHITE + "- Recarrega config (Admin).");
+            sender.sendMessage(ChatColor.YELLOW + "/rpg reset " + ChatColor.WHITE + "- Reseta todos os dados RPG (Admin).");
             sender.sendMessage("");
-            sender.sendMessage(ChatColor.AQUA + "--- CLASSE: EXPLORER ---");
-            sender.sendMessage(ChatColor.GRAY + "• Dano de Queda Reduzido (Passiva): Toma menos dano de queda.");
-            sender.sendMessage(ChatColor.GRAY + "• Speed & Invisibility (Ativa): Use uma FLOR (Poppy) para ganhar velocidade e invisibilidade.");
-            sender.sendMessage(ChatColor.GRAY + "• Hidratação (Passiva): Beber garrafa de água recupera fome.");
-            sender.sendMessage(ChatColor.GRAY + "• Jump Boost (Passiva): Ganha efeito de pulo automático ao atingir o Nível 10+.");
-            sender.sendMessage(ChatColor.GRAY + "• Respiração de Lapis (Ativa): Consuma LAPIS LAZULI para ganhar Respiração Debaixo d'água III.");
-            sender.sendMessage(ChatColor.GRAY + "• Retorno do Dragão (Ativa): Use DRAGON'S BREATH para teleportar instantaneamente ao Spawn.");
-            sender.sendMessage("");
-            sender.sendMessage(ChatColor.GOLD + "--- CLASSE: MINER ---");
-            sender.sendMessage(ChatColor.GRAY + "• Dieta de Carvão (Ativa): Coma CARVÃO/CARVÃO VEGETAL para recuperar fome.");
-            sender.sendMessage(ChatColor.GRAY + "• Visão Noturna (Passiva): Ganha visão noturna infinita automática ao atingir o nível configurado.");
-            sender.sendMessage(ChatColor.GRAY + "• Corrida do Ouro (Ativa): Clique com o botão direito usando PICARETA segurando BARRA DE OURO para ativar Haste rápido.");
-            sender.sendMessage("");
-            sender.sendMessage(ChatColor.GREEN + "--- CLASSE: BUILDER ---");
-            sender.sendMessage(ChatColor.GRAY + "• Banquete de Folhas (Ativa): Coma BLOCOS DE FOLHAS diretamente do inventário para restaurar fome.");
-            sender.sendMessage(ChatColor.GRAY + "• Silk Touch com a Mão (Passiva): Quebre blocos com a mão vazia para obter Silk Touch (coleta blocos frágeis).");
-            sender.sendMessage(ChatColor.GRAY + "• Graça de Pena (Ativa): Clique com o botão direito segurando PENA (Nível configurado+) para ganhar Jump Boost e Slow Falling.");
-            sender.sendMessage(ChatColor.GOLD + "=======================================================");
+            sender.sendMessage(ChatColor.RED + "=== MODO ROGUE-LIKE ATIVO ===");
+            sender.sendMessage(ChatColor.GRAY + "Ao morrer, voce perde TODAS as habilidades e XP!");
+            sender.sendMessage(ChatColor.GRAY + "Escolha sabiamente suas 9 habilidades (3 por tier).");
+            sender.sendMessage(ChatColor.GRAY + "4+ habilidades do mesmo tipo = SINERGIA PASSIVA!");
+            sender.sendMessage(ChatColor.GOLD + "=================================");
             return true;
         }
 
