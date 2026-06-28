@@ -1,7 +1,6 @@
 package com.project.rpgplugin;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -20,14 +19,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -54,6 +51,7 @@ public class ClassListeners implements Listener {
 
     private final RPGPlugin plugin;
     private final PlayerManager playerManager;
+    private final SkillGUI skillGUI;
 
     // Cooldown Maps (UUID -> Timestamp in millis)
     private final Map<UUID, Long> explorerDashCooldown = new HashMap<>();
@@ -78,11 +76,10 @@ public class ClassListeners implements Listener {
     private final Set<Location> reinforcedBlocks = new HashSet<>();
     private final Map<UUID, Long> moltenTouchActiveUntil = new HashMap<>();
 
-    private final String guiTitle = "Selecione suas Habilidades RPG";
-
     public ClassListeners(RPGPlugin plugin, PlayerManager playerManager) {
         this.plugin = plugin;
         this.playerManager = playerManager;
+        this.skillGUI = new SkillGUI(playerManager);
         startHUDUpdater();
     }
 
@@ -166,336 +163,7 @@ public class ClassListeners implements Listener {
     }
 
     public void openSelectionGUI(Player player) {
-        Inventory gui = Bukkit.createInventory(null, 54, Component.text(guiTitle));
-
-        fillGlass(gui);
-        addTierHeaders(gui);
-        addSkillsToGUI(gui, player);
-        addLegend(gui, player);
-        addDifficultyInfo(gui, player);
-
-        player.openInventory(gui);
-    }
-
-    private void fillGlass(Inventory gui) {
-        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta meta = glass.getItemMeta();
-        if (meta != null) {
-            meta.displayName(Component.text(" "));
-            glass.setItemMeta(meta);
-        }
-        for (int slot = 0; slot < 9; slot++) {
-            gui.setItem(slot, glass);
-        }
-        for (int slot = 45; slot < 54; slot++) {
-            gui.setItem(slot, glass);
-        }
-    }
-
-    private void addTierHeaders(Inventory gui) {
-        ItemStack bronzeHeader = new ItemStack(Material.COPPER_INGOT);
-        ItemMeta bMeta = bronzeHeader.getItemMeta();
-        if (bMeta != null) {
-            bMeta.displayName(Component.text("§6§lBronze §7(Custo: 1 XP)").decoration(TextDecoration.ITALIC, false));
-            bMeta.lore(Arrays.asList(Component.text("§7Max 3 equipadas simultaneamente")));
-            bronzeHeader.setItemMeta(bMeta);
-        }
-        gui.setItem(0, bronzeHeader);
-
-        ItemStack silverHeader = new ItemStack(Material.IRON_INGOT);
-        ItemMeta sMeta = silverHeader.getItemMeta();
-        if (sMeta != null) {
-            sMeta.displayName(Component.text("§b§lPrata §7(Custo: 3 XP)").decoration(TextDecoration.ITALIC, false));
-            sMeta.lore(Arrays.asList(Component.text("§7Max 3 equipadas simultaneamente")));
-            silverHeader.setItemMeta(sMeta);
-        }
-        gui.setItem(1, silverHeader);
-
-        ItemStack goldHeader = new ItemStack(Material.GOLD_INGOT);
-        ItemMeta gMeta = goldHeader.getItemMeta();
-        if (gMeta != null) {
-            gMeta.displayName(Component.text("§e§lOuro §7(Custo: 5 XP)").decoration(TextDecoration.ITALIC, false));
-            gMeta.lore(Arrays.asList(Component.text("§7Max 3 equipadas simultaneamente")));
-            goldHeader.setItemMeta(gMeta);
-        }
-        gui.setItem(2, goldHeader);
-    }
-
-    private void addSkillsToGUI(Inventory gui, Player player) {
-        List<String> bronze = playerManager.getAllBronzeSkills();
-        List<String> silver = playerManager.getAllSilverSkills();
-        List<String> gold = playerManager.getAllGoldSkills();
-        List<String> unlocked = playerManager.getUnlockedSkills(player);
-        List<String> equipped = playerManager.getEquippedSkills(player);
-
-        int bronzeSlot = 9;
-        for (String key : bronze) {
-            gui.setItem(bronzeSlot++, createTierSkillItem(player, key, unlocked, equipped));
-        }
-
-        int silverSlot = 18;
-        for (String key : silver) {
-            gui.setItem(silverSlot++, createTierSkillItem(player, key, unlocked, equipped));
-        }
-
-        int goldSlot = 27;
-        for (String key : gold) {
-            gui.setItem(goldSlot++, createTierSkillItem(player, key, unlocked, equipped));
-        }
-    }
-
-    private ItemStack createTierSkillItem(Player player, String skillKey, List<String> unlocked, List<String> equipped) {
-        Material mat = playerManager.determineSkillMaterial(skillKey);
-        ItemStack item = new ItemStack(mat);
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-
-        String tier = playerManager.getSkillTier(skillKey);
-        String displayName = playerManager.getSkillDisplayName(skillKey);
-        String desc = playerManager.getSkillDescription(skillKey);
-        String type = playerManager.getSkillType(skillKey);
-        int cost = playerManager.getSkillCost(skillKey);
-        boolean isUnlocked = unlocked.contains(skillKey);
-        boolean isEquipped = equipped.contains(skillKey);
-        boolean isPassive = !playerManager.isSkillEquippable(skillKey);
-
-        String typeColor;
-        switch (type) {
-            case "explorer": typeColor = "§b"; break;
-            case "miner": typeColor = "§6"; break;
-            case "builder": typeColor = "§2"; break;
-            default: typeColor = "§7";
-        }
-
-        String tierPrefix;
-        switch (tier) {
-            case "bronze": tierPrefix = "§6[Bronze] "; break;
-            case "silver": tierPrefix = "§b[Prata] "; break;
-            case "gold": tierPrefix = "§e[Ouro] "; break;
-            default: tierPrefix = "§7[] "; 
-        }
-
-        meta.displayName(Component.text(tierPrefix + displayName).decoration(TextDecoration.ITALIC, false));
-
-        List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("§7" + desc));
-        lore.add(Component.text(typeColor + "Tipo: " + type.substring(0, 1).toUpperCase() + type.substring(1)));
-        lore.add(Component.text(" "));
-
-        if (isUnlocked) {
-            if (!isPassive) {
-                if (isEquipped) {
-                    meta.addEnchant(Enchantment.UNBREAKING, 1, true);
-                    lore.add(Component.text("§a✔ Equipada!"));
-                    lore.add(Component.text("§eClique para desequipar."));
-                } else {
-                    int tierCount = playerManager.countEquippedByTier(player, tier);
-                    lore.add(Component.text("§7Disponivel (" + tierCount + "/3 equipadas no tier)"));
-                    lore.add(Component.text("§eClique para equipar."));
-                }
-            } else {
-                lore.add(Component.text("§a✔ Desbloqueada (Passiva permanente)"));
-            }
-        } else {
-            lore.add(Component.text("§c✕ Bloqueada"));
-            lore.add(Component.text("§eCusto: " + cost + " XP"));
-            lore.add(Component.text("§eClique para desbloquear com XP!"));
-        }
-
-        lore.add(Component.text(" "));
-        lore.add(Component.text(typeColor + "✦ " + type.substring(0, 1).toUpperCase() + type.substring(1)));
-
-        meta.lore(lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    private void addLegend(Inventory gui, Player player) {
-        ItemStack info = new ItemStack(Material.BOOK);
-        ItemMeta meta = info.getItemMeta();
-        if (meta != null) {
-            meta.displayName(Component.text("§6§lSuas Habilidades").decoration(TextDecoration.ITALIC, false));
-            List<String> unlockedList = playerManager.getUnlockedSkills(player);
-            List<String> equippedList = playerManager.getEquippedSkills(player);
-            List<String> lore = new ArrayList<>();
-            lore.add("§7Desbloqueadas: " + unlockedList.size() + "/" + playerManager.getAllSkillKeys().size());
-            lore.add("§7Equipadas: " + equippedList.size() + "/9 (max 3 por tier)");
-            lore.add(" ");
-            if (!equippedList.isEmpty()) {
-                lore.add("§eEquipadas:");
-                for (String eq : equippedList) {
-                    lore.add(" §a- " + playerManager.getSkillDisplayName(eq));
-                }
-            } else {
-                lore.add("§cNenhuma habilidade equipada.");
-            }
-            int explorer = playerManager.getSkillCountByType(player, "explorer");
-            int miner = playerManager.getSkillCountByType(player, "miner");
-            int builder = playerManager.getSkillCountByType(player, "builder");
-            lore.add(" ");
-            lore.add("§bExplorador: " + explorer + "/4 " + (explorer >= 4 ? "§a(SINERGIA ATIVA!)" : ""));
-            lore.add("§6Minerador: " + miner + "/4 " + (miner >= 4 ? "§a(SINERGIA ATIVA!)" : ""));
-            lore.add("§2Construtor: " + builder + "/4 " + (builder >= 4 ? "§a(SINERGIA ATIVA!)" : ""));
-            if (explorer >= 4) lore.add(" §b+ Velocidade Permanente");
-            if (miner >= 4) lore.add(" §6+ Haste Permanente");
-            if (builder >= 4) lore.add(" §2+ Regeneracao Permanente");
-            meta.lore(lore.stream().map(l -> (Component) Component.text(l)).toList());
-            info.setItemMeta(meta);
-        }
-        gui.setItem(4, info);
-
-        List<String> unlockedForDiff = playerManager.getUnlockedSkills(player);
-        ItemStack difficulty = new ItemStack(Material.SKELETON_SKULL);
-        ItemMeta dMeta = difficulty.getItemMeta();
-        if (dMeta != null) {
-            int count = unlockedForDiff.size();
-            double dmgMult = playerManager.getDifficultyDamageMultiplier(player);
-            double hungerMult = playerManager.getDifficultyHungerMultiplier(player);
-            dMeta.displayName(Component.text("§c§lDificuldade Mundial").decoration(TextDecoration.ITALIC, false));
-            dMeta.lore(Arrays.asList(
-                Component.text("§7Quanto mais habilidades, maior o desafio!"),
-                Component.text(" "),
-                Component.text("§7Dano recebido: §cx" + String.format("%.2f", dmgMult)),
-                Component.text("§7Fome: §cx" + String.format("%.2f", hungerMult)),
-                Component.text(" "),
-                Component.text("§8" + count + " habilidades desbloqueadas")
-            ));
-            difficulty.setItemMeta(dMeta);
-        }
-        gui.setItem(5, difficulty);
-    }
-
-    private void addDifficultyInfo(Inventory gui, Player player) {
-        // Synergy status row
-        int explorer = playerManager.getSkillCountByType(player, "explorer");
-        int miner = playerManager.getSkillCountByType(player, "miner");
-        int builder = playerManager.getSkillCountByType(player, "builder");
-
-        ItemStack passives = new ItemStack(Material.ENDER_PEARL);
-        ItemMeta meta = passives.getItemMeta();
-        if (meta != null) {
-            meta.displayName(Component.text("§5§lSinergias Ativas").decoration(TextDecoration.ITALIC, false));
-            List<Component> lore = new ArrayList<>();
-            lore.add(Component.text("§74+ habilidades do mesmo tipo = passiva global"));
-            lore.add(Component.text(" "));
-            lore.add(Component.text("§bExplorador: " + explorer + "/4 " + (explorer >= 4 ? "§a✔ Speed" : "§7-")));
-            lore.add(Component.text("§6Minerador: " + miner + "/4 " + (miner >= 4 ? "§a✔ Haste" : "§7-")));
-            lore.add(Component.text("§2Construtor: " + builder + "/4 " + (builder >= 4 ? "§a✔ Regeneracao" : "§7-")));
-            meta.lore(lore);
-            passives.setItemMeta(meta);
-        }
-        gui.setItem(6, passives);
-
-        ItemStack deathInfo = new ItemStack(Material.REDSTONE_BLOCK);
-        ItemMeta deathMeta = deathInfo.getItemMeta();
-        if (deathMeta != null) {
-            deathMeta.displayName(Component.text("§4§lMorte = Progresso Perdido!").decoration(TextDecoration.ITALIC, false));
-            deathMeta.lore(Arrays.asList(
-                Component.text("§c§l⚠ MODO ROGUE-LIKE ATIVO!"),
-                Component.text("§7Ao morrer, voce perde TODAS as"),
-                Component.text("§7habilidades, itens e XP acumulados!"),
-                Component.text(" "),
-                Component.text("§eApenas o Livro de RPG e preservado."),
-                Component.text("§4Este e o preco do poder!")
-            ));
-            deathInfo.setItemMeta(deathMeta);
-        }
-        gui.setItem(7, deathInfo);
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.getView().title().equals(Component.text(guiTitle))) return;
-
-        event.setCancelled(true);
-        Player player = (Player) event.getWhoClicked();
-        int slot = event.getSlot();
-
-        if (slot < 9 || slot >= 45) return;
-
-        String skillKey = getSkillKeyFromSlot(slot);
-        if (skillKey == null) return;
-
-        List<String> unlocked = playerManager.getUnlockedSkills(player);
-        List<String> equipped = playerManager.getEquippedSkills(player);
-        String tier = playerManager.getSkillTier(skillKey);
-        boolean isPassive = !playerManager.isSkillEquippable(skillKey);
-
-        if (!unlocked.contains(skillKey)) {
-            // Try to unlock
-            int cost = playerManager.getSkillCost(skillKey);
-            if (player.getLevel() < cost) {
-                player.sendMessage(Component.text("§cXP insuficiente! Custo: " + cost + " niveis. Voce tem: " + player.getLevel()));
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-                return;
-            }
-            player.setLevel(player.getLevel() - cost);
-            playerManager.unlockSkill(player, skillKey);
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-            player.sendMessage(Component.text("§a§l[RogueLata] §aHabilidade desbloqueada: " + playerManager.getSkillDisplayName(skillKey) + "! Gastou " + cost + " XP."));
-
-            if (isPassive) {
-                player.sendMessage(Component.text("§ePassiva ativada permanentemente!"));
-            }
-
-            openSelectionGUI(player);
-            return;
-        }
-
-        if (isPassive) {
-            player.sendMessage(Component.text("§eEsta habilidade e passiva e sempre fica ativa!"));
-            return;
-        }
-
-        if (equipped.contains(skillKey)) {
-            playerManager.unequipSkill(player, skillKey);
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
-            player.sendMessage(Component.text("§eHabilidade desequipada: " + playerManager.getSkillDisplayName(skillKey)));
-            openSelectionGUI(player);
-            return;
-        }
-
-        int tierCount = playerManager.countEquippedByTier(player, tier);
-        if (tierCount >= 3) {
-            player.sendMessage(Component.text("§cVoce ja tem 3 habilidades " + tier + " equipadas! Desequipe uma primeiro."));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-            return;
-        }
-
-        int totalEquipped = equipped.size();
-        if (totalEquipped >= 9) {
-            player.sendMessage(Component.text("§cVoce ja tem 9 habilidades equipadas (max)! Desequipe uma primeiro."));
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-            return;
-        }
-
-        playerManager.equipSkill(player, skillKey);
-        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
-        player.sendMessage(Component.text("§aHabilidade equipada: " + playerManager.getSkillDisplayName(skillKey)));
-        openSelectionGUI(player);
-    }
-
-    private String getSkillKeyFromSlot(int slot) {
-        List<String> bronze = playerManager.getAllBronzeSkills();
-        List<String> silver = playerManager.getAllSilverSkills();
-        List<String> gold = playerManager.getAllGoldSkills();
-
-        int bronzeIdx = slot - 9;
-        if (bronzeIdx >= 0 && bronzeIdx < bronze.size()) {
-            return bronze.get(bronzeIdx);
-        }
-
-        int silverIdx = slot - 18;
-        if (silverIdx >= 0 && silverIdx < silver.size()) {
-            return silver.get(silverIdx);
-        }
-
-        int goldIdx = slot - 27;
-        if (goldIdx >= 0 && goldIdx < gold.size()) {
-            return gold.get(goldIdx);
-        }
-
-        return null;
+        skillGUI.open(player);
     }
 
     @EventHandler
