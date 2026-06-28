@@ -1,6 +1,7 @@
 package com.project.rpgplugin;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -82,6 +83,86 @@ public class ClassListeners implements Listener {
     public ClassListeners(RPGPlugin plugin, PlayerManager playerManager) {
         this.plugin = plugin;
         this.playerManager = playerManager;
+        startHUDUpdater();
+    }
+
+    private void startHUDUpdater() {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                updatePlayerHUD(player);
+            }
+        }, 40L, 40L);
+    }
+
+    private void updatePlayerHUD(Player player) {
+        List<String> equipped = playerManager.getEquippedSkills(player);
+        List<String> unlocked = playerManager.getUnlockedSkills(player);
+        int totalUnlocked = unlocked.size();
+
+        if (equipped.isEmpty()) {
+            String msg = "§7[RogueLata] §cNenhuma skill equipada! Use §e/skills";
+            player.sendActionBar(Component.text(msg));
+            player.sendPlayerListHeaderAndFooter(
+                Component.text("§6§lRogueLata §7- §cSem habilidades ativas"),
+                Component.text("§eUse /skills para escolher suas skills!")
+            );
+            return;
+        }
+
+        int explorerCount = playerManager.getSkillCountByType(player, "explorer");
+        int minerCount = playerManager.getSkillCountByType(player, "miner");
+        int builderCount = playerManager.getSkillCountByType(player, "builder");
+
+        double dmgMult = playerManager.getDifficultyDamageMultiplier(player);
+        double hungerMult = playerManager.getDifficultyHungerMultiplier(player);
+
+        StringBuilder sb = new StringBuilder("§6[RogueLata] ");
+        for (String skill : equipped) {
+            String tier = playerManager.getSkillTier(skill);
+            String color;
+            switch (tier) {
+                case "bronze": color = "§6"; break;
+                case "silver": color = "§b"; break;
+                case "gold": color = "§e"; break;
+                default: color = "§7";
+            }
+            String typeColor;
+            String type = playerManager.getSkillType(skill);
+            switch (type) {
+                case "explorer": typeColor = "§b"; break;
+                case "miner": typeColor = "§6"; break;
+                case "builder": typeColor = "§2"; break;
+                default: typeColor = "§7";
+            }
+            sb.append(color).append("■").append(typeColor).append(skill.substring(0, Math.min(3, skill.length()))).append("§r ");
+        }
+        sb.append("§7(").append(equipped.size()).append("/9)");
+        sb.append(" §f| §c⬆x").append(String.format("%.2f", dmgMult));
+
+        String actionBar = sb.toString();
+        player.sendActionBar(Component.text(actionBar));
+
+        // Header: detailed breakdown
+        StringBuilder header = new StringBuilder("§6§lRogueLata§r\n");
+        header.append("§7Skills: §e").append(totalUnlocked).append("§7/§e").append(playerManager.getAllSkillKeys().size());
+        header.append(" §7| Equipadas: §a").append(equipped.size()).append("§7/§9").append(9);
+        header.append("\n§7Dificuldade: Dano §cx").append(String.format("%.2f", dmgMult));
+        header.append(" §7Fome §cx").append(String.format("%.2f", hungerMult));
+
+        StringBuilder footer = new StringBuilder();
+        footer.append("\n");
+        if (explorerCount >= 4) footer.append("§b✦ Sinergia Explorador: Speed I\n");
+        if (minerCount >= 4) footer.append("§6✦ Sinergia Minerador: Haste I\n");
+        if (builderCount >= 4) footer.append("§2✦ Sinergia Construtor: Regeneracao I\n");
+        if (explorerCount < 4 && minerCount < 4 && builderCount < 4) {
+            footer.append("§7Nenhuma sinergia ativa (4+ do mesmo tipo)\n");
+        }
+        footer.append("§e/skills §7para abrir o menu");
+
+        player.sendPlayerListHeaderAndFooter(
+            Component.text(header.toString()),
+            Component.text(footer.toString())
+        );
     }
 
     public void openSelectionGUI(Player player) {
@@ -422,6 +503,16 @@ public class ClassListeners implements Listener {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         if (item == null) return;
+
+        // Book check FIRST — works regardless of equipped skills
+        if (item.getType() == Material.BOOK) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null && meta.hasDisplayName() && meta.getDisplayName().contains("Livro de RPG")) {
+                event.setCancelled(true);
+                openSelectionGUI(player);
+                return;
+            }
+        }
 
         List<String> equipped = playerManager.getEquippedSkills(player);
         if (equipped.isEmpty()) return;
@@ -920,14 +1011,6 @@ public class ClassListeners implements Listener {
             }
         }
 
-        // Book: open RPG GUI
-        if (item.getType() == Material.BOOK) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null && meta.hasDisplayName() && meta.getDisplayName().contains("Livro de RPG")) {
-                event.setCancelled(true);
-                openSelectionGUI(player);
-            }
-        }
     }
 
     @EventHandler
