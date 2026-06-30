@@ -208,7 +208,7 @@ glass_cannon:
 - **Pool esgotado de um tier:** fallback para tier inferior; nunca slot vazio.
 - **Cartas únicas já possuídas:** `offerable` retorna false (não reaparecem).
 - **Stacking de atributos vs. teto do MC:** vida máx tem limite prático; o `StatService` deve respeitar tetos e/ou usar `scale` configurável.
-- **Power creep:** como tudo reseta na morte e a dificuldade sobe via AuraMobs + Mayhem, o acúmulo é auto-balanceado pela profundidade. Ainda assim, manter `maxStacks` e custos de reroll para não trivializar.
+- **Power creep:** como tudo reseta na morte e a dificuldade sobe por profundidade (vanilla) + Mayhem (e AuraMobs, se presente), o acúmulo é auto-balanceado pela profundidade. Ainda assim, manter `maxStacks` e custos de reroll para não trivializar.
 - **Cartas que dependem de plugin (mana/AuraSkills):** ter fallback standalone (ex: carta de mana só entra no pool se AuraSkills presente).
 - **Anti-frustração:** garantir que toda oferta tenha ao menos uma carta "útil agora" para o estado do player (heurística simples por tags do que ele já tem).
 

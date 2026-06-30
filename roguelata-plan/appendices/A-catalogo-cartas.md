@@ -159,7 +159,7 @@ Totais: **35 cartas de habilidade** + **53 augments** = **88 cartas**. Valores e
 1. **Bronze** deve ser "tempero" incremental e empilhável; nunca define a build sozinho.
 2. **Prata** abre uma direção (sustain, dps, mobility...). Stacks médios (2–3).
 3. **Ouro** define a build; quase sempre **única** (`maxStacks: 1`) e com trade-off.
-4. **Trade-offs explícitos** em cartas de risco (glass_cannon, blood_pact, vampire_lord) para casar com a dificuldade do AuraMobs/Mayhem.
+4. **Trade-offs explícitos** em cartas de risco (glass_cannon, blood_pact, vampire_lord) para casar com a dificuldade (vanilla por profundidade + Mayhem; AuraMobs opcional).
 5. **Nada permanente entre runs** — todo número é per-run (EPIC-3).
 6. **Pool mínimo viável para shipping:** as 35 abilities + ~20 augments (resto em ondas).
 7. **Anti-redundância:** cartas de mesmo efeito empilham via `maxStacks`, não viram entradas separadas.

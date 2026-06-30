@@ -24,7 +24,7 @@ Termos do RogueLata e como aparecem no código.
 | **Mundo fresco** | Teleporte aleatório distante a cada run (vs. mesmo spawn). | `core/run/SpawnResolver`, `run.yml` |
 | **Kit inicial** | Carta Bronze aleatória concedida no início da run (sabor ARAM). | `RunManager.rollInitialKit` |
 | **Phoenix** | Carta que nega a primeira morte da run (revive 1x). | `RunState.phoenixCharge`, `PlayerLifecycleListener` |
-| **Dificuldade dinâmica** | Mundo escala via AuraMobs (nível por raio) + profundidade + Mayhem (substitui o +2%/skill legado). | `DifficultyService`, `AuraMobsBridge` (EPIC-7) |
+| **Dificuldade dinâmica** | Mundo escala via **API vanilla** (profundidade da run + nível médio dos players no raio) + Mayhem (substitui o +2%/skill legado). AuraMobs é opcional e só reforça. | `DifficultyService` (vanilla); `AuraMobsBridge` opcional (EPIC-7) |
 | **Sinergia** | Bônus por acumular cartas de uma mesma tag (4/6/8). | `SynergyService` (EPIC-10) |
 | **Arquétipo** | Identidade dominante da build (tank/mobility/loot...). | `core/build/Archetype` (EPIC-10) |
 | **CollectionMenu** | Tela que mostra a build atual da run (substitui o catálogo de compra). | `ui/CollectionMenu` (EPIC-8) |

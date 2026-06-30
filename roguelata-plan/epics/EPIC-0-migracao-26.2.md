@@ -7,7 +7,7 @@
 
 ## Contexto
 
-- `pom.xml` fixa `paper-api 1.21-R0.1-SNAPSHOT` e `plugin.yml` declara `api-version: '1.21'`.
+- `pom.xml` fixa `paper-api 1.21.4-R0.1-SNAPSHOT` e `plugin.yml` declara `api-version: '1.21'`.
 - A conversa estabelece que o servidor-alvo é **26.2** e que "plugins bons de menu ainda não atualizaram pra 26.2".
 - APIs usadas hoje que mudaram/saíram nas versões recentes:
   - `org.bukkit.ChatColor` → legado; usar **Adventure** (`NamedTextColor`/MiniMessage).
@@ -77,7 +77,7 @@ InvUI v2 não é mais multi-versão (cada release casa com versões específicas
 </configuration>
 ```
 
-**CA:** servidor 26.2 sobe; `/skills` abre a GUI sem `NoClassDefFoundError`/erro de NMS. Se não houver build de InvUI para 26.2, **acionar o plano B do [EPIC-6](EPIC-6-menus.md) (abstração `GuiProvider`)** e registrar a decisão.
+**CA:** servidor 26.2 sobe; `/skills` abre a GUI sem `NoClassDefFoundError`/erro de NMS. Se não houver build de InvUI para 26.2, **acionar o plano B do [EPIC-8](EPIC-8-menus.md) (menus vanilla / abstração de GUI)** e registrar a decisão.
 
 ---
 
@@ -154,7 +154,7 @@ Criar checklist reproduzível num servidor Paper 26.2 local:
 - [ ] Ao entrar, jogador recebe o "Livro de RPG" no slot 8
 - [ ] /skills abre a GUI; abas Bronze/Prata/Ouro trocam o conteúdo
 - [ ] Desbloquear uma skill consome XP corretamente
-- [ ] Equipar/desequipar respeita limite de 3 por tier e 9 total
+- [ ] Equipar/desequipar respeita limite de 3 por tier e 9 total *(baseline 1.2.0; o draft do EPIC-2 substitui esse fluxo)*
 - [ ] Ativar uma skill (ex: dash com flor) aplica efeito e cooldown
 - [ ] Morrer reseta skills/XP e teleporta ao spawn; livro permanece
 - [ ] Tentar dropar o livro é bloqueado

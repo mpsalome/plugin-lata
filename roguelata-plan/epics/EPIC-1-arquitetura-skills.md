@@ -177,7 +177,7 @@ registry.register(new RecallSkill(services));
 // ... todas as 35
 ```
 
-> **Checklist de migração (não perder nada):** percorrer todas as skills do [Apêndice B](../appendices/B-skill-map.md). Cada skill deve preservar: item de ativação, efeito, duração/amplificador, cooldown, partícula, som, mensagem e penalidades (ex: `core_overdrive` aplica Slowness+Hunger; `dim_shift` aplica Blindness+Hunger). Passivas (`sight`, `jump_boost`, `canopy_step`, `safe_fall`) vão para `PassiveTrigger`.
+> **Checklist de migração (não perder nada):** percorrer todas as skills do [Apêndice A — Catálogo de Cartas](../appendices/A-catalogo-cartas.md). Cada skill deve preservar: item de ativação, efeito, duração/amplificador, cooldown, partícula, som, mensagem e penalidades (ex: `core_overdrive` aplica Slowness+Hunger; `dim_shift` aplica Blindness+Hunger). Passivas (`sight`, `jump_boost`, `canopy_step`, `safe_fall`) vão para `PassiveTrigger`.
 
 **CA:**
 - `SkillRegistry.size()` == número canônico de skills (35).

@@ -14,7 +14,7 @@
 | **Paper** | Servidor / API | **Obrigatório** | 1.21.4+ (alvo 26.2 no EPIC-0) | não roda |
 | **Java** | Runtime | **Obrigatório** | 21 | não compila/roda |
 | **AuraSkills** | Camada 1 (skills nativas), gates, mana abilities, reset-on-death | **Soft-dep** | 2.3.12+ | standalone: sem skills nativas/gates/mana; draft segue normal |
-| **AuraMobs** | Escala de dificuldade (nível do mob por raio) | **Soft-dep** | atual p/ AuraSkills | dificuldade cai para depth-only (`DifficultyService`) |
+| **AuraMobs** | **Reforço opcional** da dificuldade (nível do mob por raio) | **Soft-dep (extra)** | atual p/ AuraSkills | dificuldade já funciona vanilla (profundidade + vizinhança); AuraMobs só reforça |
 | **MythicMobs** | AI/skills mais ricos para bosses/mobs nomeados | **Soft-dep (extra)** | versão compatível com a do servidor | bosses/elites já funcionam via **API vanilla** (nome + BossBar + fases); MythicMobs só enriquece |
 | **ModelEngine** | Modelos 3D dos bosses (imersão sem mod) | **Soft-dep (extra)** | compatível c/ MythicMobs | boss usa a entidade base vanilla (maior via atributo `SCALE`) |
 | **InvUI** | GUI legada (`SkillGUI`) | **Em remoção** | 2.2.0 (`provided`) | após [EPIC-8](EPIC-8-menus.md), removida (menus passam a ser vanilla) |

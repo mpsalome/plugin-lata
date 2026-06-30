@@ -76,7 +76,7 @@ spawn_resolver:
 > **Recomendação (EPIC-3):** default `random_far` para "mundo fresco" por run.
 
 ### `plugin.yml` ✅
-`api-version: '1.21'` (⚠️ EPIC-0 quer **26.2**). Comandos: `skills`, `rpg [reload|reset|debug]`, `run`, `recall`. `softdepend: [AuraSkills]` (adicionar **AuraMobs** no EPIC-7). Permissão `rpg.admin`.
+`api-version: '1.21'` (⚠️ EPIC-0 quer **26.2**). Comandos: `skills`, `rpg [reload|reset|debug]`, `run`, `recall`. `softdepend: [AuraSkills]` (adicionar **AuraMobs/MythicMobs/ModelEngine** no EPIC-11). Permissão `rpg.admin`.
 
 ### `pom.xml` ✅
 `version 1.3.0`; `paper.version 1.21.4-R0.1-SNAPSHOT` (⚠️ ainda **não** é 26.2); `invui 2.2.0` **provided** (EPIC-8 quer remover); `auraskills-api-bukkit 2.3.12` provided; JUnit 5.10.2; surefire 3.2.5; shade ativo (mas InvUI não é mais empacotada).

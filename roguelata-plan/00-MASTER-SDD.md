@@ -3,16 +3,16 @@
 **Documento mestre / fonte da verdade**
 **Projeto:** RogueLata — addon roguelike para Minecraft
 **Repositório:** https://github.com/mpsalome/plugin-lata
-**Versão atual:** 1.2.0 · **Alvo:** Paper **26.2** · **Java 21** · **Maven**
+**Versão atual:** 1.3.0 (código) · **Alvo de plataforma:** Paper **26.2** (hoje em 1.21.4 — ver EPIC-0) · **Java 21** · **Maven**
 **Última revisão de design:** 2026-06-29
 
-> Este documento substitui o rascunho de alto nível em [`../ROGUELATA_SDD.md`](../ROGUELATA_SDD.md). Cada épico tem arquivo dedicado em [`epics/`](epics/) e o catálogo completo de cartas está em [`appendices/A-catalogo-cartas.md`](appendices/A-catalogo-cartas.md).
+> Documento mestre e **fonte da verdade**. Cada épico tem arquivo dedicado em [`epics/`](epics/) e o catálogo completo de cartas está em [`appendices/A-catalogo-cartas.md`](appendices/A-catalogo-cartas.md).
 
 ---
 
 ## 1. Visão do produto (pós-revisão de game design)
 
-RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada morte = uma run nova e diferente**, no espírito de **ARAM Mayhem / Modo Arena do LoL** — builds emergem de **drafts aleatórios**, não de uma loja otimizável, e o caos cresce conforme a run avança.
+RogueLata é um **plugin roguelike** que roda **standalone com Paper** e opcionalmente integra AuraSkills/AuraMobs/MythicMobs. O loop: **cada morte = uma run nova e diferente**, no espírito de **ARAM Mayhem / Modo Arena do LoL** — builds emergem de **drafts aleatórios**, não de uma loja otimizável, e o caos cresce conforme a run avança.
 
 ### 1.1 As 3 camadas de progressão (decisão central)
 
@@ -31,8 +31,9 @@ RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada 
 │   Cada milestone atingido adiciona uma regra maluca que fica até  │
 │   o fim da run. A run começa normal e vira caos crescente.        │
 └─────────────────────────────────────────────────────────────────┘
-        Dificuldade base escala via AURAMOBS (nível do mob pela
-        média de nível dos players no raio) + spikes dos modificadores.
+        Dificuldade escala via API VANILLA (profundidade da run +
+        nível médio dos players no raio) + spikes dos modificadores.
+        AuraMobs é opcional e só reforça esse scaling.
 ```
 
 ### 1.2 Pilares de design
@@ -42,7 +43,7 @@ RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada 
 | P1 | **Variância vem de aleatoriedade controlada** | Build montada por **draft 1-de-3**, não por compra livre de catálogo |
 | P2 | **Reset total na morte** | Nada de poder persiste entre runs; cada run é do zero (sem meta-progressão) |
 | P3 | **Caos crescente** | Modificadores acumulam por milestone (estilo Mayhem) |
-| P4 | **Dificuldade pelo mundo, não pela punição** | AuraMobs escala mobs por nível; jogador não é punido por usar o sistema |
+| P4 | **Dificuldade pelo mundo, não pela punição** | mundo escala via API vanilla (profundidade + vizinhança); AuraMobs opcional reforça; jogador não é punido por usar o sistema |
 | P5 | **Toda run tem clímax** | Condição de **vitória** (boss/objetivo), não só de derrota |
 | P6 | **Recompensa por investimento dentro da run** | Camada AuraSkills premia quem foca uma atividade |
 | P7 | **Standalone-first** | Funciona sem AuraSkills/AuraMobs; integrações são soft |
@@ -54,7 +55,7 @@ RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada 
 | Comprar skill com XP num catálogo | **Draftar 1 de 3 cartas** a cada X níveis |
 | Equipar 9 (3 por tier), gerenciar loadout | **Acumular** tudo que draftou na run (sem loadout) |
 | Tiers = preço na loja | Tiers = **raridade da carta** (peso escala com nível) |
-| Dificuldade +2%/skill desbloqueada (pune engajamento) | Dificuldade via **AuraMobs** (profundidade) + modificadores |
+| Dificuldade +2%/skill desbloqueada (pune engajamento) | Dificuldade via **API vanilla** (profundidade + vizinhança) + modificadores; AuraMobs opcional |
 | Só condição de derrota (morte) | **Vitória (boss/objetivo)** + derrota |
 | Sem caos por run | **Modificadores Mayhem** cumulativos |
 | 35 skills hardcoded em if-else | 35 skills viram **cartas de habilidade** no pool, data-driven |
@@ -72,7 +73,7 @@ RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada 
 | EPIC-4 | Modificadores "Mayhem" por milestone | F2 | [epics/EPIC-4-mayhem-modificadores.md](epics/EPIC-4-mayhem-modificadores.md) |
 | EPIC-5 | Gatilhos por gameplay (distância, recall, gates) | F3 | [epics/EPIC-5-gameplay-triggers.md](epics/EPIC-5-gameplay-triggers.md) |
 | EPIC-6 | Integração AuraSkills (loja nativa + mana) | F3 | [epics/EPIC-6-auraskills.md](epics/EPIC-6-auraskills.md) |
-| EPIC-7 | AuraMobs, dificuldade, custom mobs & bosses (vitória) | F3 | [epics/EPIC-7-auramobs-mobs-bosses.md](epics/EPIC-7-auramobs-mobs-bosses.md) |
+| EPIC-7 | Dificuldade, elites & bosses (vanilla-first), vitória | F3 | [epics/EPIC-7-auramobs-mobs-bosses.md](epics/EPIC-7-auramobs-mobs-bosses.md) |
 | EPIC-8 | Menus & GUI (draft menu premium) | F4 | [epics/EPIC-8-menus.md](epics/EPIC-8-menus.md) |
 | EPIC-9 | Dados, cooldowns, performance, persistência | F1 | [epics/EPIC-9-dados-performance.md](epics/EPIC-9-dados-performance.md) |
 | EPIC-10 | Builds/sinergias/tags + Qualidade (i18n, testes, CI) | F4/F5 | [epics/EPIC-10-builds-qualidade.md](epics/EPIC-10-builds-qualidade.md) |
@@ -153,7 +154,7 @@ com.project.rpgplugin
 │   │   ├── MilestoneService.java
 │   │   └── MayhemService.java
 │   ├── progression/                # EPIC-5 — distância, recall, gates
-│   ├── difficulty/                 # escalonamento (delegado a AuraMobs quando presente)
+│   ├── difficulty/                 # escalonamento vanilla (profundidade + vizinhança); AuraMobs opcional
 │   ├── build/                      # EPIC-10 — arquétipos/sinergias por tags
 │   └── mob/                        # EPIC-7 — custom mobs + bosses (vitória)
 ├── data/                           # EPIC-9 — PlayerProfile, DataStore, CooldownService

@@ -115,7 +115,7 @@ Acumular várias cartas da **mesma tag** ativa **sinergias** (bônus crescentes 
 
 O mundo **escala com você** — não é punição, é o mundo subindo de nível junto:
 
-- 🧟 **Mobs mais fortes** conforme o nível médio dos jogadores na região (via AuraMobs)
+- 🧟 **Mobs mais fortes** conforme a profundidade da run e o nível médio dos jogadores na região (nativo; o AuraMobs, se instalado, reforça isso)
 - 📈 **Profundidade da run** (tempo, distância, marcos) aumenta o desafio
 - 🎲 **Mayhem** adiciona picos de caos
 - ⚠️ **Cartas de risco** (ex: Canhão de Vidro) — *você* escolhe mais perigo por mais recompensa
