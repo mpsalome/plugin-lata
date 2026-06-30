@@ -1,136 +1,271 @@
 # 🎲 RogueLata
 
-**Plugin Rogue-Like com sistema de habilidades em 3 tiers para Minecraft Paper 1.21+**
+**Addon roguelike para Minecraft — toda morte é um recomeço, toda run é uma build nova.**
+Inspirado no caos do **ARAM Mayhem** e no draft do **Modo Arena** do LoL. Construído sobre o [AuraSkills](https://www.spigotmc.org/resources/auraskills.81069/) + [AuraMobs](https://wiki.aurelium.dev/auramobs/).
 
-## Conceito
+> Plataforma: Paper 1.21.4+ · Java 21 · funciona em modo standalone ou integrado ao AuraSkills/AuraMobs.
 
-RogueLata transforma o Minecraft em uma experiencia rogue-like onde voce escolhe habilidades individualmente (sem classes fixas) em 3 tiers. Quanto mais habilidades voce desbloqueia, maior o desafio. **Ao morrer, tudo e perdido.**
+---
 
-## Sistema de Habilidades
+## 🎯 O que é
 
-### 3 Tiers (35 habilidades no total)
+RogueLata transforma o Minecraft numa experiência **roguelike**: você não monta uma build fixa de uma vez — você a **drafta** ao longo da run, escolhendo cartas aleatórias. Quanto mais fundo você vai, mais forte fica... e mais o mundo enlouquece. **Ao morrer, você perde tudo e recomeça do zero — com uma build completamente diferente.**
 
-| Tier | Custo XP | Max Equipadas | Habilidades |
-|------|----------|---------------|-------------|
-| **Bronze** | 1 XP | 3 | 11 |
-| **Prata** | 3 XP | 3 | 11 |
-| **Ouro** | 5 XP | 3 | 13 |
+Não existe "build ótima" para decorar. Cada run é uma história curta e única.
 
-Voce pode equipar ate **9 habilidades simultaneamente** (3 de cada tier).
+---
 
-### Lista Completa de Habilidades
+## ⚡ Como funciona (resumo)
 
-#### 🥉 Bronze (1 XP)
+1. Você joga normalmente e **ganha níveis**.
+2. A cada poucos níveis, abre um **Draft**: escolha **1 de 3 cartas** aleatórias.
+3. As cartas se **acumulam** e formam sua build (habilidades + bônus).
+4. Conforme você progride, o mundo fica mais difícil e surgem **regras malucas (Mayhem)**.
+5. **Derrote o boss** para vencer a run — ou **morra** e perca tudo.
+6. Renasceu? **Nova run, build nova.** Repete.
 
-| Habilidade | Tipo | Descricao |
-|------------|------|-----------|
-| Dash das Flores | Explorador | Consuma flor para dashes com Speed II e Invisibilidade |
-| Hidratacao | Explorador | Garrafas de agua enchem fome e saturacao |
-| Passo Agil | Explorador | Consuma acucar para Speed II por 15s |
-| Salto Escalador | Explorador | Consuma slimeball para salto frontal |
-| Dieta de Carvao | Minerador | Alimente-se de carvao para recuperar fome |
-| Quebra-Pedra | Minerador | Quebre pedra mais rapido segurando pedregulho |
-| Luz de Tocha | Minerador | Consuma tocha para Visao Noturna 30s |
-| Banquete de Folhas | Construtor | Alimente-se de folhas diretamente |
-| Lenhador Rapido | Construtor | Trigo com machado da Haste I por 10s |
-| Toque de Seda Manual | Construtor | Colete blocos frágeis de mao vazia |
-| Salto do Andaime | Construtor | Pula alto gerando blocos temporarios |
+---
 
-#### 🥈 Prata (3 XP)
+# 📜 Regras do Jogo (para Players)
 
-| Habilidade | Tipo | Descricao |
-|------------|------|-----------|
-| Escudo Anti-Queda | Explorador | Anula dano de queda com Slow Falling |
-| Respiracao Aquatica | Explorador | Consuma Lapis Lazuli para respirar na agua |
-| Super Salto | Explorador | Salto passivo permanente |
-| Escudo de Lava | Explorador | Magma cream da Fire Resistance por 15s |
-| Radar de Minerio | Minerador | Mapeia minerios proximos com particulas |
-| Febre do Ouro | Minerador | Consuma ouro com picareta para Haste II |
-| Passo da Canopia | Construtor | Speed II ao pisar em folhas ou grama |
-| Adubo Verde | Construtor | Farinha de osso cresce plantas ao redor |
-| Escudo Floral | Construtor | Consuma flor para regenerar 8 de vida |
-| Foco do Arquiteto | Construtor | Resistencia IV por 30s com penalty |
-| Desafio Gravitacional | Construtor | Flutue no ar temporariamente |
+Leia isto antes de jogar. É simples, mas muda tudo em relação ao Minecraft normal.
 
-#### 🥇 Ouro (5 XP)
+## 1. O ciclo de uma run
 
-| Habilidade | Tipo | Descricao |
-|------------|------|-----------|
-| Recall do Dragao | Explorador | Teleporta ao spawn do mundo |
-| Sonar de Eco | Explorador | Revela entidades proximas com particulas |
-| Mudanca Dimensional | Explorador | Teletransporte dimensional avancado |
-| Explosao de Vento | Explorador | Ejetado ao ceu com explosao de vento |
-| Visao Noturna | Minerador | Visao noturna permanente |
-| Reparo de Minerio | Minerador | Use ferro para reparar 30% da picareta |
-| Toque de Fusao | Minerador | Funde minerios automaticamente por 30s |
-| Transmutacao | Minerador | Transmute metais em itens nobres |
-| Escudo Gravitacional | Minerador | Resistencia III ao consumir obsidiana |
-| Sobrecarga do Nucleo | Minerador | Haste III e Forca II com penalty |
-| Graca da Pena | Construtor | Pule alto com queda lenta |
+Uma **run** é uma vida. Ela começa quando você nasce/renasce e termina quando você **morre** (derrota) ou **derrota o boss final** (vitória). Tudo que você conquista — cartas, níveis, poderes — vale **só para a run atual**.
 
-### Tipos de Habilidade
+## 2. 💀 Morte = reset total
 
-Cada habilidade pertence a um dos 3 tipos:
+Ao morrer, você **perde absolutamente todo o seu poder**:
 
-- **Explorador** (azul) - Mobilidade e exploracao
-- **Minerador** (dourado) - Mineracao e recursos
-- **Construtor** (verde) - Construcao e natureza
+- 🃏 Todas as **cartas** draftadas
+- 📊 Todos os **níveis e XP** (inclusive das skills do AuraSkills: Mining, Agility, etc.)
+- 🎲 Todos os **modificadores Mayhem** acumulados
+- 🎒 Todos os **itens de habilidade**
+- 🔁 Cooldowns, progresso de recall e bônus
 
-## Sistema Rogue-Like
+**O que você mantém:** apenas o **Livro de RPG** (sua ferramenta para abrir o menu). Você renasce e começa uma run limpa.
 
-### Morte = Progresso Perdido
+> Não tem meta-progressão: nada de poder passa de uma run para a outra. É a graça do roguelike.
 
-Ao morrer:
-- Todas as habilidades sao perdidas
-- Todo XP e perdido
-- Voce retorna ao spawn do mundo
-- Apenas o Livro de RPG e preservado
+## 3. 🧱 As 3 camadas de poder
 
-### Dificuldade Dinamica
+Sua força numa run vem de três fontes que se somam:
 
-Quanto mais habilidades voce desbloqueia, maior o desafio:
+| Camada | O que é | Como evolui |
+|--------|---------|-------------|
+| **1. Skills do AuraSkills** | Recompensa por dedicação | Minerar sobe Mining, andar sobe Agility... e isso **libera cartas** (gates) |
+| **2. Draft de cartas** | A alma roguelike | A cada X níveis, escolha 1 de 3 cartas aleatórias |
+| **3. Mayhem** | O caos | A cada marco, o mundo ganha uma regra maluca nova |
 
-- **Dano recebido**: Aumenta +2% por habilidade desbloqueada
-- **Fome**: Aumenta +1.5% por habilidade desbloqueada
-- Isso cria um equilibrio risco-recompensa: mais poder = mais perigo
+## 4. 🃏 O Draft (escolha 1 de 3)
 
-## Sistema de Sinergia
+A cada **X níveis** (padrão: 3), o jogo abre um menu com **3 cartas aleatórias**. Você escolhe **uma**. Não dá para comprar do catálogo inteiro nem trocar depois — a variedade vem justamente do que o jogo te oferece.
 
-Quando voce equipa **4+ habilidades do mesmo tipo**, uma passiva global e ativada:
+- As cartas se **acumulam**. Algumas podem ser pegas **várias vezes** (empilham).
+- 🔄 **Reroll:** re-sortear as 3 cartas pagando um custo (limitado por draft).
+- ⏭️ **Pular:** se nenhuma agradar, pule e ganhe um bônus (ex: vida/mana).
 
-| Tipo | Bonus (4+) |
-|------|------------|
-| Explorador | Speed I Permanente |
-| Minerador | Haste I Permanente |
-| Construtor | Regeneracao I Permanente |
+## 5. 🥉🥈🥇 Tiers = raridade
 
-## Comandos
+Cada carta tem um tier, que é a sua **raridade**. Quanto **mais alto seu nível**, maior a chance de aparecer carta de tier alto — mas tier alto pode pintar cedo (raro!):
 
-| Comando | Descricao | Permissao |
+| Seu nível | 🥉 Bronze | 🥈 Prata | 🥇 Ouro |
+|-----------|-----------|----------|---------|
+| 1–9 | 80% | 18% | 2% |
+| 10–19 | 60% | 30% | 10% |
+| 20–29 | 40% | 40% | 20% |
+| 30+ | 25% | 40% | 35% |
+
+- 🥉 **Bronze** — bônus pequenos, empilháveis (o "tempero" da build)
+- 🥈 **Prata** — abrem uma direção (sustain, dano, mobilidade...)
+- 🥇 **Ouro** — definem a build, quase sempre únicas e com trade-off
+
+## 6. 🎨 Tipos, tags e sinergias
+
+Cada carta tem **tags**. As três principais são os tipos clássicos:
+
+- 🔵 **Explorador** — mobilidade e exploração
+- 🟡 **Minerador** — mineração e recursos
+- 🟢 **Construtor** — construção e natureza
+
+Acumular várias cartas da **mesma tag** ativa **sinergias** (bônus crescentes em 4/6/8 cartas). Quer ser tanque? Junte cartas `TANK`. Quer farmar? Junte `LOOT`. A build emerge das suas escolhas no draft.
+
+## 7. 🔥 Dificuldade dinâmica
+
+O mundo **escala com você** — não é punição, é o mundo subindo de nível junto:
+
+- 🧟 **Mobs mais fortes** conforme o nível médio dos jogadores na região (via AuraMobs)
+- 📈 **Profundidade da run** (tempo, distância, marcos) aumenta o desafio
+- 🎲 **Mayhem** adiciona picos de caos
+- ⚠️ **Cartas de risco** (ex: Canhão de Vidro) — *você* escolhe mais perigo por mais recompensa
+
+## 8. 🌪️ Modificadores Mayhem
+
+A cada **marco** que o grupo atinge (ex: níveis 10, 20, 30...), o mundo ganha uma **regra maluca permanente** para o resto da run — e elas **acumulam**. A run começa tranquila e vira caos total. Exemplos:
+
+- 🌙 **Noite Eterna** — o tempo trava na noite
+- 🔥 **Mobs em Chamas** — mobs pegam fogo e te incendeiam
+- 🩸 **Lua de Sangue** — mobs muito mais fortes e numerosos (recompensa alta)
+- 🪶 **Gravidade Baixa** — todos pulam mais alto e caem devagar
+- 💎 **XP em Dobro**, 🪞 **Mobs Espelho**, ⏳ **Distorção do Tempo**... e mais.
+
+Quanto mais fundo, mais pesados os modificadores que podem sair.
+
+## 9. 🏆 Vitória
+
+Diferente do Minecraft normal, aqui dá para **vencer** uma run: **derrote o boss final** (ex: o **Frostmaw**) ou cumpra o objetivo da run. A vitória encerra a run com glória — e aí começa uma nova.
+
+## 10. 🌀 Recall por distância
+
+A carta **Recall do Dragão** te leva de volta ao spawn — mas só depois de **andar uma certa distância**, e o requisito **cresce a cada uso** (ex: 2000 → 3000 → 4500 blocos). Use com sabedoria; não é teleporte grátis.
+
+## 11. 🐦‍🔥 Fênix e Kit Inicial
+
+- **Fênix** (carta Ouro): te **revive uma vez** na run. Morreu com ela? Você volta com 1 de vida e a carta é consumida.
+- **Kit inicial:** ao começar uma run, você pode receber **uma carta Bronze aleatória** para já começar com um sabor diferente (estilo ARAM).
+
+## 12. 💡 Dicas de build
+
+- Foque uma atividade (minerar/andar) para acelerar os **gates** daquela linha de cartas.
+- Cartas Bronze empilháveis (vida, velocidade, %XP) somam muito ao longo da run.
+- Combine tags iguais para destravar **sinergias**.
+- Cartas de risco compensam quando você já tem **sustain** (cura/vida) para bancar.
+
+---
+
+# 🃏 Catálogo de Cartas
+
+## ⚡ Habilidades
+
+### 🥉 Bronze
+| Carta | Tipo | Efeito |
+|-------|------|--------|
+| Dash das Flores | Explorador | Speed II + Invisibilidade temporária |
+| Hidratação | Explorador | Garrafa d'água enche fome e saturação |
+| Passo Ágil | Explorador | Speed II por 15s |
+| Salto Escalador | Explorador | Impulso pra frente e pra cima |
+| Dieta de Carvão | Minerador | Coma carvão para recuperar fome |
+| Quebra-Pedra | Minerador | Quebra pedra mais rápido |
+| Luz de Tocha | Minerador | Visão Noturna por 30s |
+| Banquete de Folhas | Construtor | Coma folhas para recuperar fome |
+| Lenhador Rápido | Construtor | Haste I com machado |
+| Toque de Seda Manual | Construtor | Coleta blocos frágeis com a mão |
+| Salto do Andaime | Construtor | Salto + bloco temporário |
+
+### 🥈 Prata
+| Carta | Tipo | Efeito |
+|-------|------|--------|
+| Escudo Anti-Queda | Explorador | Anula/reduz dano de queda |
+| Respiração Aquática | Explorador | Respira embaixo d'água |
+| Super Salto | Explorador | Pulo aumentado permanente |
+| Escudo de Lava | Explorador | Resistência a fogo por 15s |
+| Radar de Minério | Minerador | Marca minérios próximos |
+| Febre do Ouro | Minerador | Haste II ao minerar |
+| Passo da Canópia | Construtor | Speed II em folhas/grama |
+| Adubo Verde | Construtor | Faz plantas crescerem ao redor |
+| Escudo Floral | Construtor | Cura ao consumir flor |
+| Foco do Arquiteto | Construtor | Resistência IV (com penalidade) |
+| Desafio Gravitacional | Construtor | Flutua brevemente |
+
+### 🥇 Ouro
+| Carta | Tipo | Efeito |
+|-------|------|--------|
+| Recall do Dragão | Explorador | Teleporta ao spawn após andar X blocos (custo crescente) |
+| Sonar de Eco | Explorador | Revela entidades próximas |
+| Mudança Dimensional | Explorador | Teleporte + Speed IV (com penalidades) |
+| Explosão de Vento | Explorador | Lançado para o alto |
+| Visão Noturna | Minerador | Visão noturna permanente |
+| Reparo de Minério | Minerador | Repara 30% da picareta |
+| Toque de Fusão | Minerador | Funde minérios automaticamente |
+| Transmutação | Minerador | Converte metais (5 ferro→ouro, 5 ouro→diamante) |
+| Escudo Gravitacional | Minerador | Resistência III |
+| Sobrecarga do Núcleo | Minerador | Haste III + Força II (com penalidade) |
+| Graça da Pena | Construtor | Super salto + queda lenta |
+| Golpe do Lenhador | Construtor | Haste IV por 5s |
+| Bloco Reforçado | Construtor | Torna um bloco indestrutível por 15s |
+
+## ✦ Augments
+
+### 🥉 Bronze
+| Carta | Efeito |
+|-------|--------|
+| Vigor | +1 coração máximo (empilha até 10) |
+| Aprendiz | +10% de XP (empilha) |
+| Passada Leve | +velocidade (empilha) |
+| Pele Dura | +armadura (empilha) |
+| Mãos Rápidas | −5% de cooldown das cartas (empilha) |
+| Aterrissagem Suave | −dano de queda (empilha) |
+| Bom de Garfo | Fome cai mais devagar |
+| Catador | Chance de drop extra de mobs |
+| Recuperação | Regeneração lenta fora de combate |
+| Punho do Minerador | Mineração mais rápida |
+| Dedo Verde | Colheitas rendem mais |
+| Olho Atento | Minérios próximos brilham |
+| Aquecimento | +dano no início do combate |
+| Areia nos Olhos | Chance de cegar quem te ataca |
+
+### 🥈 Prata
+| Carta | Efeito |
+|-------|--------|
+| Constituição | +2 corações máximos (empilha) |
+| Sanguessuga | Cura parte do dano causado |
+| Fúria | +dano com pouca vida |
+| Espinhos | Reflete dano corpo a corpo |
+| Pulo Duplo | Um segundo salto no ar |
+| Bateria de Dash | +cargas/−cooldown de dash |
+| Golpe Crítico | Chance de dano crítico |
+| Cobiça | Chance de dobrar drop de minério |
+| Forja Interna | Funde minério ao quebrar |
+| Ímã | Atrai itens próximos |
+| Reservatório | +mana (com AuraSkills) |
+| Fôlego Extra | Absorção ao quase morrer |
+| Estudioso | +25% de XP |
+| Vento nos Pés | +velocidade |
+
+### 🥇 Ouro
+| Carta | Efeito |
+|-------|--------|
+| Colosso | +4 corações máximos |
+| Canhão de Vidro | +40% dano causado, +30% recebido |
+| Lorde Vampiro | Cura 15% do dano; queima ao sol |
+| Carrasco | Executa mobs com pouca vida |
+| Sobrecarga | A cada 5º acerto, dano em área |
+| Toque de Midas | Mobs dropam ouro/esmeralda |
+| Fênix | Revive 1x na run |
+| Colheita de Almas | Kills curam e dão mana |
+| Corrente Elétrica | Ataques saltam entre inimigos |
+| Gigante | Maior, mais vida e dano, mais lento |
+| Distorção Temporal | Lentidão nos mobs ao levar dano |
+| Ganância | Próximos drafts oferecem 4 cartas |
+| Pacto de Sangue | +dano, −vida máxima |
+
+> O catálogo é configurável e está em expansão. Cartas com trade-off pesado são propositais — são as que mudam a run.
+
+---
+
+## 🎮 Comandos
+
+| Comando | Descrição | Permissão |
 |---------|-----------|-----------|
-| `/skills` | Abre o menu de selecao de habilidades | Todos |
-| `/rpg` | Recebe o Livro de RPG | Todos |
-| `/rpg reload` | Recarrega configuracao | rpg.admin |
-| `/rpg reset` | Reseta todos os dados do jogador | rpg.admin |
+| `/skills` | Abre o menu da sua build/coleção da run | Todos |
+| `/run` | Mostra informações da run atual | Todos |
+| `/recall` | Usa o Recall (se disponível por distância) | Todos |
+| `/rpg` | Recebe o Livro de RPG se não tiver | Todos |
+| `/rpg reload` | Recarrega a configuração | `rpg.admin` |
+| `/rpg reset` | Reseta os dados RPG do jogador | `rpg.admin` |
+| `/rpg debug` | Mostra o estado interno da run | `rpg.admin` |
 
-## Instalacao
+---
 
-1. Baixe o JAR mais recente
-2. Coloque em `plugins/` do seu servidor Paper 1.21.4+ (26.2)
-3. Coloque `InvUI.jar` em `plugins/` (necessario para os menus)
-4. **(Opcional)** Coloque `AuraSkills.jar` e `AuraMobs.jar` em `plugins/` para integracao completa
-5. Reinicie o servidor
-6. Use `/skills` para comecar
+## 🧩 Integrações
 
-> **Nota**: RogueLata funciona standalone sem AuraSkills. Com AuraSkills, as 35 habilidades custom sao registradas sob o namespace `roguelata/` e desbloqueadas automaticamente ao atingir certos niveis nas skills padrao (Agility, Mining, Foraging, etc.).
+- **AuraSkills** (recomendado): habilita as skills nativas (Mining, Agility, Foraging...) como recompensa por dedicação, os **gates** que liberam cartas e o reset de skills na morte.
+- **AuraMobs** (recomendado): escala a dificuldade dos mobs pelo nível médio dos jogadores na região.
 
-## Configuracao
+> Sem esses plugins, o RogueLata roda em **modo standalone** — o draft, o reset na morte e o Mayhem continuam funcionando.
 
-O plugin possui configuracao padrao via `config.yml` (gerado na primeira execucao). Use `/rpg reload` para recarregar.
-
-### AuraSkills (Recomendado)
-
-Para reset completo na morte, configure em `plugins/AuraSkills/config.yml`:
+### Configuração recomendada do AuraSkills (`plugins/AuraSkills/config.yml`)
 ```yaml
 on_death:
   reset_skills: true
@@ -138,56 +273,38 @@ on_death:
   reset_xp_ratio: 0.0
 ```
 
-### AuraMobs
+---
 
-Adicione `AuraMobs.jar` em `plugins/` para mobs com nivel baseado nas skills dos jogadores. Baixe em: https://wiki.aurelium.dev/auramobs/
+## 📦 Instalação
 
-## Permissoes
+1. Baixe o `RogueLata.jar` mais recente.
+2. (Opcional, recomendado) instale `AuraSkills` e `AuraMobs` em `plugins/`.
+3. Coloque o `RogueLata.jar` em `plugins/` do seu servidor Paper (Java 21).
+4. Reinicie o servidor.
+5. Entre no jogo, use `/skills` e comece sua primeira run.
 
-```
-rpg.admin:
-  description: Permite recarregar/resetar o plugin
-  default: op
-```
+---
 
-## Marcador de Skills Custom
+## ⚙️ Configuração
 
-Todas as habilidades do RogueLata sao registradas no AuraSkills sob o namespace `roguelata/` (ex: `roguelata/dash`, `roguelata/stone_smash`).
-Isso serve como marcador visual para identificar quais skills sao nossas vs. as padrao do AuraSkills.
+Arquivos em `plugins/RogueLata/`:
 
-**Progression Gates** - Skills sao desbloqueadas ao atingir certos niveis:
-- Explorador: Agility level 2-16
-- Minerador: Mining level 2-20 + Enchanting 15
-- Construtor: Foraging level 2-26
+| Arquivo | Para quê |
+|---------|----------|
+| `config.yml` / `skills.yml` | Parâmetros das habilidades (durações, cooldowns) |
+| `draft.yml` | Frequência do draft, pesos por tier, reroll, skip |
+| `augments.yml` | Catálogo de cartas de augment |
+| `gates.yml` | Quais skills/níveis liberam quais cartas |
+| `mayhem.yml` | Modificadores, marcos e severidade |
+| `run.yml` | Onde o jogador renasce (spawn / ponto aleatório) |
 
-## Desenvolvimento
+Use `/rpg reload` após editar.
 
-### Build
+---
+
+## 🛠️ Build (desenvolvedores)
 
 ```bash
 mvn clean package
 ```
-
-O JAR sera gerado em `target/RogueLata-${project.version}.jar`.
-
-### Dependencias
-
-- Paper API 1.21.4 (Paper 26.2)
-- AuraSkills API 2.3.12 (optional, compile-only)
-- Java 21
-- Maven 3.9+
-
-### Estrutura do Projeto
-
-```
-src/main/java/com/project/rpgplugin/
-├── RPGPlugin.java              # Entry point e comandos
-├── PlayerManager.java          # Dados persistentes e metadados das skills
-├── SkillGUI.java               # GUI InvUI de selecao de habilidades
-├── ClassListeners.java         # Eventos, ativacao de skills e HUD
-└── AuraSkillsIntegration.java  # Ponte com AuraSkills (namespace roguelata/)
-```
-
-## Licenca
-
-MIT
+O JAR é gerado em `target/`. Requisitos: Java 21, Maven 3.9+, Paper API.
