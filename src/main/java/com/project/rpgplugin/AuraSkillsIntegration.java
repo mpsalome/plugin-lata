@@ -1,5 +1,6 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.core.progression.GateRegistry;
 import dev.aurelium.auraskills.api.AuraSkillsApi;
 import dev.aurelium.auraskills.api.event.skill.SkillLevelUpEvent;
 import dev.aurelium.auraskills.api.item.ItemContext;
@@ -25,6 +26,7 @@ public class AuraSkillsIntegration implements Listener {
 
     private final RPGPlugin plugin;
     private final PlayerManager playerManager;
+    private final GateRegistry gateRegistry;
     private AuraSkillsApi auraSkills;
     private NamespacedRegistry registry;
     private boolean enabled;
@@ -32,13 +34,10 @@ public class AuraSkillsIntegration implements Listener {
     // All our custom skill keys registered in AuraSkills
     private final Set<String> registeredSkillKeys = new HashSet<>();
 
-    // Map of AuraSkills default skill + level -> RogueLata skill to unlock
-    // e.g., Skills.MINING at level 5 -> "stone_smash"
-    private final Map<ProgressionGate, List<String>> progressionGates = new LinkedHashMap<>();
-
-    public AuraSkillsIntegration(RPGPlugin plugin, PlayerManager playerManager) {
+    public AuraSkillsIntegration(RPGPlugin plugin, PlayerManager playerManager, GateRegistry gateRegistry) {
         this.plugin = plugin;
         this.playerManager = playerManager;
+        this.gateRegistry = gateRegistry;
         this.enabled = false;
 
         Plugin asPlugin = Bukkit.getPluginManager().getPlugin("AuraSkills");
@@ -51,7 +50,6 @@ public class AuraSkillsIntegration implements Listener {
             this.auraSkills = AuraSkillsApi.get();
             this.registry = auraSkills.useRegistry(NAMESPACE, plugin.getDataFolder());
             registerCustomSkills();
-            setupProgressionGates();
             Bukkit.getPluginManager().registerEvents(this, plugin);
             this.enabled = true;
             plugin.getLogger().info("AuraSkills integrado com sucesso! " + registeredSkillKeys.size() + " skills registradas.");
@@ -78,49 +76,6 @@ public class AuraSkillsIntegration implements Listener {
         }
     }
 
-    private void setupProgressionGates() {
-        // Explorer skills -> Agility levels
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 2), List.of("dash"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 4), List.of("step_assist"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 6), List.of("grapple"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 8), List.of("safe_fall"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 10), List.of("jump_boost"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 12), List.of("wind_burst"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 14), List.of("dim_shift"));
-        progressionGates.put(new ProgressionGate(Skills.AGILITY, 16), List.of("sonar"));
-        progressionGates.put(new ProgressionGate(Skills.FIGHTING, 10), List.of("recall"));
-        progressionGates.put(new ProgressionGate(Skills.FIGHTING, 5), List.of("thermal_resistance"));
-        progressionGates.put(new ProgressionGate(Skills.FIGHTING, 8), List.of("water_breathing"));
-
-        // Miner skills -> Mining levels
-        progressionGates.put(new ProgressionGate(Skills.MINING, 2), List.of("stone_smash"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 4), List.of("torch_light"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 5), List.of("diet"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 7), List.of("ore_sonar"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 10), List.of("haste"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 12), List.of("sight"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 14), List.of("ore_repair"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 16), List.of("molten_touch"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 18), List.of("gravity_shield"));
-        progressionGates.put(new ProgressionGate(Skills.MINING, 20), List.of("core_overdrive"));
-        progressionGates.put(new ProgressionGate(Skills.ENCHANTING, 15), List.of("transmutation"));
-
-        // Builder skills -> Foraging levels
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 2), List.of("feast"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 4), List.of("woodcutter"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 5), List.of("canopy_step"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 7), List.of("fertilize"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 10), List.of("flora_shield"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 12), List.of("scaffold"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 14), List.of("silk_touch"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 16), List.of("lumberjack"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 18), List.of("architect_focus"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 20), List.of("grace"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 22), List.of("unbreakable_block"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 24), List.of("gravity_defiance"));
-        progressionGates.put(new ProgressionGate(Skills.FORAGING, 26), List.of("hydration"));
-    }
-
     @EventHandler
     public void onSkillLevelUp(SkillLevelUpEvent event) {
         if (!enabled) return;
@@ -130,19 +85,7 @@ public class AuraSkillsIntegration implements Listener {
         Skill skill = event.getSkill();
         int level = event.getLevel();
 
-        for (Map.Entry<ProgressionGate, List<String>> entry : progressionGates.entrySet()) {
-            ProgressionGate gate = entry.getKey();
-            if (gate.skill.equals(skill) && level >= gate.level) {
-                for (String rogueKey : entry.getValue()) {
-                    if (!playerManager.hasSkill(player, rogueKey)) {
-                        playerManager.unlockSkill(player, rogueKey);
-                        player.sendMessage("§a§l[RogueLata] §aNova habilidade desbloqueada: "
-                                + playerManager.getSkillDisplayName(rogueKey));
-                        syncAuraSkillLevel(player, rogueKey, 1);
-                    }
-                }
-            }
-        }
+        gateRegistry.check(player, skill.name(), level);
     }
 
     public void syncAuraSkillLevel(Player player, String rogueSkillKey, int level) {
@@ -202,28 +145,5 @@ public class AuraSkillsIntegration implements Listener {
 
     private String stripColorCodes(String input) {
         return input.replaceAll("§[0-9a-fklmnor]", "").trim();
-    }
-
-    private static class ProgressionGate {
-        final Skill skill;
-        final int level;
-
-        ProgressionGate(Skill skill, int level) {
-            this.skill = skill;
-            this.level = level;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ProgressionGate that = (ProgressionGate) o;
-            return level == that.level && Objects.equals(skill, that.skill);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(skill, level);
-        }
     }
 }

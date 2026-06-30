@@ -1,0 +1,41 @@
+gates:
+  # Explorer skills -> Agility
+  - { skill: AGILITY, level: 2,  card: dash,        mode: grant }
+  - { skill: AGILITY, level: 4,  card: step_assist,  mode: grant }
+  - { skill: AGILITY, level: 6,  card: grapple,      mode: grant }
+  - { skill: AGILITY, level: 8,  card: safe_fall,    mode: pool }
+  - { skill: AGILITY, level: 10, card: jump_boost,   mode: grant }
+  - { skill: AGILITY, level: 12, card: wind_burst,   mode: pool }
+  - { skill: AGILITY, level: 14, card: dim_shift,    mode: pool }
+  - { skill: AGILITY, level: 16, card: sonar,        mode: pool }
+  - { skill: FIGHTING, level: 5,  card: thermal_resistance, mode: pool }
+  - { skill: FIGHTING, level: 8,  card: water_breathing,    mode: pool }
+  - { skill: FIGHTING, level: 10, card: recall,      mode: grant }
+
+  # Miner skills -> Mining
+  - { skill: MINING, level: 2,  card: stone_smash,      mode: grant }
+  - { skill: MINING, level: 4,  card: torch_light,      mode: pool }
+  - { skill: MINING, level: 5,  card: diet,             mode: grant }
+  - { skill: MINING, level: 7,  card: ore_sonar,        mode: pool }
+  - { skill: MINING, level: 10, card: haste,            mode: pool }
+  - { skill: MINING, level: 12, card: sight,            mode: grant }
+  - { skill: MINING, level: 14, card: ore_repair,       mode: pool }
+  - { skill: MINING, level: 16, card: molten_touch,     mode: pool }
+  - { skill: MINING, level: 18, card: gravity_shield,   mode: pool }
+  - { skill: MINING, level: 20, card: core_overdrive,   mode: pool }
+  - { skill: ENCHANTING, level: 15, card: transmutation, mode: pool }
+
+  # Builder skills -> Foraging
+  - { skill: FORAGING, level: 2,  card: feast,            mode: grant }
+  - { skill: FORAGING, level: 4,  card: woodcutter,       mode: pool }
+  - { skill: FORAGING, level: 5,  card: canopy_step,      mode: grant }
+  - { skill: FORAGING, level: 7,  card: fertilize,        mode: pool }
+  - { skill: FORAGING, level: 10, card: flora_shield,     mode: pool }
+  - { skill: FORAGING, level: 12, card: scaffold,         mode: pool }
+  - { skill: FORAGING, level: 14, card: silk_touch,       mode: pool }
+  - { skill: FORAGING, level: 16, card: lumberjack,       mode: pool }
+  - { skill: FORAGING, level: 18, card: architect_focus,  mode: pool }
+  - { skill: FORAGING, level: 20, card: grace,            mode: pool }
+  - { skill: FORAGING, level: 22, card: unbreakable_block, mode: pool }
+  - { skill: FORAGING, level: 24, card: gravity_defiance,  mode: pool }
+  - { skill: FORAGING, level: 26, card: hydration,        mode: pool }

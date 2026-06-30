@@ -32,6 +32,7 @@ public class RunState {
     private long startedAt;
     private boolean phoenixCharge;
     private long blocksWalked;
+    private long blocksSinceRecall;
     private int recallUses;
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
@@ -127,7 +128,10 @@ public class RunState {
 
     public long blocksWalked() { return blocksWalked; }
     public void setBlocksWalked(long v) { this.blocksWalked = v; }
-    public void addBlocksWalked(long v) { this.blocksWalked += v; }
+    public void addBlocksWalked(long v) { this.blocksWalked += v; this.blocksSinceRecall += v; }
+
+    public long blocksSinceRecall() { return blocksSinceRecall; }
+    public void resetBlocksSinceRecall() { this.blocksSinceRecall = 0; }
 
     public int recallUses() { return recallUses; }
     public void setRecallUses(int v) { this.recallUses = v; }
@@ -150,6 +154,7 @@ public class RunState {
         startedAt = System.currentTimeMillis();
         phoenixCharge = false;
         blocksWalked = 0;
+        blocksSinceRecall = 0;
         recallUses = 0;
     }
 }

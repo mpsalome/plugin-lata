@@ -13,7 +13,9 @@ grapple:
 water_breathing:
   duration: 15
 recall:
-  cooldown: 60
+  base_distance: 2000
+  growth: 1.5
+  cap: 0
 thermal_resistance:
   cooldown: 30
 sonar:

@@ -1,5 +1,6 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.command.RecallCommand;
 import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.card.CardRegistry;
@@ -13,6 +14,9 @@ import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.core.mayhem.MilestoneService;
 import com.project.rpgplugin.core.mayhem.ModifierRegistration;
 import com.project.rpgplugin.core.mayhem.ModifierRegistry;
+import com.project.rpgplugin.core.progression.DistanceTracker;
+import com.project.rpgplugin.core.progression.GateRegistry;
+import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.ResetService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunOutcome;
@@ -23,7 +27,9 @@ import com.project.rpgplugin.core.skill.SkillRegistration;
 import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.listener.PlayerLevelListener;
 import com.project.rpgplugin.listener.PlayerLifecycleListener;
+import com.project.rpgplugin.listener.RecallListener;
 import com.project.rpgplugin.listener.SkillDispatchListener;
+import com.project.rpgplugin.task.DistanceTask;
 import com.project.rpgplugin.ui.DraftMenuListener;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
@@ -72,13 +78,22 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private PlayerLifecycleListener playerLifecycleListener;
     private RunCommand runCommand;
 
+    // EPIC-5: Gameplay triggers
+    private GateRegistry gateRegistry;
+    private DistanceTracker distanceTracker;
+    private DistanceTask distanceTask;
+    private RecallProgression recallProgression;
+    private RecallCommand recallCommand;
+    private RecallListener recallListener;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
         ItemKeys.init(this);
 
         this.playerManager = new PlayerManager(this);
-        this.auraSkillsIntegration = new AuraSkillsIntegration(this, playerManager);
+        this.gateRegistry = new GateRegistry(this);
+        this.auraSkillsIntegration = new AuraSkillsIntegration(this, playerManager, gateRegistry);
         this.classListeners = new ClassListeners(this, playerManager, auraSkillsIntegration);
 
         // EPIC-1: Data-driven skill architecture
@@ -119,6 +134,13 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.playerLifecycleListener = new PlayerLifecycleListener(runManager);
         this.runCommand = new RunCommand(runManager);
 
+        // EPIC-5: Gameplay triggers
+        this.distanceTracker = new DistanceTracker(runManager);
+        this.distanceTask = new DistanceTask();
+        this.recallProgression = new RecallProgression(this, runManager, spawnResolver);
+        this.recallCommand = new RecallCommand(runManager, recallProgression);
+        this.recallListener = new RecallListener(runManager, recallProgression);
+
         // Register old listener (active during migration)
         getServer().getPluginManager().registerEvents(classListeners, this);
         // EPIC-2 listeners
@@ -126,11 +148,17 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         getServer().getPluginManager().registerEvents(draftMenuListener, this);
         // EPIC-3 listeners
         getServer().getPluginManager().registerEvents(playerLifecycleListener, this);
+        // EPIC-5 listeners
+        getServer().getPluginManager().registerEvents(recallListener, this);
         // SkillDispatchListener ready for EPIC-2/3 (RunState) - not registered yet during migration
+
+        // Start distance tracking
+        this.distanceTask.start(this, distanceTracker);
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
         getCommand("run").setExecutor(runCommand);
+        getCommand("recall").setExecutor(recallCommand);
 
         getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
         getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");
@@ -145,6 +173,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     @Override
     public void onDisable() {
+        if (distanceTask != null) distanceTask.stop();
         getLogger().info("RogueLata Plugin desativado.");
     }
 

@@ -17,6 +17,9 @@ commands:
   run:
     description: Mostra informacoes da run atual.
     usage: /run
+  recall:
+    description: Usa o Recall para teleportar ao spawn.
+    usage: /recall
 permissions:
   rpg.admin:
     description: Permite recarregar/resetar o plugin RogueLata.
