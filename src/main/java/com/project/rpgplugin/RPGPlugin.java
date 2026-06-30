@@ -1,10 +1,20 @@
 package com.project.rpgplugin;
 
 import com.project.rpgplugin.config.SkillsConfig;
+import com.project.rpgplugin.core.card.CardRegistry;
+import com.project.rpgplugin.core.card.StatService;
+import com.project.rpgplugin.core.card.ability.AbilityCardRegistration;
+import com.project.rpgplugin.core.card.augment.AugmentLoader;
+import com.project.rpgplugin.core.draft.DraftService;
+import com.project.rpgplugin.core.draft.DraftWeighting;
+import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillRegistration;
 import com.project.rpgplugin.core.skill.SkillServices;
+import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.listener.PlayerLevelListener;
 import com.project.rpgplugin.listener.SkillDispatchListener;
+import com.project.rpgplugin.ui.DraftMenuListener;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
@@ -18,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class RPGPlugin extends JavaPlugin implements CommandExecutor {
@@ -31,6 +40,15 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private SkillServices skillServices;
     private SkillDispatchListener skillDispatchListener;
     private SkillsConfig skillsConfig;
+
+    // EPIC-2: Card & Draft system
+    private CardRegistry cardRegistry;
+    private StatService statService;
+    private DraftWeighting draftWeighting;
+    private DraftService draftService;
+    private RunManager runManager;
+    private PlayerLevelListener playerLevelListener;
+    private DraftMenuListener draftMenuListener;
 
     @Override
     public void onEnable() {
@@ -48,14 +66,36 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         SkillRegistration.registerAll(skillRegistry, skillServices);
         this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, playerManager);
 
+        // EPIC-2: Card system
+        this.cardRegistry = new CardRegistry();
+        this.statService = new StatService();
+        this.runManager = new RunManager(this, cardRegistry, statService);
+        this.draftWeighting = new DraftWeighting(this);
+
+        // Register ability cards (wrapping EPIC-1 skills)
+        AbilityCardRegistration.registerAll(cardRegistry, skillRegistry);
+
+        // Load augment cards from augments.yml
+        AugmentLoader.load(this, cardRegistry);
+
+        this.draftService = new DraftService(cardRegistry, draftWeighting, statService, runManager);
+
+        // EPIC-2 listeners
+        this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this);
+        this.draftMenuListener = new DraftMenuListener(runManager, draftService, draftWeighting, playerLevelListener);
+
         // Register old listener (active during migration)
         getServer().getPluginManager().registerEvents(classListeners, this);
+        // EPIC-2 listeners
+        getServer().getPluginManager().registerEvents(playerLevelListener, this);
+        getServer().getPluginManager().registerEvents(draftMenuListener, this);
         // SkillDispatchListener ready for EPIC-2/3 (RunState) - not registered yet during migration
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
 
         getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
+        getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");
 
         if (auraSkillsIntegration.isEnabled()) {
             getLogger().info("RogueLata + AuraSkills integrado com sucesso!");
@@ -83,6 +123,22 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     public SkillsConfig getSkillsConfig() {
         return skillsConfig;
+    }
+
+    public CardRegistry getCardRegistry() {
+        return cardRegistry;
+    }
+
+    public StatService getStatService() {
+        return statService;
+    }
+
+    public RunManager getRunManager() {
+        return runManager;
+    }
+
+    public DraftService getDraftService() {
+        return draftService;
     }
 
     @Override
@@ -120,6 +176,26 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
+            if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(Component.text("Apenas jogadores podem usar /rpg debug.").color(NamedTextColor.RED));
+                    return true;
+                }
+                Player player = (Player) sender;
+                if (!runManager.hasActiveRun(player)) {
+                    runManager.startRun(player);
+                }
+                RunState run = runManager.getRun(player);
+                if (run != null) {
+                    player.sendMessage(Component.text("=== RogueLata Debug ===").color(NamedTextColor.GOLD));
+                    player.sendMessage(Component.text("Level: " + run.level()).color(NamedTextColor.WHITE));
+                    player.sendMessage(Component.text("Cartas: " + String.join(", ", run.ownedCards())).color(NamedTextColor.WHITE));
+                    player.sendMessage(Component.text("Drafts pendentes: " + run.pendingDrafts()).color(NamedTextColor.WHITE));
+                    player.sendMessage(Component.text("Multipliers: " + run.multipliers()).color(NamedTextColor.WHITE));
+                }
+                return true;
+            }
+
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 boolean hasBook = false;
@@ -142,11 +218,11 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             sender.sendMessage(Component.text("/rpg ").color(NamedTextColor.YELLOW).append(Component.text("- Recebe o Livro de RPG se necessario.").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg reload ").color(NamedTextColor.YELLOW).append(Component.text("- Recarrega config (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg reset ").color(NamedTextColor.YELLOW).append(Component.text("- Reseta todos os dados RPG (Admin).").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/rpg debug ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra estado interno da run (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.empty());
             sender.sendMessage(Component.text("=== MODO ROGUE-LIKE ATIVO ===").color(NamedTextColor.RED));
             sender.sendMessage(Component.text("Ao morrer, voce perde TODAS as habilidades e XP!").color(NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("Escolha sabiamente suas 9 habilidades (3 por tier).").color(NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("4+ habilidades do mesmo tipo = SINERGIA PASSIVA!").color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("Escolha sabiamente suas cartas no draft!").color(NamedTextColor.GRAY));
             sender.sendMessage(Component.text("=================================").color(NamedTextColor.GOLD));
             return true;
         }

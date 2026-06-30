@@ -1,0 +1,17 @@
+draft:
+  every_levels: 3
+  cards_per_offer: 3
+  queue_pending: true
+  allow_skip: true
+  skip_bonus:
+    heal: 6
+    mana: 20
+  reroll:
+    enabled: true
+    cost_levels: 1
+    max_per_draft: 1
+  weights:
+    - { from: 1, to: 9, bronze: 80, silver: 18, gold: 2 }
+    - { from: 10, to: 19, bronze: 60, silver: 30, gold: 10 }
+    - { from: 20, to: 29, bronze: 40, silver: 40, gold: 20 }
+    - { from: 30, to: 999, bronze: 25, silver: 40, gold: 35 }

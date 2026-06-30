@@ -1,0 +1,203 @@
+max_health:
+  tier: bronze
+  tags: [tank, sustain]
+  kind: augment
+  icon: APPLE
+  max_stacks: 10
+  effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 2 }
+xp_boost:
+  tier: bronze
+  tags: [utility]
+  kind: augment
+  icon: EXPERIENCE_BOTTLE
+  max_stacks: 5
+  effect: { type: MULT, key: xp_gain, add: 0.10 }
+swift:
+  tier: bronze
+  tags: [mobility]
+  kind: augment
+  icon: SUGAR
+  max_stacks: 5
+  effect: { type: ATTRIBUTE, attribute: MOVEMENT_SPEED, add_per_stack: 0.02 }
+tough_skin:
+  tier: bronze
+  tags: [tank]
+  kind: augment
+  icon: IRON_CHESTPLATE
+  max_stacks: 6
+  effect: { type: ATTRIBUTE, attribute: ARMOR, add_per_stack: 1 }
+quick_hands:
+  tier: bronze
+  tags: [utility]
+  kind: augment
+  icon: CLOCK
+  max_stacks: 5
+  effect: { type: MULT, key: cooldown_reduction, add: 0.05 }
+soft_landing:
+  tier: bronze
+  tags: [mobility, tank]
+  kind: augment
+  icon: FEATHER
+  max_stacks: 3
+  effect: { type: MULT, key: fall_damage_reduction, add: 0.15 }
+hearty_appetite:
+  tier: bronze
+  tags: [sustain]
+  kind: augment
+  icon: COOKED_BEEF
+  max_stacks: 3
+  effect: { type: MULT, key: hunger_decay_reduction, add: 0.20 }
+scavenger:
+  tier: bronze
+  tags: [loot]
+  kind: augment
+  icon: ROTTEN_FLESH
+  max_stacks: 3
+  effect: { type: MULT, key: extra_mob_drops, add: 0.10 }
+miner_grip:
+  tier: bronze
+  tags: [miner]
+  kind: augment
+  icon: IRON_PICKAXE
+  max_stacks: 3
+  effect: { type: MULT, key: mining_speed, add: 0.10 }
+green_thumb:
+  tier: bronze
+  tags: [builder, economy]
+  kind: augment
+  icon: WHEAT
+  max_stacks: 3
+  effect: { type: MULT, key: crop_yield, add: 1 }
+keen_eye:
+  tier: bronze
+  tags: [miner, utility]
+  kind: augment
+  icon: COMPASS
+  max_stacks: 1
+  effect: { type: POTION, potion: NIGHT_VISION, amplifier: 0 }
+warmup:
+  tier: bronze
+  tags: [dps]
+  kind: augment
+  icon: BLAZE_POWDER
+  max_stacks: 3
+  effect: { type: MULT, key: early_combat_damage, add: 0.05 }
+pocket_sand:
+  tier: bronze
+  tags: [utility]
+  kind: augment
+  icon: SAND
+  max_stacks: 2
+  effect: { type: MULT, key: blind_on_hit_chance, add: 0.10 }
+max_health_plus:
+  tier: silver
+  tags: [tank, sustain]
+  kind: augment
+  icon: GOLDEN_APPLE
+  max_stacks: 5
+  effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 4 }
+lifesteal:
+  tier: silver
+  tags: [sustain, dps]
+  kind: augment
+  icon: REDSTONE
+  max_stacks: 3
+  effect: { type: ON_DAMAGE_DEALT, heal_pct: 0.05 }
+berserker:
+  tier: silver
+  tags: [risk, dps]
+  kind: augment
+  icon: BONE
+  max_stacks: 3
+  effect: { type: MULT, key: low_hp_damage, add: 0.15 }
+thorns:
+  tier: silver
+  tags: [tank]
+  kind: augment
+  icon: CACTUS
+  max_stacks: 2
+  effect: { type: MULT, key: thorns_reflect, add: 0.20 }
+double_jump:
+  tier: silver
+  tags: [mobility]
+  kind: augment
+  icon: SLIME_BALL
+  max_stacks: 1
+  effect: { type: MULT, key: double_jump, add: 1 }
+crit_strike:
+  tier: silver
+  tags: [dps]
+  kind: augment
+  icon: NETHERITE_SWORD
+  max_stacks: 3
+  effect: { type: MULT, key: crit_chance, add: 0.15 }
+ore_greed:
+  tier: silver
+  tags: [miner, loot]
+  kind: augment
+  icon: DIAMOND_ORE
+  max_stacks: 2
+  effect: { type: MULT, key: double_ore_drop, add: 0.25 }
+magnet:
+  tier: silver
+  tags: [utility, loot]
+  kind: augment
+  icon: HOPPER
+  max_stacks: 1
+  effect: { type: MULT, key: item_magnet_range, add: 5 }
+xp_boost_plus:
+  tier: silver
+  tags: [utility]
+  kind: augment
+  icon: EXPERIENCE_BOTTLE
+  max_stacks: 3
+  effect: { type: MULT, key: xp_gain, add: 0.25 }
+swift_plus:
+  tier: silver
+  tags: [mobility]
+  kind: augment
+  icon: SUGAR
+  max_stacks: 3
+  effect: { type: ATTRIBUTE, attribute: MOVEMENT_SPEED, add_per_stack: 0.05 }
+glass_cannon:
+  tier: gold
+  tags: [risk, dps]
+  kind: augment
+  icon: TNT
+  max_stacks: 1
+  effect: { type: MULT_MULTI, damage_dealt: 0.40, damage_taken: 0.30 }
+vampire_lord:
+  tier: gold
+  tags: [sustain, risk]
+  kind: augment
+  icon: NETHER_STAR
+  max_stacks: 1
+  effect: { type: ON_DAMAGE_DEALT, heal_pct: 0.15 }
+executioner:
+  tier: gold
+  tags: [dps]
+  kind: augment
+  icon: WITHER_SKELETON_SKULL
+  max_stacks: 1
+  effect: { type: MULT, key: execute_threshold, add: 0.15 }
+midas:
+  tier: gold
+  tags: [loot, economy]
+  kind: augment
+  icon: GOLD_INGOT
+  max_stacks: 1
+  effect: { type: ON_KILL, effect: gold_drop, value: 1 }
+soul_harvest:
+  tier: gold
+  tags: [sustain, dps]
+  kind: augment
+  icon: SOUL_SAND
+  max_stacks: 1
+  effect: { type: ON_KILL, effect: heal_and_mana, value: 2 }
+giant:
+  tier: gold
+  tags: [tank, risk]
+  kind: augment
+  icon: IRON_BLOCK
+  max_stacks: 1
+  effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 20 }
