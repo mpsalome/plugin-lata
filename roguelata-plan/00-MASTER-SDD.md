@@ -76,8 +76,32 @@ RogueLata é um **addon roguelike** sobre AuraSkills + AuraMobs. O loop: **cada 
 | EPIC-8 | Menus & GUI (draft menu premium) | F4 | [epics/EPIC-8-menus.md](epics/EPIC-8-menus.md) |
 | EPIC-9 | Dados, cooldowns, performance, persistência | F1 | [epics/EPIC-9-dados-performance.md](epics/EPIC-9-dados-performance.md) |
 | EPIC-10 | Builds/sinergias/tags + Qualidade (i18n, testes, CI) | F4/F5 | [epics/EPIC-10-builds-qualidade.md](epics/EPIC-10-builds-qualidade.md) |
+| EPIC-11 | Dependências externas & setup do servidor (AuraSkills, AuraMobs, MythicMobs, ModelEngine) | F1/F3 | [epics/EPIC-11-dependencias-setup.md](epics/EPIC-11-dependencias-setup.md) |
+| EPIC-12 | Revisão de documentação (wiki, README, SDDs) | F5 | [epics/EPIC-12-revisao-documentacao.md](epics/EPIC-12-revisao-documentacao.md) |
 
 **Apêndices:** [A — Catálogo de Cartas](appendices/A-catalogo-cartas.md) · [B — Referência de Config](appendices/B-config-reference.md) · [C — Glossário](appendices/C-glossario.md)
+
+---
+
+## 2.1 Status de implementação (auditado no repo em 2026-06-30, commit `4403c36`)
+
+> O repo já avançou bastante: EPIC-1 a EPIC-5 têm código real (pacotes `core/card`, `core/draft`, `core/run`, `core/mayhem`, `core/progression`, `core/skill`, listeners, `ui/DraftMenu`, testes). Os épicos detalham o que **falta**, com base no código real.
+
+| Épico | Status | Pendências-chave |
+|-------|--------|------------------|
+| EPIC-0 | 🟡 **não feito de fato** | `pom.xml` ainda em `1.21.4` e `api-version: '1.21'` — **migração para 26.2 pendente** |
+| EPIC-1 | 🟢 majoritário | `SkillDispatchListener` ainda lê de `PlayerManager` (não `RunState`) e não está registrado |
+| EPIC-2 | 🟢 majoritário | catálogo parcial (~28/53 augments); efeitos `MULT`/`ON_*` sem handler |
+| EPIC-3 | 🟢 majoritário | `RunState` só em memória (sem persistência — ver EPIC-9) |
+| EPIC-4 | 🟢 majoritário | validar limpeza/leak de modificadores; HUD |
+| EPIC-5 | 🟢 majoritário | sem `onQuit` para limpar `DistanceTracker` |
+| EPIC-6 | 🔴 pendente | bridge usa `PlayerManager`; sem mana abilities; reset-on-death é placeholder |
+| EPIC-7 | 🔴 pendente | sem `mob/`/`difficulty/`; vitória sem disparo; augments de combate "mortos" |
+| EPIC-8 | 🟡 parcial | `DraftMenu` vanilla pronto; `SkillGUI`/InvUI legados a remover; sem `CollectionMenu` |
+| EPIC-9 | 🔴 pendente | sem persistência de run; sem `onQuit`; leaks em `SkillServices` |
+| EPIC-10 | 🔴 pendente | sem sinergias; i18n ausente (mistura `§`/Adventure); legado ativo |
+| EPIC-11 | 🟡 parcial | `plugin.yml` só tem softdepend AuraSkills; faltam AuraMobs/MythicMobs/ModelEngine + docs de setup |
+| EPIC-12 | 🔴 pendente | revisão final de wiki/README/SDDs (links, acurácia, formatação) |
 
 ---
 
@@ -155,6 +179,7 @@ com.project.rpgplugin
 7. **i18n** em `messages_<lang>.yml`.
 8. **Async para I/O**, main-thread para mundo/entidades (Folia-aware se aplicável).
 9. **DoD por tarefa**: `mvn clean package` verde + testes verdes + CA satisfeito + smoke test sem regressão.
+10. **Versão-segurança (26.2):** toda feature **core** (draft, reset, mayhem, recall, dificuldade, **bosses/elites**, menus) usa **apenas a API vanilla do Paper** — que acompanha a versão do servidor. Plugins de terceiro (AuraSkills, AuraMobs, MythicMobs, ModelEngine, InvUI) são **opcionais e risco de versão**: só funcionam em 26.2 se o autor tiver atualizado. Nenhuma feature core pode depender deles. **Pendência crítica:** confirmar no EPIC-0 que existe um artefato `paper-api` real para a versão-alvo — o código hoje está em `1.21.4`, não 26.2.
 
 ---
 
