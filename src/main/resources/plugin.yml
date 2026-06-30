@@ -12,8 +12,11 @@ commands:
     usage: /skills
   rpg:
     description: Comando principal do RogueLata.
-    usage: /rpg [reload|reset]
+    usage: /rpg [reload|reset|debug]
     permission: rpg.admin
+  run:
+    description: Mostra informacoes da run atual.
+    usage: /run
 permissions:
   rpg.admin:
     description: Permite recarregar/resetar o plugin RogueLata.

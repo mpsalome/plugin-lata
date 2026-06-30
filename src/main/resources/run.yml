@@ -1,0 +1,5 @@
+spawn_resolver:
+  mode: world_spawn
+  random_far:
+    min_radius: 5000
+    max_radius: 20000

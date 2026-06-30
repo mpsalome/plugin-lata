@@ -1,5 +1,6 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.StatService;
@@ -12,12 +13,16 @@ import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.core.mayhem.MilestoneService;
 import com.project.rpgplugin.core.mayhem.ModifierRegistration;
 import com.project.rpgplugin.core.mayhem.ModifierRegistry;
+import com.project.rpgplugin.core.run.ResetService;
 import com.project.rpgplugin.core.run.RunManager;
+import com.project.rpgplugin.core.run.RunOutcome;
+import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.core.run.SpawnResolver;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillRegistration;
 import com.project.rpgplugin.core.skill.SkillServices;
-import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.listener.PlayerLevelListener;
+import com.project.rpgplugin.listener.PlayerLifecycleListener;
 import com.project.rpgplugin.listener.SkillDispatchListener;
 import com.project.rpgplugin.ui.DraftMenuListener;
 import com.project.rpgplugin.util.ItemKeys;
@@ -61,6 +66,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private MilestoneService milestoneService;
     private MayhemService mayhemService;
 
+    // EPIC-3: Run cycle
+    private SpawnResolver spawnResolver;
+    private ResetService resetService;
+    private PlayerLifecycleListener playerLifecycleListener;
+    private RunCommand runCommand;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -77,10 +88,19 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         SkillRegistration.registerAll(skillRegistry, skillServices);
         this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, playerManager);
 
+        // EPIC-4: Mayhem system (needed by EPIC-3)
+        this.modifierRegistry = new ModifierRegistry();
+        ModifierRegistration.registerAll(modifierRegistry);
+        this.mayhemConfig = new MayhemConfig(this);
+        this.milestoneService = new MilestoneService(mayhemConfig);
+        this.mayhemService = new MayhemService(this, modifierRegistry, milestoneService, mayhemConfig);
+
         // EPIC-2: Card system
         this.cardRegistry = new CardRegistry();
         this.statService = new StatService();
-        this.runManager = new RunManager(this, cardRegistry, statService);
+        this.spawnResolver = new SpawnResolver(this);
+        this.resetService = new ResetService(this, cardRegistry, statService, mayhemService, spawnResolver);
+        this.runManager = new RunManager(this, cardRegistry, statService, resetService, mayhemService);
         this.draftWeighting = new DraftWeighting(this);
 
         // Register ability cards (wrapping EPIC-1 skills)
@@ -95,22 +115,22 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this, milestoneService);
         this.draftMenuListener = new DraftMenuListener(runManager, draftService, draftWeighting, playerLevelListener);
 
-        // EPIC-4: Mayhem system
-        this.modifierRegistry = new ModifierRegistry();
-        ModifierRegistration.registerAll(modifierRegistry);
-        this.mayhemConfig = new MayhemConfig(this);
-        this.milestoneService = new MilestoneService(mayhemConfig);
-        this.mayhemService = new MayhemService(this, modifierRegistry, milestoneService, mayhemConfig);
+        // EPIC-3: Run lifecycle
+        this.playerLifecycleListener = new PlayerLifecycleListener(runManager);
+        this.runCommand = new RunCommand(runManager);
 
         // Register old listener (active during migration)
         getServer().getPluginManager().registerEvents(classListeners, this);
         // EPIC-2 listeners
         getServer().getPluginManager().registerEvents(playerLevelListener, this);
         getServer().getPluginManager().registerEvents(draftMenuListener, this);
+        // EPIC-3 listeners
+        getServer().getPluginManager().registerEvents(playerLifecycleListener, this);
         // SkillDispatchListener ready for EPIC-2/3 (RunState) - not registered yet during migration
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
+        getCommand("run").setExecutor(runCommand);
 
         getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
         getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");
@@ -252,6 +272,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             sender.sendMessage(Component.text("/rpg reload ").color(NamedTextColor.YELLOW).append(Component.text("- Recarrega config (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg reset ").color(NamedTextColor.YELLOW).append(Component.text("- Reseta todos os dados RPG (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg debug ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra estado interno da run (Admin).").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/run ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra informacoes da run atual.").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.empty());
             sender.sendMessage(Component.text("=== MODO ROGUE-LIKE ATIVO ===").color(NamedTextColor.RED));
             sender.sendMessage(Component.text("Ao morrer, voce perde TODAS as habilidades e XP!").color(NamedTextColor.GRAY));

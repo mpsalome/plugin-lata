@@ -28,11 +28,17 @@ public class RunState {
     private Set<String> sharedModifiers = Set.of();
     private int xpMultTotal;
     private double cooldownMultTotal;
+    private RunOutcome outcome = RunOutcome.ONGOING;
+    private long startedAt;
+    private boolean phoenixCharge;
+    private long blocksWalked;
+    private int recallUses;
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
         this.playerId = playerId;
         this.cardRegistry = cardRegistry;
         this.level = 1;
+        this.startedAt = System.currentTimeMillis();
     }
 
     public UUID playerId() { return playerId; }
@@ -110,6 +116,23 @@ public class RunState {
     public Set<String> sharedModifiers() { return sharedModifiers; }
     public void setSharedModifiers(Set<String> v) { this.sharedModifiers = v; }
 
+    public RunOutcome outcome() { return outcome; }
+    public void setOutcome(RunOutcome v) { this.outcome = v; }
+
+    public long startedAt() { return startedAt; }
+    public void setStartedAt(long v) { this.startedAt = v; }
+
+    public boolean phoenixCharge() { return phoenixCharge; }
+    public void setPhoenixCharge(boolean v) { this.phoenixCharge = v; }
+
+    public long blocksWalked() { return blocksWalked; }
+    public void setBlocksWalked(long v) { this.blocksWalked = v; }
+    public void addBlocksWalked(long v) { this.blocksWalked += v; }
+
+    public int recallUses() { return recallUses; }
+    public void setRecallUses(int v) { this.recallUses = v; }
+    public void incrementRecallUses() { this.recallUses++; }
+
     public void reset() {
         ownedCards.clear();
         cardCounts.clear();
@@ -123,5 +146,10 @@ public class RunState {
         sharedModifiers = Set.of();
         xpMultTotal = 0;
         cooldownMultTotal = 0;
+        outcome = RunOutcome.ONGOING;
+        startedAt = System.currentTimeMillis();
+        phoenixCharge = false;
+        blocksWalked = 0;
+        recallUses = 0;
     }
 }
