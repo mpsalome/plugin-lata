@@ -6,6 +6,7 @@ import com.project.rpgplugin.core.card.augment.OnKillEffect;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,9 @@ public class RunState {
     private final List<OnKillEffect> onKillEffects = new ArrayList<>();
     private int level;
     private int pendingDrafts;
+    private int milestonesReached;
+    private final Set<String> activeModifiers = new LinkedHashSet<>();
+    private Set<String> sharedModifiers = Set.of();
     private int xpMultTotal;
     private double cooldownMultTotal;
 
@@ -96,6 +100,16 @@ public class RunState {
     public double cooldownMultTotal() { return cooldownMultTotal; }
     public void setCooldownMultTotal(double value) { this.cooldownMultTotal = value; }
 
+    public int milestonesReached() { return milestonesReached; }
+    public void setMilestonesReached(int v) { this.milestonesReached = v; }
+
+    public Set<String> activeModifiers() { return activeModifiers; }
+    public void addModifier(String id) { activeModifiers.add(id); }
+    public void removeModifier(String id) { activeModifiers.remove(id); }
+
+    public Set<String> sharedModifiers() { return sharedModifiers; }
+    public void setSharedModifiers(Set<String> v) { this.sharedModifiers = v; }
+
     public void reset() {
         ownedCards.clear();
         cardCounts.clear();
@@ -104,6 +118,9 @@ public class RunState {
         onKillEffects.clear();
         level = 1;
         pendingDrafts = 0;
+        milestonesReached = 0;
+        activeModifiers.clear();
+        sharedModifiers = Set.of();
         xpMultTotal = 0;
         cooldownMultTotal = 0;
     }

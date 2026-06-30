@@ -1,0 +1,15 @@
+mayhem:
+  scope: server
+  milestones:
+    type: level
+    thresholds: [10, 20, 30, 40, 50]
+  severity_by_index:
+    - { index: 0, allow: [MILD] }
+    - { index: 1, allow: [MILD, WILD] }
+    - { index: 2, allow: [WILD] }
+    - { index: 3, allow: [WILD, INSANE] }
+    - { index: 4, allow: [INSANE] }
+  announce: true
+  max_active: 6
+  incompatibilities:
+    - glass_body + glass_cannon_world

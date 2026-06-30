@@ -4,6 +4,7 @@ import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftSession;
 import com.project.rpgplugin.core.draft.DraftWeighting;
+import com.project.rpgplugin.core.mayhem.MilestoneService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.DraftMenu;
@@ -18,12 +19,14 @@ public class PlayerLevelListener implements Listener {
     private final DraftService draftService;
     private final DraftWeighting weighting;
     private final RPGPlugin plugin;
+    private final MilestoneService milestoneService;
 
-    public PlayerLevelListener(RunManager runManager, DraftService draftService, DraftWeighting weighting, RPGPlugin plugin) {
+    public PlayerLevelListener(RunManager runManager, DraftService draftService, DraftWeighting weighting, RPGPlugin plugin, MilestoneService milestoneService) {
         this.runManager = runManager;
         this.draftService = draftService;
         this.weighting = weighting;
         this.plugin = plugin;
+        this.milestoneService = milestoneService;
     }
 
     @EventHandler
@@ -43,12 +46,19 @@ public class PlayerLevelListener implements Listener {
 
         run.setLevel(newLevel);
 
+        // EPIC-2: Draft trigger
         int everyLevels = DraftWeighting.getEveryLevels(plugin);
-
         int draftsEarned = newLevel / everyLevels - oldLevel / everyLevels;
         if (draftsEarned > 0) {
             run.addPendingDrafts(draftsEarned);
             openNextDraft(p, run);
+        }
+
+        // EPIC-4: Mayhem milestone check
+        if (milestoneService.reachedNewMilestone(run, oldLevel, newLevel)) {
+            int newMilestones = milestoneService.milestonesReached(run);
+            run.setMilestonesReached(newMilestones);
+            plugin.getMayhemService().rollAndApply(run, p.getWorld());
         }
     }
 

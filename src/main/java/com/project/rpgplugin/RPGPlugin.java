@@ -7,6 +7,11 @@ import com.project.rpgplugin.core.card.ability.AbilityCardRegistration;
 import com.project.rpgplugin.core.card.augment.AugmentLoader;
 import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftWeighting;
+import com.project.rpgplugin.core.mayhem.MayhemConfig;
+import com.project.rpgplugin.core.mayhem.MayhemService;
+import com.project.rpgplugin.core.mayhem.MilestoneService;
+import com.project.rpgplugin.core.mayhem.ModifierRegistration;
+import com.project.rpgplugin.core.mayhem.ModifierRegistry;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillRegistration;
@@ -50,6 +55,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private PlayerLevelListener playerLevelListener;
     private DraftMenuListener draftMenuListener;
 
+    // EPIC-4: Mayhem modifiers
+    private ModifierRegistry modifierRegistry;
+    private MayhemConfig mayhemConfig;
+    private MilestoneService milestoneService;
+    private MayhemService mayhemService;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -81,8 +92,15 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.draftService = new DraftService(cardRegistry, draftWeighting, statService, runManager);
 
         // EPIC-2 listeners
-        this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this);
+        this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this, milestoneService);
         this.draftMenuListener = new DraftMenuListener(runManager, draftService, draftWeighting, playerLevelListener);
+
+        // EPIC-4: Mayhem system
+        this.modifierRegistry = new ModifierRegistry();
+        ModifierRegistration.registerAll(modifierRegistry);
+        this.mayhemConfig = new MayhemConfig(this);
+        this.milestoneService = new MilestoneService(mayhemConfig);
+        this.mayhemService = new MayhemService(this, modifierRegistry, milestoneService, mayhemConfig);
 
         // Register old listener (active during migration)
         getServer().getPluginManager().registerEvents(classListeners, this);
@@ -96,6 +114,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
         getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");
+        getLogger().info("ModifierRegistry loaded: " + modifierRegistry.size() + " modifiers registered.");
 
         if (auraSkillsIntegration.isEnabled()) {
             getLogger().info("RogueLata + AuraSkills integrado com sucesso!");
@@ -139,6 +158,18 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     public DraftService getDraftService() {
         return draftService;
+    }
+
+    public MayhemService getMayhemService() {
+        return mayhemService;
+    }
+
+    public MilestoneService getMilestoneService() {
+        return milestoneService;
+    }
+
+    public MayhemConfig getMayhemConfig() {
+        return mayhemConfig;
     }
 
     @Override
@@ -192,6 +223,8 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                     player.sendMessage(Component.text("Cartas: " + String.join(", ", run.ownedCards())).color(NamedTextColor.WHITE));
                     player.sendMessage(Component.text("Drafts pendentes: " + run.pendingDrafts()).color(NamedTextColor.WHITE));
                     player.sendMessage(Component.text("Multipliers: " + run.multipliers()).color(NamedTextColor.WHITE));
+                player.sendMessage(Component.text("Milestones: " + run.milestonesReached()).color(NamedTextColor.WHITE));
+                player.sendMessage(Component.text("Mayhem ativos: " + String.join(", ", run.activeModifiers())).color(NamedTextColor.RED));
                 }
                 return true;
             }
