@@ -55,6 +55,8 @@ public class RunState {
 
     public int cardCount(String id) { return cardCounts.getOrDefault(id, 0); }
 
+    public Map<String, Integer> cardCounts() { return Map.copyOf(cardCounts); }
+
     public void addCard(String id) {
         if (ownedCards.add(id)) {
             cardCounts.put(id, cardCounts.getOrDefault(id, 0) + 1);
@@ -129,8 +131,10 @@ public class RunState {
     public long blocksWalked() { return blocksWalked; }
     public void setBlocksWalked(long v) { this.blocksWalked = v; }
     public void addBlocksWalked(long v) { this.blocksWalked += v; this.blocksSinceRecall += v; }
+    public long getBlocksSinceRecall() { return blocksSinceRecall; }
 
     public long blocksSinceRecall() { return blocksSinceRecall; }
+    public void setBlocksSinceRecall(long v) { this.blocksSinceRecall = v; }
     public void resetBlocksSinceRecall() { this.blocksSinceRecall = 0; }
 
     public int recallUses() { return recallUses; }

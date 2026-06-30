@@ -1,12 +1,22 @@
-# Smoke Test — RogueLata (Paper 26.2)
+# Smoke Test — RogueLata (Paper 1.21.4+)
 
 - [ ] Servidor sobe sem erro no console (modo standalone, sem AuraSkills)
 - [ ] Ao entrar, jogador recebe o "Livro de RPG" no slot 8
-- [ ] `/skills` abre a GUI; abas Bronze/Prata/Ouro trocam o conteudo
-- [ ] Desbloquear uma skill consome XP corretamente
-- [ ] Equipar/desequipar respeita limite de 3 por tier e 9 total
+- [ ] `/skills` abre o CollectionMenu (run atual)
+- [ ] Draft abre a cada 3 níveis com 3 cartas distintas
+- [ ] Escolher uma carta no draft a adiciona a run
+- [ ] Escolher reroll re-sorteia as 3 cartas (consome 1 nivel)
+- [ ] Escolher skip concede bonus e fecha o draft
 - [ ] Ativar uma skill (ex: dash com flor) aplica efeito e cooldown
-- [ ] Morrer reseta skills/XP e teleporta ao spawn; livro permanece
+- [ ] Morrer reseta cartas/XP e teleporta ao spawn; livro permanece
+- [ ] Fênix revive 1x na run (se possuir a carta)
 - [ ] Tentar dropar o livro e bloqueado
 - [ ] `/rpg reload` recarrega config sem erro
+- [ ] `/rpg debug` mostra estado interno da run
+- [ ] `/run` mostra informacoes da run
+- [ ] HUD mostra progresso do recall e mayhem ativos
+- [ ] Mobs spawnam com dificuldade escalada (profundidade + players)
+- [ ] Mayhem ativa a cada 10 niveis com broadcast
 - [ ] (com AuraSkills) skills roguelata/ aparecem e gates funcionam
+- [ ] `mvn clean package` verde
+- [ ] `mvn test` verde (57 testes)

@@ -43,7 +43,7 @@ public class DraftMenu {
 
     public void open() {
         Inventory inv = Bukkit.createInventory(null, 27,
-            Component.text("§8⬡ Escolha sua carta"));
+            Component.text("<dark_gray>⬡ Escolha sua carta"));
 
         List<Card> options = session.options();
         for (int i = 0; i < Math.min(3, options.size()); i++) {

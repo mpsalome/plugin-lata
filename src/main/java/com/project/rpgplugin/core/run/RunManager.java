@@ -9,6 +9,7 @@ import com.project.rpgplugin.core.mayhem.MayhemService;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class RunManager {
         rollInitialKit(p, run);
 
         statService.recompute(p, run);
-        p.sendMessage(Component.text("§a§l✦ Nova Run Iniciada! ✦"));
+        p.sendMessage(Component.text("Nova Run Iniciada!").color(net.kyori.adventure.text.format.NamedTextColor.GREEN).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
     }
 
     public void endRun(Player p, RunOutcome outcome) {
@@ -57,8 +58,7 @@ public class RunManager {
         run.setOutcome(outcome);
 
         if (outcome == RunOutcome.VICTORY) {
-            // Celebrate — hook for EPIC-7
-            p.sendMessage(Component.text("§6§l🏆 VITÓRIA! 🏆"));
+            p.sendMessage(Component.text("VITORIA!").color(net.kyori.adventure.text.format.NamedTextColor.GOLD).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
         }
 
         resetService.fullReset(p, run);
@@ -79,7 +79,7 @@ public class RunManager {
             Card starter = bronzeCards.get(random.nextInt(bronzeCards.size()));
             starter.onAcquire(p, run);
             statService.recompute(p, run);
-            p.sendActionBar(Component.text("§aKit inicial: " + starter.id().replace("_", " ")));
+            p.sendActionBar(Component.text("Kit inicial: " + starter.id().replace("_", " ")).color(net.kyori.adventure.text.format.NamedTextColor.GREEN));
         }
     }
 
@@ -91,7 +91,19 @@ public class RunManager {
         return activeRuns.containsKey(p.getUniqueId());
     }
 
+    public void restoreRun(Player p, RunState run) {
+        activeRuns.put(p.getUniqueId(), run);
+        statService.recompute(p, run);
+        mayhemService.reapplyOnJoin(p, run);
+        p.sendMessage(Component.text("Run restaurada!").color(net.kyori.adventure.text.format.NamedTextColor.GREEN).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+    }
+
+    public void removeRun(Player p) {
+        activeRuns.remove(p.getUniqueId());
+    }
+
     public RPGPlugin plugin() { return plugin; }
     public CardRegistry cardRegistry() { return cardRegistry; }
     public StatService statService() { return statService; }
+    public Collection<RunState> getAllRuns() { return activeRuns.values(); }
 }

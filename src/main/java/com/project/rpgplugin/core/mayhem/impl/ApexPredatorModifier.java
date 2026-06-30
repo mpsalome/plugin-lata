@@ -45,7 +45,7 @@ public class ApexPredatorModifier extends BaseModifier {
         if (target == null) return;
         Location loc = target.getLocation().clone().add(random.nextInt(20) - 10, 0, random.nextInt(20) - 10);
         apex = (Mob) w.spawnEntity(loc, EntityType.ZOGLIN);
-        apex.setCustomName("§c§lPredador Alfa");
+        apex.customName(com.project.rpgplugin.util.Text.mm("<red><bold>Predador Alfa"));
         apex.setCustomNameVisible(true);
         var health = apex.getAttribute(Attribute.MAX_HEALTH);
         if (health != null) health.setBaseValue(80.0);

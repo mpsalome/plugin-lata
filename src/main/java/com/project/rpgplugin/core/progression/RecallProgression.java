@@ -3,7 +3,7 @@ package com.project.rpgplugin.core.progression;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.run.SpawnResolver;
-import net.kyori.adventure.text.Component;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -39,21 +39,21 @@ public class RecallProgression {
 
     public void use(Player p, RunState run) {
         if (!ready(run)) {
-            p.sendActionBar(Component.text("§cRecall ainda não carregado!"));
+            p.sendActionBar(Text.mm("<red>Recall ainda não carregado!"));
             return;
         }
         p.teleport(spawnResolver.resolve(p));
         run.incrementRecallUses();
         run.resetBlocksSinceRecall();
         p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
-        p.sendActionBar(Component.text("§dRecall usado! Próximo em " + (int) required(run) + " blocos."));
+        p.sendActionBar(Text.mm("<light_purple>Recall usado! Próximo em " + (int) required(run) + " blocos."));
     }
 
     public String progress(RunState run) {
         if (!run.hasCard("recall")) return "";
         long current = run.blocksSinceRecall();
         long needed = (long) required(run);
-        return "§dRecall: " + current + "/" + needed;
+        return "<light_purple>Recall: " + current + "/" + needed;
     }
 
     private FileConfiguration getCfg() {

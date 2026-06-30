@@ -1,0 +1,33 @@
+# English - RogueLata
+general:
+  prefix: "<gold>RogueLata <dark_gray>|"
+run:
+  started: "<green><bold>New Run Started!"
+  ended: "<red><bold>RUN ENDED"
+  restored: "<green><bold>Run restored!"
+  reset: "<gray>All powers have been lost."
+  victory: "<gold><bold>VICTORY!"
+  death: "<gray>You died! All powers have been lost."
+draft:
+  title: "<gray>Draft - Choose your card"
+  reroll: "<yellow>Reroll"
+  skip: "<gray>Skip"
+  no_cards: "<red>No cards available for draft."
+recall:
+  ready: "<light_purple>Recall ready! Use /recall"
+  used: "<light_purple>Recall used!"
+  progress: "<light_purple>Recall: {0}/{1}"
+  not_ready: "<red>Recall is not ready yet. Walk {0} more blocks."
+  no_card: "<red>You don't have the Recall card."
+mayhem:
+  activated: "<dark_gray>[<red>MAYHEM<dark_gray>] <gray>{0} activated!"
+skill:
+  cooldown: "<red>{0} on cooldown! {1}s remaining."
+  activated: "<green>{0} activated!"
+card:
+  acquired: "<green>Card acquired: <yellow>{0}"
+  not_offerable: "<red>Card cannot be offered."
+error:
+  no_run: "<red>You don't have an active run! Use /skills to start."
+  no_permission: "<red>You don't have permission."
+  player_only: "<red>Only players can use this command."

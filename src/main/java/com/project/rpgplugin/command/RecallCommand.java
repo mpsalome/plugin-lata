@@ -3,7 +3,7 @@ package com.project.rpgplugin.command;
 import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
-import net.kyori.adventure.text.Component;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,13 +27,13 @@ public class RecallCommand implements CommandExecutor {
         }
 
         if (!runManager.hasActiveRun(p)) {
-            p.sendMessage(Component.text("§cVoce nao tem uma run ativa! Use /run para comecar."));
+            p.sendMessage(Text.mm("<red>Voce nao tem uma run ativa! Use /run para comecar."));
             return true;
         }
 
         RunState run = runManager.getRun(p);
         if (!run.hasCard("recall")) {
-            p.sendMessage(Component.text("§cVoce ainda nao desbloqueou o Recall! (FIGHTING 10)"));
+            p.sendMessage(Text.mm("<red>Voce ainda nao desbloqueou o Recall! (FIGHTING 10)"));
             return true;
         }
 

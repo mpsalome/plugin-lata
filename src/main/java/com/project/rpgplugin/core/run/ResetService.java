@@ -49,8 +49,10 @@ public class ResetService {
         // 3. Mayhem: clear active modifiers
         mayhemService.clear(p, run);
 
-        // 4. AuraSkills: placeholder for EPIC-6
-        // auraSkillsBridge.resetAll(p);
+        // 4. AuraSkills: reset if bridge available
+        if (plugin.getAuraSkillsIntegration().isEnabled()) {
+            plugin.getAuraSkillsIntegration().resetAllAuraSkills(p);
+        }
 
         // 5. Level/XP vanilla → 0
         p.setLevel(0);
@@ -74,8 +76,8 @@ public class ResetService {
         // 10. Ensure RPG book
         ensureRpgBook(p);
 
-        p.sendMessage(Component.text("§c§l☠ RUN ENCERRADA ☠"));
-        p.sendMessage(Component.text("§7Todos os poderes foram perdidos. Uma nova run começa!"));
+        p.sendMessage(Component.text("RUN ENCERRADA").color(net.kyori.adventure.text.format.NamedTextColor.RED).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+        p.sendMessage(Component.text("Todos os poderes foram perdidos. Uma nova run comeca!").color(net.kyori.adventure.text.format.NamedTextColor.GRAY));
     }
 
     private void removeTaggedSkillItems(Player p) {
@@ -106,10 +108,10 @@ public class ResetService {
             ItemStack book = new ItemStack(Material.BOOK, 1);
             ItemMeta meta = book.getItemMeta();
             if (meta != null) {
-                meta.displayName(Component.text("§6§lLivro de RPG"));
+                meta.displayName(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<gold><bold>Livro de RPG"));
                 meta.lore(List.of(
-                    Component.text("§7Use para abrir o Menu de Habilidades!"),
-                    Component.text("§eClique com o direito para abrir.")
+                    net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<gray>Use para abrir o Menu de Habilidades!"),
+                    net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<yellow>Clique com o direito para abrir.")
                 ));
                 meta.getPersistentDataContainer().set(ItemKeys.rpgBook(), org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
                 book.setItemMeta(meta);

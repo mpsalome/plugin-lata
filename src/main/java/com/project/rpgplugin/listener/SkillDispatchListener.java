@@ -1,12 +1,14 @@
 package com.project.rpgplugin.listener;
 
-import com.project.rpgplugin.PlayerManager;
+import com.project.rpgplugin.core.run.RunManager;
+import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.Skill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.util.ItemKeys;
+import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -29,12 +31,12 @@ public class SkillDispatchListener implements Listener {
 
     private final SkillRegistry registry;
     private final SkillServices services;
-    private final PlayerManager playerManager;
+    private final RunManager runManager;
 
-    public SkillDispatchListener(SkillRegistry registry, SkillServices services, PlayerManager playerManager) {
+    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager) {
         this.registry = registry;
         this.services = services;
-        this.playerManager = playerManager;
+        this.runManager = runManager;
     }
 
     @EventHandler
@@ -63,7 +65,7 @@ public class SkillDispatchListener implements Listener {
 
         if (services.isReinforced(block.getLocation())) {
             e.setCancelled(true);
-            p.sendMessage(Component.text("§cEste bloco foi reforçado e está temporariamente indestrutível!"));
+            p.sendMessage(Component.text("Este bloco foi reforcado e esta temporariamente indestrutivel!").color(net.kyori.adventure.text.format.NamedTextColor.RED));
             return;
         }
 
@@ -91,20 +93,23 @@ public class SkillDispatchListener implements Listener {
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent e) {
         if (!(e.getEntity() instanceof Player p)) return;
-        List<String> unlocked = playerManager.getUnlockedSkills(p);
-        if (unlocked.isEmpty()) return;
-        int count = unlocked.size();
-        if (count > 0 && e.getFoodLevel() < p.getFoodLevel()) {
-            double hungerMult = services.getDifficultyHungerMultiplier(count);
-            int extraHunger = (int) Math.round((p.getFoodLevel() - e.getFoodLevel()) * (hungerMult - 1.0));
-            if (extraHunger > 0) {
-                p.setFoodLevel(Math.max(0, p.getFoodLevel() - extraHunger));
+        RunState run = runManager.getRun(p);
+        if (run == null) return;
+        if (e.getFoodLevel() < p.getFoodLevel()) {
+            double decayReduction = run.getMultiplier("hunger_decay_reduction");
+            if (decayReduction > 0) {
+                int reduction = (int) Math.round((p.getFoodLevel() - e.getFoodLevel()) * decayReduction);
+                if (reduction > 0) {
+                    p.setFoodLevel(Math.max(0, p.getFoodLevel() - reduction));
+                }
             }
         }
     }
 
     private void dispatch(Player player, TriggerKind kind, Event event, ItemStack item, Block block) {
-        List<String> owned = playerManager.getEquippedSkills(player);
+        RunState run = runManager.getRun(player);
+        if (run == null) return;
+        List<String> owned = run.ownedAbilities().stream().toList();
         if (owned.isEmpty()) return;
 
         for (String skillId : owned) {

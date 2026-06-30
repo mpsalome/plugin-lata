@@ -3,10 +3,12 @@ package com.project.rpgplugin;
 import com.project.rpgplugin.command.RecallCommand;
 import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.config.SkillsConfig;
+import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.card.ability.AbilityCardRegistration;
 import com.project.rpgplugin.core.card.augment.AugmentLoader;
+import com.project.rpgplugin.core.difficulty.DifficultyService;
 import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftWeighting;
 import com.project.rpgplugin.core.mayhem.MayhemConfig;
@@ -19,18 +21,25 @@ import com.project.rpgplugin.core.progression.GateRegistry;
 import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.ResetService;
 import com.project.rpgplugin.core.run.RunManager;
-import com.project.rpgplugin.core.run.RunOutcome;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.run.SpawnResolver;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillRegistration;
 import com.project.rpgplugin.core.skill.SkillServices;
+import com.project.rpgplugin.data.CooldownService;
+import com.project.rpgplugin.data.PlayerDataStore;
+import com.project.rpgplugin.data.YamlDataStore;
+import com.project.rpgplugin.listener.CombatListener;
+import com.project.rpgplugin.listener.MobScalingListener;
 import com.project.rpgplugin.listener.PlayerLevelListener;
 import com.project.rpgplugin.listener.PlayerLifecycleListener;
 import com.project.rpgplugin.listener.RecallListener;
 import com.project.rpgplugin.listener.SkillDispatchListener;
 import com.project.rpgplugin.task.DistanceTask;
+import com.project.rpgplugin.ui.CollectionMenu;
 import com.project.rpgplugin.ui.DraftMenuListener;
+import com.project.rpgplugin.ui.HudService;
+import com.project.rpgplugin.ui.menu.MenuListener;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
@@ -86,10 +95,27 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private RecallCommand recallCommand;
     private RecallListener recallListener;
 
+    // EPIC-7: Difficulty & Combat
+    private DifficultyService difficultyService;
+    private MobScalingListener mobScalingListener;
+    private CombatListener combatListener;
+
+    // EPIC-8: Menus & HUD
+    private HudService hudService;
+    private MenuListener menuListener;
+
+    // EPIC-9: Persistence
+    private PlayerDataStore dataStore;
+    private CooldownService cooldownService;
+
+    // EPIC-10: Synergies
+    private SynergyService synergyService;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
         ItemKeys.init(this);
+        this.cooldownService = new CooldownService();
 
         this.playerManager = new PlayerManager(this);
         this.gateRegistry = new GateRegistry(this);
@@ -101,7 +127,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.skillServices = new SkillServices(this);
         this.skillRegistry = new SkillRegistry();
         SkillRegistration.registerAll(skillRegistry, skillServices);
-        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, playerManager);
 
         // EPIC-4: Mayhem system (needed by EPIC-3)
         this.modifierRegistry = new ModifierRegistry();
@@ -141,19 +166,39 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.recallCommand = new RecallCommand(runManager, recallProgression);
         this.recallListener = new RecallListener(runManager, recallProgression);
 
-        // Register old listener (active during migration)
+        // EPIC-7: Difficulty & Combat
+        this.difficultyService = new DifficultyService(runManager);
+        this.mobScalingListener = new MobScalingListener(difficultyService);
+        this.combatListener = new CombatListener(runManager);
+
+        // EPIC-8: HUD & Menu framework
+        this.hudService = new HudService(this, runManager, recallProgression);
+        this.menuListener = new MenuListener();
+
+        // EPIC-9: Persistence
+        this.dataStore = new YamlDataStore(this, cardRegistry);
+
+        // EPIC-10: Synergies
+        this.synergyService = new SynergyService(cardRegistry);
+
+        // Prepare SkillDispatchListener with RunManager
+        RunManager rm = this.runManager;
+        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm);
+
+        // Register listeners
         getServer().getPluginManager().registerEvents(classListeners, this);
-        // EPIC-2 listeners
         getServer().getPluginManager().registerEvents(playerLevelListener, this);
         getServer().getPluginManager().registerEvents(draftMenuListener, this);
-        // EPIC-3 listeners
         getServer().getPluginManager().registerEvents(playerLifecycleListener, this);
-        // EPIC-5 listeners
         getServer().getPluginManager().registerEvents(recallListener, this);
-        // SkillDispatchListener ready for EPIC-2/3 (RunState) - not registered yet during migration
+        getServer().getPluginManager().registerEvents(skillDispatchListener, this);
+        getServer().getPluginManager().registerEvents(mobScalingListener, this);
+        getServer().getPluginManager().registerEvents(combatListener, this);
+        getServer().getPluginManager().registerEvents(menuListener, this);
 
-        // Start distance tracking
+        // Start distance tracking & HUD
         this.distanceTask.start(this, distanceTracker);
+        this.hudService.start();
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
@@ -164,16 +209,25 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");
         getLogger().info("ModifierRegistry loaded: " + modifierRegistry.size() + " modifiers registered.");
 
+        // Detect soft-dependencies
         if (auraSkillsIntegration.isEnabled()) {
             getLogger().info("RogueLata + AuraSkills integrado com sucesso!");
         } else {
             getLogger().info("RogueLata ativado em modo standalone (sem AuraSkills).");
+        }
+        if (getServer().getPluginManager().getPlugin("AuraMobs") != null) {
+            getLogger().info("RogueLata + AuraMobs detectado (reforco de dificuldade).");
+        }
+        if (getServer().getPluginManager().getPlugin("MythicMobs") != null) {
+            getLogger().info("RogueLata + MythicMobs detectado (enriquecimento de bosses).");
         }
     }
 
     @Override
     public void onDisable() {
         if (distanceTask != null) distanceTask.stop();
+        if (hudService != null) hudService.stop();
+        if (dataStore != null) dataStore.flushAll();
         getLogger().info("RogueLata Plugin desativado.");
     }
 
@@ -229,7 +283,13 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                 return true;
             }
             Player player = (Player) sender;
-            classListeners.openSelectionGUI(player);
+            if (!runManager.hasActiveRun(player)) {
+                runManager.startRun(player);
+            }
+            RunState run = runManager.getRun(player);
+            if (run != null) {
+                new CollectionMenu(player, run);
+            }
             return true;
         }
 
@@ -331,4 +391,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     public PlayerManager getPlayerManager() {
         return playerManager;
     }
+
+    public DifficultyService getDifficultyService() { return difficultyService; }
+    public PlayerDataStore getDataStore() { return dataStore; }
+    public CooldownService getCooldownService() { return cooldownService; }
+    public SynergyService getSynergyService() { return synergyService; }
+    public HudService getHudService() { return hudService; }
+    public GateRegistry getGateRegistry() { return gateRegistry; }
+    public DistanceTracker getDistanceTracker() { return distanceTracker; }
 }

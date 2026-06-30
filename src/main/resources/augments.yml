@@ -89,6 +89,13 @@ pocket_sand:
   icon: SAND
   max_stacks: 2
   effect: { type: MULT, key: blind_on_hit_chance, add: 0.10 }
+regen_lite:
+  tier: bronze
+  tags: [sustain]
+  kind: augment
+  icon: PINK_TULIP
+  max_stacks: 3
+  effect: { type: POTION, potion: REGENERATION, amplifier: 0 }
 max_health_plus:
   tier: silver
   tags: [tank, sustain]
@@ -159,6 +166,76 @@ swift_plus:
   icon: SUGAR
   max_stacks: 3
   effect: { type: ATTRIBUTE, attribute: MOVEMENT_SPEED, add_per_stack: 0.05 }
+dash_charge:
+  tier: silver
+  tags: [mobility]
+  kind: augment
+  icon: FEATHER
+  max_stacks: 2
+  effect: { type: MULT, key: dash_charge, add: 1 }
+auto_smelt:
+  tier: silver
+  tags: [miner, economy]
+  kind: augment
+  icon: FURNACE
+  max_stacks: 1
+  effect: { type: MULT, key: auto_smelt, add: 1 }
+mana_pool:
+  tier: silver
+  tags: [utility]
+  kind: augment
+  icon: EXPERIENCE_BOTTLE
+  max_stacks: 3
+  effect: { type: MULT, key: mana_max, add: 20 }
+second_wind:
+  tier: silver
+  tags: [tank, sustain]
+  kind: augment
+  icon: TOTEM_OF_UNDYING
+  max_stacks: 1
+  effect: { type: MULT, key: second_wind, add: 1 }
+bulwark:
+  tier: silver
+  tags: [tank, risk]
+  kind: augment
+  icon: SHIELD
+  max_stacks: 2
+  effect: { type: MULT, key: damage_reduction, add: -0.10 }
+frost_touch:
+  tier: silver
+  tags: [dps, utility]
+  kind: augment
+  icon: ICE
+  max_stacks: 2
+  effect: { type: MULT, key: frost_touch, add: 1 }
+vampiric_night:
+  tier: silver
+  tags: [sustain, risk]
+  kind: augment
+  icon: CLOCK
+  max_stacks: 1
+  effect: { type: MULT, key: vampiric_night, add: 1 }
+forager_plus:
+  tier: silver
+  tags: [builder, economy]
+  kind: augment
+  icon: GOLDEN_HOE
+  max_stacks: 1
+  effect: { type: MULT, key: crop_yield, add: 2 }
+adrenaline:
+  tier: silver
+  tags: [mobility, dps]
+  kind: augment
+  icon: BLAZE_POWDER
+  max_stacks: 3
+  effect: { type: MULT, key: adrenaline, add: 1 }
+shield_battery:
+  tier: silver
+  tags: [tank]
+  kind: augment
+  icon: SHIELD
+  max_stacks: 2
+  effect: { type: POTION, potion: ABSORPTION, amplifier: 0 }
 glass_cannon:
   tier: gold
   tags: [risk, dps]
@@ -201,3 +278,94 @@ giant:
   icon: IRON_BLOCK
   max_stacks: 1
   effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 20 }
+max_health_max:
+  tier: gold
+  tags: [tank]
+  kind: augment
+  icon: ENCHANTED_GOLDEN_APPLE
+  max_stacks: 3
+  effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 8 }
+overcharge:
+  tier: gold
+  tags: [dps]
+  kind: augment
+  icon: NETHERITE_AXE
+  max_stacks: 1
+  effect: { type: MULT, key: overcharge, add: 1 }
+phoenix:
+  tier: gold
+  tags: [sustain]
+  kind: augment
+  icon: TOTEM_OF_UNDYING
+  max_stacks: 1
+  effect: { type: MULT, key: phoenix, add: 1 }
+chain_lightning:
+  tier: gold
+  tags: [dps]
+  kind: augment
+  icon: TRIDENT
+  max_stacks: 1
+  effect: { type: MULT, key: chain_lightning, add: 1 }
+time_dilation:
+  tier: gold
+  tags: [utility, tank]
+  kind: augment
+  icon: CLOCK
+  max_stacks: 1
+  effect: { type: MULT, key: time_dilation, add: 1 }
+greedy_draft:
+  tier: gold
+  tags: [utility]
+  kind: augment
+  icon: MAP
+  max_stacks: 1
+  effect: { type: MULT, key: greedy_draft, add: 1 }
+echo:
+  tier: gold
+  tags: [utility, dps]
+  kind: augment
+  icon: REPEATER
+  max_stacks: 1
+  effect: { type: MULT, key: echo, add: 1 }
+blood_pact:
+  tier: gold
+  tags: [risk, dps]
+  kind: augment
+  icon: REDSTONE_BLOCK
+  max_stacks: 1
+  effect: { type: MULT_MULTI, damage_dealt: 0.60, damage_taken: 0.40 }
+last_stand:
+  tier: gold
+  tags: [tank, risk]
+  kind: augment
+  icon: SHIELD
+  max_stacks: 1
+  effect: { type: MULT, key: last_stand, add: 1 }
+momentum:
+  tier: gold
+  tags: [mobility]
+  kind: augment
+  icon: DIAMOND_BOOTS
+  max_stacks: 1
+  effect: { type: MULT, key: momentum, add: 1 }
+explorer_ascendant:
+  tier: gold
+  tags: [explorer]
+  kind: augment
+  icon: NETHER_STAR
+  max_stacks: 1
+  effect: { type: MULT, key: explorer_ascendant, add: 1 }
+miner_ascendant:
+  tier: gold
+  tags: [miner]
+  kind: augment
+  icon: NETHER_STAR
+  max_stacks: 1
+  effect: { type: MULT, key: miner_ascendant, add: 1 }
+builder_ascendant:
+  tier: gold
+  tags: [builder]
+  kind: augment
+  icon: NETHER_STAR
+  max_stacks: 1
+  effect: { type: MULT, key: builder_ascendant, add: 1 }

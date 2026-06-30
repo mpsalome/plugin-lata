@@ -50,57 +50,57 @@ public class PlayerManager {
         dataInitialized = true;
 
         // Bronze - Explorer
-        putSkill("dash", "§dDash das Flores", "Consuma flor para dashes com Speed II e Invisibilidade", Material.NETHER_WART, "bronze", "explorer");
-        putSkill("hydration", "§bHidratacao", "Garrafas de agua enchem fome e saturacao", Material.POTION, "bronze", "explorer");
-        putSkill("step_assist", "§ePasso Agil", "Consuma acucar para Speed II por 15s", Material.SUGAR, "bronze", "explorer");
-        putSkill("grapple", "§aSalto Escalador", "Consuma slimeball para salto frontal", Material.STRING, "bronze", "explorer");
+        putSkill("dash", "<light_purple>Dash das Flores", "Consuma flor para dashes com Speed II e Invisibilidade", Material.NETHER_WART, "bronze", "explorer");
+        putSkill("hydration", "<aqua>Hidratacao", "Garrafas de agua enchem fome e saturacao", Material.POTION, "bronze", "explorer");
+        putSkill("step_assist", "<yellow>Passo Agil", "Consuma acucar para Speed II por 15s", Material.SUGAR, "bronze", "explorer");
+        putSkill("grapple", "<green>Salto Escalador", "Consuma slimeball para salto frontal", Material.STRING, "bronze", "explorer");
 
         // Bronze - Miner
-        putSkill("diet", "§6Dieta de Carvao", "Alimente-se de carvao para recuperar fome", Material.COAL, "bronze", "miner");
-        putSkill("stone_smash", "§8Quebra-Pedra", "Quebre pedra mais rapido segurando pedregulho", Material.COBBLESTONE, "bronze", "miner");
-        putSkill("torch_light", "§fLuz de Tocha", "Consuma tocha para Visao Noturna 30s", Material.TORCH, "bronze", "miner");
+        putSkill("diet", "<gold>Dieta de Carvao", "Alimente-se de carvao para recuperar fome", Material.COAL, "bronze", "miner");
+        putSkill("stone_smash", "<dark_gray>Quebra-Pedra", "Quebre pedra mais rapido segurando pedregulho", Material.COBBLESTONE, "bronze", "miner");
+        putSkill("torch_light", "<white>Luz de Tocha", "Consuma tocha para Visao Noturna 30s", Material.TORCH, "bronze", "miner");
 
         // Bronze - Builder
-        putSkill("feast", "§2Banquete de Folhas", "Alimente-se de folhas diretamente", Material.OAK_LEAVES, "bronze", "builder");
-        putSkill("woodcutter", "§aLenhador Rapido", "Trigo com machado da Haste I por 10s", Material.WHEAT, "bronze", "builder");
-        putSkill("silk_touch", "§7Toque de Seda Manual", "Colete blocos fragsis de mao vazia", Material.SHEARS, "bronze", "builder");
-        putSkill("scaffold", "§aSalto do Andaime", "Pula alto gerandoblocos temporarios", Material.DIRT, "bronze", "builder");
+        putSkill("feast", "<dark_green>Banquete de Folhas", "Alimente-se de folhas diretamente", Material.OAK_LEAVES, "bronze", "builder");
+        putSkill("woodcutter", "<green>Lenhador Rapido", "Trigo com machado da Haste I por 10s", Material.WHEAT, "bronze", "builder");
+        putSkill("silk_touch", "<gray>Toque de Seda Manual", "Colete blocos fragsis de mao vazia", Material.SHEARS, "bronze", "builder");
+        putSkill("scaffold", "<green>Salto do Andaime", "Pula alto gerando blocos temporarios", Material.DIRT, "bronze", "builder");
 
         // Silver - Explorer
-        putSkill("safe_fall", "§fEscudo Anti-Queda", "Anula dano de queda com Slow Falling", Material.FEATHER, "silver", "explorer");
-        putSkill("water_breathing", "§6Respiracao Aquatica", "Consuma Lapis Lazuli para respirar na agua", Material.LAPIS_LAZULI, "silver", "explorer");
-        putSkill("jump_boost", "§cSuper Salto", "Salto passivo permanente nas botas", Material.RABBIT_FOOT, "silver", "explorer");
-        putSkill("thermal_resistance", "§eEscudo de Lava", "Magma cream da Fire Resistance por 15s", Material.MAGMA_CREAM, "silver", "explorer");
+        putSkill("safe_fall", "<white>Escudo Anti-Queda", "Anula dano de queda com Slow Falling", Material.FEATHER, "silver", "explorer");
+        putSkill("water_breathing", "<gold>Respiracao Aquatica", "Consuma Lapis Lazuli para respirar na agua", Material.LAPIS_LAZULI, "silver", "explorer");
+        putSkill("jump_boost", "<red>Super Salto", "Salto passivo permanente nas botas", Material.RABBIT_FOOT, "silver", "explorer");
+        putSkill("thermal_resistance", "<yellow>Escudo de Lava", "Magma cream da Fire Resistance por 15s", Material.MAGMA_CREAM, "silver", "explorer");
 
         // Silver - Miner
-        putSkill("ore_sonar", "§eRadar de Minerio", "Mapeia minerios proximos com particulas", Material.GLOWSTONE_DUST, "silver", "miner");
-        putSkill("haste", "§eFebre do Ouro", "Consuma ouro com picareta para Haste II", Material.GOLD_INGOT, "silver", "miner");
+        putSkill("ore_sonar", "<yellow>Radar de Minerio", "Mapeia minerios proximos com particulas", Material.GLOWSTONE_DUST, "silver", "miner");
+        putSkill("haste", "<yellow>Febre do Ouro", "Consuma ouro com picareta para Haste II", Material.GOLD_INGOT, "silver", "miner");
 
         // Silver - Builder
-        putSkill("canopy_step", "§2Paso da Canopia", "Speed II ao pisar em folhas ou grama", Material.LEATHER_BOOTS, "silver", "builder");
-        putSkill("fertilize", "§2Adubo Verde", "Farinha de osso cresce plantas ao redor", Material.BONE_MEAL, "silver", "builder");
-        putSkill("flora_shield", "§aEscudo Floral", "Consuma flor para regenerar 8 de vida", Material.DANDELION, "silver", "builder");
-        putSkill("architect_focus", "§aFoco do Arquiteto", "Resistencia IV por 30s com penalty", Material.STONE_BRICKS, "silver", "builder");
-        putSkill("gravity_defiance", "§aDesafio Gravitacional", "Flutue no ar temporariamente", Material.SLIME_BLOCK, "silver", "builder");
+        putSkill("canopy_step", "<dark_green>Passo da Canopia", "Speed II ao pisar em folhas ou grama", Material.LEATHER_BOOTS, "silver", "builder");
+        putSkill("fertilize", "<dark_green>Adubo Verde", "Farinha de osso cresce plantas ao redor", Material.BONE_MEAL, "silver", "builder");
+        putSkill("flora_shield", "<green>Escudo Floral", "Consuma flor para regenerar 8 de vida", Material.DANDELION, "silver", "builder");
+        putSkill("architect_focus", "<green>Foco do Arquiteto", "Resistencia IV por 30s com penalty", Material.STONE_BRICKS, "silver", "builder");
+        putSkill("gravity_defiance", "<green>Desafio Gravitacional", "Flutue no ar temporariamente", Material.SLIME_BLOCK, "silver", "builder");
 
         // Gold - Explorer
-        putSkill("recall", "§5Recall do Dragao", "Teleporta ao spawn do mundo", Material.DRAGON_BREATH, "gold", "explorer");
-        putSkill("sonar", "§dSonar de Eco", "Revela entidades proximas com particulas", Material.AMETHYST_SHARD, "gold", "explorer");
-        putSkill("dim_shift", "§9Mudanca Dimensional", "Teletransporte dimensional avancado", Material.ENDER_PEARL, "gold", "explorer");
-        putSkill("wind_burst", "§aExplosao de Vento", "Ejetado ao ceu com explosao de vento", Material.GUNPOWDER, "gold", "explorer");
+        putSkill("recall", "<dark_purple>Recall do Dragao", "Teleporta ao spawn do mundo", Material.DRAGON_BREATH, "gold", "explorer");
+        putSkill("sonar", "<light_purple>Sonar de Eco", "Revela entidades proximas com particulas", Material.AMETHYST_SHARD, "gold", "explorer");
+        putSkill("dim_shift", "<blue>Mudanca Dimensional", "Teletransporte dimensional avancado", Material.ENDER_PEARL, "gold", "explorer");
+        putSkill("wind_burst", "<green>Explosao de Vento", "Ejetado ao ceu com explosao de vento", Material.GUNPOWDER, "gold", "explorer");
 
         // Gold - Miner
-        putSkill("sight", "§8Visao Noturna", "Visao noturna permanente em locais escuros", Material.AMETHYST_SHARD, "gold", "miner");
-        putSkill("ore_repair", "§7Reparo de Minerio", "Use ferro para reparar 30% da picareta", Material.IRON_INGOT, "gold", "miner");
-        putSkill("molten_touch", "§cToque de Fusao", "Funde minerios automaticamente por 30s", Material.FLINT, "gold", "miner");
-        putSkill("transmutation", "§cTransmutacao", "Transmute metais em itens nobres", Material.DIAMOND, "gold", "miner");
-        putSkill("gravity_shield", "§8Escudo Gravitacional", "Resistencia III ao consumir obsidiana", Material.OBSIDIAN, "gold", "miner");
-        putSkill("core_overdrive", "§cSobrecarga do Nucleo", "Haste III e Forca II com penalty de lentidao", Material.REDSTONE_BLOCK, "gold", "miner");
+        putSkill("sight", "<dark_gray>Visao Noturna", "Visao noturna permanente em locais escuros", Material.AMETHYST_SHARD, "gold", "miner");
+        putSkill("ore_repair", "<gray>Reparo de Minerio", "Use ferro para reparar 30% da picareta", Material.IRON_INGOT, "gold", "miner");
+        putSkill("molten_touch", "<red>Toque de Fusao", "Funde minerios automaticamente por 30s", Material.FLINT, "gold", "miner");
+        putSkill("transmutation", "<red>Transmutacao", "Transmute metais em itens nobres", Material.DIAMOND, "gold", "miner");
+        putSkill("gravity_shield", "<dark_gray>Escudo Gravitacional", "Resistencia III ao consumir obsidiana", Material.OBSIDIAN, "gold", "miner");
+        putSkill("core_overdrive", "<red>Sobrecarga do Nucleo", "Haste III e Forca II com penalty de lentidao", Material.REDSTONE_BLOCK, "gold", "miner");
 
         // Gold - Builder
-        putSkill("lumberjack", "§2Golpe do Lenhador", "Quebrearvore inteira com Haste IV", Material.IRON_BLOCK, "gold", "builder");
-        putSkill("unbreakable_block", "§aBloco Reforcado", "Reforce bloco temporariamente", Material.CLAY_BALL, "gold", "builder");
-        putSkill("grace", "§aGraca da Pena", "Pule alto com queda lenta", Material.FEATHER, "gold", "builder");
+        putSkill("lumberjack", "<dark_green>Golpe do Lenhador", "Quebre arvore inteira com Haste IV", Material.IRON_BLOCK, "gold", "builder");
+        putSkill("unbreakable_block", "<green>Bloco Reforcado", "Reforce bloco temporariamente", Material.CLAY_BALL, "gold", "builder");
+        putSkill("grace", "<green>Graca da Pena", "Pule alto com queda lenta", Material.FEATHER, "gold", "builder");
     }
 
     private static void putSkill(String key, String displayName, String desc, Material mat, String tier, String type) {
@@ -299,7 +299,7 @@ public class PlayerManager {
     }
 
     public String getSkillDisplayName(String skillKey) {
-        return SKILL_DISPLAY_NAMES.getOrDefault(skillKey.toLowerCase(), "§7Habilidade Desconhecida");
+        return SKILL_DISPLAY_NAMES.getOrDefault(skillKey.toLowerCase(), "<gray>Habilidade Desconhecida");
     }
 
     public String getSkillDescription(String skillKey) {

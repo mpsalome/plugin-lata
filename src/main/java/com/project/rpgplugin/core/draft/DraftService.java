@@ -93,7 +93,7 @@ public class DraftService {
         statService.recompute(p, run);
 
         playTierSound(p, chosen.tier());
-        p.sendActionBar(Component.text("§a✔ Draftado: " + chosen.id()));
+        p.sendActionBar(Component.text("<green>✔ Draftado: " + chosen.id()));
     }
 
     public void skipDraft(Player p, RunState run, DraftSession session) {
@@ -105,7 +105,7 @@ public class DraftService {
         } else {
             p.setHealth(p.getMaxHealth());
         }
-        p.sendActionBar(Component.text("§7Draft pulado. Você recuperou §c❤ " + (int) heal + " §7de vida."));
+        p.sendActionBar(Component.text("<gray>Draft pulado. Você recuperou <red>❤ " + (int) heal + " <gray>de vida."));
     }
 
     public boolean reroll(Player p, RunState run, DraftSession session) {

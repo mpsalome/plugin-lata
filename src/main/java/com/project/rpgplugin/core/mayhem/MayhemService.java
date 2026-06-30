@@ -94,12 +94,10 @@ public class MayhemService {
             case WILD -> "<gold>";
             case INSANE -> "<red>";
         };
-        Component msg = Component.text("")
-            .append(Component.text("§8[§cMAYHEM§8] §f"))
-            .append(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
-                .deserialize(severityColor + "<bold>" + m.id().replace("_", " ") + "</bold>"))
-            .append(Component.text(" §7ativado!"));
-        Bukkit.broadcast(msg);
+        String msg = "<dark_gray>[<red>MAYHEM<dark_gray>] <gray>"
+            + severityColor + "<bold>" + m.id().replace("_", " ") + "</bold>"
+            + " <gray>ativado!";
+        Bukkit.broadcast(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(msg));
     }
 
     private boolean scopeIsServer() {

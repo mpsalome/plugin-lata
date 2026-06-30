@@ -49,6 +49,6 @@ public class ArchitectFocusSkill extends AbstractSkill {
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 600, 0));
         p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 600, 3));
         p.playSound(p.getLocation(), Sound.BLOCK_STONE_PLACE, 1.0f, 1.0f);
-        feedback(ctx, "§aFoco do Arquiteto: Resistência IV!", null);
+        feedback(ctx, "<green>Foco do Arquiteto: Resistência IV!", null);
     }
 }

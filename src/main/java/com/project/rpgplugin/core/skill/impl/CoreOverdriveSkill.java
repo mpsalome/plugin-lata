@@ -50,6 +50,6 @@ public class CoreOverdriveSkill extends AbstractSkill {
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 300, 1));
         p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 300, 2));
         p.playSound(p.getLocation(), Sound.BLOCK_REDSTONE_TORCH_BURNOUT, 1.0f, 1.0f);
-        feedback(ctx, "§cSobrecarga do Núcleo Ativada!", null);
+        feedback(ctx, "<red>Sobrecarga do Núcleo Ativada!", null);
     }
 }

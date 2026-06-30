@@ -49,7 +49,7 @@ public class DashSkill extends AbstractSkill {
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "§cDash em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            feedback(ctx, "<red>Dash em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
             return;
         }
         Player p = ctx.player();

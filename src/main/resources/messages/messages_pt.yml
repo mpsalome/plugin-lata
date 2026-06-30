@@ -1,0 +1,33 @@
+# Portugues Brasileiro - RogueLata
+general:
+  prefix: "<gold>RogueLata <dark_gray>|"
+run:
+  started: "<green><bold>Nova Run Iniciada!"
+  ended: "<red><bold>RUN ENCERRADA"
+  restored: "<green><bold>Run restaurada!"
+  reset: "<gray>Todos os poderes foram perdidos."
+  victory: "<gold><bold>VITORIA!"
+  death: "<gray>Voce morreu! Todos os poderes foram perdidos."
+draft:
+  title: "<gray>Draft - Escolha sua carta"
+  reroll: "<yellow>Reroll"
+  skip: "<gray>Pular"
+  no_cards: "<red>Nenhuma carta disponivel para draft."
+recall:
+  ready: "<light_purple>Recall pronto! Use /recall"
+  used: "<light_purple>Recall usado!"
+  progress: "<light_purple>Recall: {0}/{1}"
+  not_ready: "<red>Recall ainda nao esta pronto. Ande mais {0} blocos."
+  no_card: "<red>Voce nao tem a carta Recall."
+mayhem:
+  activated: "<dark_gray>[<red>MAYHEM<dark_gray>] <gray>{0} ativado!"
+skill:
+  cooldown: "<red>{0} em cooldown! Restam {1}s."
+  activated: "<green>{0} ativado!"
+card:
+  acquired: "<green>Carta adquirida: <yellow>{0}"
+  not_offerable: "<red>Carta nao pode ser ofertada."
+error:
+  no_run: "<red>Voce nao tem uma run ativa! Use /skills para comecar."
+  no_permission: "<red>Voce nao tem permissao."
+  player_only: "<red>Apenas jogadores podem usar este comando."

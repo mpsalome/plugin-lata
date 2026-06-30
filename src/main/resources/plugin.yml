@@ -3,9 +3,11 @@ version: '${project.version}'
 main: com.project.rpgplugin.RPGPlugin
 api-version: '1.21'
 author: Developer
-description: Plugin Rogue-Like com sistema de habilidades em 3 tiers (Bronze/Prata/Ouro).
+description: Plugin Rogue-Like com sistema de habilidades em 3 tiers (Bronze/Prata/Ouro) para Minecraft Paper 1.21.4+.
 softdepend:
   - AuraSkills
+  - AuraMobs
+  - MythicMobs
 commands:
   skills:
     description: Abre o menu visual de selecao de habilidades.

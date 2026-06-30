@@ -61,8 +61,8 @@ public class GateRegistry {
 
             if (!playerManager.hasSkill(p, gate.card)) {
                 playerManager.unlockSkill(p, gate.card);
-                p.sendMessage("§a§l[RogueLata] §aNova habilidade desbloqueada: "
-                        + playerManager.getSkillDisplayName(gate.card));
+                p.sendMessage(com.project.rpgplugin.util.Text.mm("<green><bold>[RogueLata] <green>Nova habilidade desbloqueada: "
+                        + playerManager.getSkillDisplayName(gate.card)));
                 auraSkills.syncAuraSkillLevel(p, gate.card, 1);
             }
 
@@ -70,7 +70,7 @@ public class GateRegistry {
                 Card card = plugin.getCardRegistry().byId(gate.card).orElse(null);
                 if (card != null) {
                     card.onAcquire(p, run);
-                    p.sendMessage("§a§l✦ Carta adicionada: " + gate.card.replace("_", " "));
+                    p.sendMessage(com.project.rpgplugin.util.Text.mm("<green><bold>✦ Carta adicionada: " + gate.card.replace("_", " ")));
                 }
             }
         }
