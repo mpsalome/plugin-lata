@@ -8,13 +8,13 @@ RogueLata transforma o Minecraft em uma experiencia rogue-like onde voce escolhe
 
 ## Sistema de Habilidades
 
-### 3 Tiers (33 habilidades no total)
+### 3 Tiers (35 habilidades no total)
 
 | Tier | Custo XP | Max Equipadas | Habilidades |
 |------|----------|---------------|-------------|
 | **Bronze** | 1 XP | 3 | 11 |
 | **Prata** | 3 XP | 3 | 11 |
-| **Ouro** | 5 XP | 3 | 11 |
+| **Ouro** | 5 XP | 3 | 13 |
 
 Voce pode equipar ate **9 habilidades simultaneamente** (3 de cada tier).
 
@@ -116,10 +116,11 @@ Quando voce equipa **4+ habilidades do mesmo tipo**, uma passiva global e ativad
 ## Instalacao
 
 1. Baixe o JAR mais recente
-2. Coloque em `plugins/` do seu servidor Paper 1.21+
-3. **(Opcional)** Coloque `AuraSkills.jar` e `AuraMobs.jar` em `plugins/` para integracao completa
-4. Reinicie o servidor
-5. Use `/skills` para comecar
+2. Coloque em `plugins/` do seu servidor Paper 1.21.4+ (26.2)
+3. Coloque `InvUI.jar` em `plugins/` (necessario para os menus)
+4. **(Opcional)** Coloque `AuraSkills.jar` e `AuraMobs.jar` em `plugins/` para integracao completa
+5. Reinicie o servidor
+6. Use `/skills` para comecar
 
 > **Nota**: RogueLata funciona standalone sem AuraSkills. Com AuraSkills, as 35 habilidades custom sao registradas sob o namespace `roguelata/` e desbloqueadas automaticamente ao atingir certos niveis nas skills padrao (Agility, Mining, Foraging, etc.).
 
@@ -167,11 +168,11 @@ Isso serve como marcador visual para identificar quais skills sao nossas vs. as 
 mvn clean package
 ```
 
-O JAR sera gerado em `target/RogueLata-1.1-SNAPSHOT.jar`.
+O JAR sera gerado em `target/RogueLata-${project.version}.jar`.
 
 ### Dependencias
 
-- Paper API 1.21
+- Paper API 1.21.4 (Paper 26.2)
 - AuraSkills API 2.3.12 (optional, compile-only)
 - Java 21
 - Maven 3.9+

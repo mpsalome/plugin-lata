@@ -6,7 +6,7 @@
 
     <groupId>com.project</groupId>
     <artifactId>RogueLata</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <name>RogueLata</name>
@@ -15,6 +15,8 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <paper.version>1.21.4-R0.1-SNAPSHOT</paper.version>
+        <invui.version>2.2.0</invui.version>
     </properties>
 
     <repositories>
@@ -35,14 +37,15 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21-R0.1-SNAPSHOT</version>
+            <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- InvUI for modern GUI system -->
+        <!-- InvUI for modern GUI system (provided - must be installed on server) -->
         <dependency>
             <groupId>xyz.xenondevs.invui</groupId>
             <artifactId>invui</artifactId>
-            <version>2.2.0</version>
+            <version>${invui.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- AuraSkills API -->
         <dependency>

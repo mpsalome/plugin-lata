@@ -35,6 +35,8 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.Sound;
 import org.bukkit.Particle;
+import com.project.rpgplugin.util.ItemKeys;
+import com.project.rpgplugin.util.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,14 +176,10 @@ public class ClassListeners implements Listener {
         ItemStack item = event.getItem();
         if (item == null) return;
 
-        // Book check FIRST — works regardless of equipped skills
-        if (item.getType() == Material.BOOK) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null && meta.hasDisplayName() && meta.getDisplayName().contains("Livro de RPG")) {
-                event.setCancelled(true);
-                openSelectionGUI(player);
-                return;
-            }
+        if (ItemKeys.isRpgBook(item)) {
+            event.setCancelled(true);
+            openSelectionGUI(player);
+            return;
         }
 
         List<String> equipped = playerManager.getEquippedSkills(player);
@@ -291,7 +289,7 @@ public class ClassListeners implements Listener {
                 player.sendActionBar(Component.text("Sonar ativo! Localizando entidades...").color(NamedTextColor.DARK_PURPLE));
                 for (Entity entity : player.getNearbyEntities(15, 15, 15)) {
                     if (entity instanceof LivingEntity && entity != player) {
-                        entity.getWorld().spawnParticle(Particle.GLOW, entity.getLocation().add(0, 1, 0), 10, 0.2, 0.5, 0.2, 0);
+                        entity.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, entity.getLocation().add(0, 1, 0), 10, 0.2, 0.5, 0.2, 0);
                     }
                 }
                 return;
@@ -309,7 +307,7 @@ public class ClassListeners implements Listener {
                 item.subtract(1);
                 player.setVelocity(new org.bukkit.util.Vector(0, 1.3, 0));
                 windBurstCooldown.put(uuid, now);
-                player.getWorld().spawnParticle(Particle.EXPLOSION, player.getLocation(), 10, 0.5, 0.5, 0.5, 0.1);
+                player.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, player.getLocation(), 10, 0.5, 0.5, 0.5, 0.1);
                 player.playSound(player.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 1.0f, 1.0f);
                 player.sendActionBar(Component.text("Explosao de Vento!").color(NamedTextColor.WHITE));
                 return;
@@ -383,7 +381,7 @@ public class ClassListeners implements Listener {
                             if (b.getType() == Material.IRON_ORE || b.getType() == Material.DEEPSLATE_IRON_ORE ||
                                 b.getType() == Material.GOLD_ORE || b.getType() == Material.DEEPSLATE_GOLD_ORE ||
                                 b.getType() == Material.DIAMOND_ORE || b.getType() == Material.DEEPSLATE_DIAMOND_ORE) {
-                                b.getWorld().spawnParticle(Particle.GLOW, b.getLocation().add(0.5, 0.5, 0.5), 5, 0.1, 0.1, 0.1, 0);
+                                b.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, b.getLocation().add(0.5, 0.5, 0.5), 5, 0.1, 0.1, 0.1, 0);
                             }
                         }
                     }
@@ -554,9 +552,9 @@ public class ClassListeners implements Listener {
                     player.sendActionBar(Component.text("Escudo Floral em cooldown! " + rem + "s").color(NamedTextColor.RED));
                     return;
                 }
-                if (player.getHealth() < Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()) {
+                if (player.getHealth() < Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue()) {
                     item.subtract(1);
-                    player.setHealth(Math.min(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue(), player.getHealth() + 8.0));
+                    player.setHealth(Math.min(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue(), player.getHealth() + 8.0));
                     floraShieldCooldown.put(uuid, now);
                     player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 8, 0.3, 0.3, 0.3, 0);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
@@ -812,12 +810,12 @@ public class ClassListeners implements Listener {
 
         playerManager.clearAllSkills(player);
         auraSkills.resetPlayerSkills(player);
-        player.sendMessage(Component.text("§4§l╔══════════════════════════════════╗"));
-        player.sendMessage(Component.text("§4§l║   VOCE MORREU!                  ║"));
-        player.sendMessage(Component.text("§4§l║   Todas as habilidades foram     ║"));
-        player.sendMessage(Component.text("§4§l║   perdidas! (Modo Rogue-Like)    ║"));
-        player.sendMessage(Component.text("§4§l║   Comece novamente no spawn!    ║"));
-        player.sendMessage(Component.text("§4§l╚══════════════════════════════════╝"));
+        player.sendMessage(Text.mm("<dark_red><bold>╔══════════════════════════════════╗"));
+        player.sendMessage(Text.mm("<dark_red><bold>║   VOCE MORREU!                  ║"));
+        player.sendMessage(Text.mm("<dark_red><bold>║   Todas as habilidades foram     ║"));
+        player.sendMessage(Text.mm("<dark_red><bold>║   perdidas! (Modo Rogue-Like)    ║"));
+        player.sendMessage(Text.mm("<dark_red><bold>║   Comece novamente no spawn!    ║"));
+        player.sendMessage(Text.mm("<dark_red><bold>╚══════════════════════════════════╝"));
 
         Location spawn = player.getWorld().getSpawnLocation();
         player.teleport(spawn);
@@ -854,12 +852,9 @@ public class ClassListeners implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
-        if (item.getType() == Material.BOOK) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null && meta.hasDisplayName() && meta.getDisplayName().contains("Livro de RPG")) {
-                event.setCancelled(true);
-                event.getPlayer().sendMessage(Component.text("§cVoce nao pode descartar o Livro de RPG!"));
-            }
+        if (ItemKeys.isRpgBook(item)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(Component.text("Voce nao pode descartar o Livro de RPG!").color(NamedTextColor.RED));
         }
     }
 
@@ -872,32 +867,21 @@ public class ClassListeners implements Listener {
     private void giveRpgBookIfMissing(Player player) {
         boolean hasBook = false;
         for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && item.getType() == Material.BOOK) {
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null && meta.hasDisplayName() && meta.getDisplayName().contains("Livro de RPG")) {
-                    hasBook = true;
-                    break;
-                }
+            if (ItemKeys.isRpgBook(item)) {
+                hasBook = true;
+                break;
             }
         }
         if (!hasBook) {
-            ItemStack rpgBook = new ItemStack(Material.BOOK, 1);
-            ItemMeta meta = rpgBook.getItemMeta();
-            if (meta != null) {
-                meta.displayName(Component.text("§6§lLivro de RPG").decoration(TextDecoration.ITALIC, false));
-                meta.lore(Arrays.asList(
-                    Component.text("§7Use para abrir o Menu de Habilidades!"),
-                    Component.text("§eClique com o direito para abrir.")
-                ));
-                rpgBook.setItemMeta(meta);
-            }
+            RPGPlugin rpg = (RPGPlugin) Bukkit.getPluginManager().getPlugin("RogueLata");
+            ItemStack rpgBook = rpg.createRpgBook();
             ItemStack currentItemInSlot8 = player.getInventory().getItem(8);
             if (currentItemInSlot8 == null || currentItemInSlot8.getType() == Material.AIR) {
                 player.getInventory().setItem(8, rpgBook);
             } else {
                 player.getInventory().addItem(rpgBook);
             }
-            player.sendMessage(Component.text("§a§l[RogueLata] §aVoce recebeu o §6§lLivro de RPG§a. Use-o para evoluir!"));
+            player.sendMessage(Text.mm("<green><bold>[RogueLata] <green>Voce recebeu o <gold><bold>Livro de RPG<green>. Use-o para evoluir!"));
         }
     }
 
