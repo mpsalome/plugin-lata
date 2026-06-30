@@ -1,5 +1,10 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.config.SkillsConfig;
+import com.project.rpgplugin.core.skill.SkillRegistry;
+import com.project.rpgplugin.core.skill.SkillRegistration;
+import com.project.rpgplugin.core.skill.SkillServices;
+import com.project.rpgplugin.listener.SkillDispatchListener;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
@@ -22,6 +27,11 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private ClassListeners classListeners;
     private AuraSkillsIntegration auraSkillsIntegration;
 
+    private SkillRegistry skillRegistry;
+    private SkillServices skillServices;
+    private SkillDispatchListener skillDispatchListener;
+    private SkillsConfig skillsConfig;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -31,10 +41,21 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.auraSkillsIntegration = new AuraSkillsIntegration(this, playerManager);
         this.classListeners = new ClassListeners(this, playerManager, auraSkillsIntegration);
 
+        // EPIC-1: Data-driven skill architecture
+        this.skillsConfig = new SkillsConfig(this);
+        this.skillServices = new SkillServices(this);
+        this.skillRegistry = new SkillRegistry();
+        SkillRegistration.registerAll(skillRegistry, skillServices);
+        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, playerManager);
+
+        // Register old listener (active during migration)
         getServer().getPluginManager().registerEvents(classListeners, this);
+        // SkillDispatchListener ready for EPIC-2/3 (RunState) - not registered yet during migration
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
+
+        getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
 
         if (auraSkillsIntegration.isEnabled()) {
             getLogger().info("RogueLata + AuraSkills integrado com sucesso!");
@@ -50,6 +71,18 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     public AuraSkillsIntegration getAuraSkillsIntegration() {
         return auraSkillsIntegration;
+    }
+
+    public SkillRegistry getSkillRegistry() {
+        return skillRegistry;
+    }
+
+    public SkillServices getSkillServices() {
+        return skillServices;
+    }
+
+    public SkillsConfig getSkillsConfig() {
+        return skillsConfig;
     }
 
     @Override
@@ -71,6 +104,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                     return true;
                 }
                 reloadConfig();
+                skillsConfig.reload();
                 sender.sendMessage(Component.text("[RogueLata] Configuracao recarregada!").color(NamedTextColor.GREEN));
                 return true;
             }

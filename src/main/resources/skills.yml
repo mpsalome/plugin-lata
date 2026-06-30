@@ -1,0 +1,46 @@
+# RogueLata - Skill Parameters
+# All gameplay values are configurable here without recompiling.
+# Durations in seconds, cooldowns in seconds unless noted.
+
+dash:
+  duration: 10
+  cooldown: 30
+  speed: 1
+step_assist:
+  cooldown: 15
+grapple:
+  cooldown: 10
+water_breathing:
+  duration: 15
+recall:
+  cooldown: 60
+thermal_resistance:
+  cooldown: 30
+sonar:
+  cooldown: 20
+wind_burst:
+  cooldown: 25
+torch_light:
+  cooldown: 30
+ore_sonar:
+  cooldown: 30
+haste:
+  cooldown: 20
+molten_touch:
+  cooldown: 45
+gravity_shield:
+  cooldown: 45
+woodcutter:
+  cooldown: 15
+fertilize:
+  cooldown: 10
+flora_shield:
+  cooldown: 15
+lumberjack:
+  cooldown: 60
+scaffold:
+  cooldown: 12
+grace:
+  cooldown: 45
+gravity_defiance:
+  cooldown: 40
