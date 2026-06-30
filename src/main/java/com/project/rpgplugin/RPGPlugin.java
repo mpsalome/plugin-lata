@@ -149,7 +149,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // Load augment cards from augments.yml
         AugmentLoader.load(this, cardRegistry);
 
-        this.draftService = new DraftService(cardRegistry, draftWeighting, statService, runManager);
+        this.draftService = new DraftService(cardRegistry, draftWeighting, statService, runManager, auraSkillsIntegration);
 
         // EPIC-2 listeners
         this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this, milestoneService);

@@ -17,7 +17,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import com.project.rpgplugin.core.card.CardTag;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AuraSkillsIntegration implements Listener {
 
@@ -122,6 +124,49 @@ public class AuraSkillsIntegration implements Listener {
             }
             resetPlayerSkills(player);
         } catch (Exception ignored) {}
+    }
+
+    public Map<CardTag, Double> getClassWeights(Player player) {
+        if (!enabled) {
+            return defaultWeights();
+        }
+        try {
+            SkillsUser user = auraSkills.getUser(player.getUniqueId());
+            double explorer = 0;
+            explorer += user.getSkillLevel(Skills.AGILITY);
+            explorer += user.getSkillLevel(Skills.ARCHERY);
+            explorer += user.getSkillLevel(Skills.DEFENSE);
+            explorer += user.getSkillLevel(Skills.FIGHTING);
+
+            double miner = 0;
+            miner += user.getSkillLevel(Skills.MINING);
+            miner += user.getSkillLevel(Skills.EXCAVATION);
+            miner += user.getSkillLevel(Skills.ENCHANTING);
+            miner += user.getSkillLevel(Skills.FORAGING);
+
+            double builder = 0;
+            builder += user.getSkillLevel(Skills.FARMING);
+            builder += user.getSkillLevel(Skills.FISHING);
+            builder += user.getSkillLevel(Skills.ALCHEMY);
+            builder += user.getSkillLevel(Skills.FORAGING);
+
+            double base = 30.0;
+            Map<CardTag, Double> weights = new HashMap<>();
+            weights.put(CardTag.EXPLORER, base + explorer);
+            weights.put(CardTag.MINER, base + miner);
+            weights.put(CardTag.BUILDER, base + builder);
+            return weights;
+        } catch (Exception e) {
+            return defaultWeights();
+        }
+    }
+
+    private Map<CardTag, Double> defaultWeights() {
+        return Map.of(
+            CardTag.EXPLORER, 100.0,
+            CardTag.MINER, 100.0,
+            CardTag.BUILDER, 100.0
+        );
     }
 
     public boolean isEnabled() {

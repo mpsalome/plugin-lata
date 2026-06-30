@@ -1,7 +1,9 @@
 package com.project.rpgplugin.core.draft;
 
+import com.project.rpgplugin.AuraSkillsIntegration;
 import com.project.rpgplugin.core.card.Card;
 import com.project.rpgplugin.core.card.CardRegistry;
+import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.run.RunState;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -24,14 +27,16 @@ public class DraftService {
     private final DraftWeighting weighting;
     private final StatService statService;
     private final RunManager runManager;
+    private final AuraSkillsIntegration auraSkills;
     private final Random random = new Random();
     private final Map<UUID, DraftSession> activeSessions = new HashMap<>();
 
-    public DraftService(CardRegistry cardRegistry, DraftWeighting weighting, StatService statService, RunManager runManager) {
+    public DraftService(CardRegistry cardRegistry, DraftWeighting weighting, StatService statService, RunManager runManager, AuraSkillsIntegration auraSkills) {
         this.cardRegistry = cardRegistry;
         this.weighting = weighting;
         this.statService = statService;
         this.runManager = runManager;
+        this.auraSkills = auraSkills;
     }
 
     public DraftSession getActiveSession(UUID playerId) {
@@ -45,19 +50,19 @@ public class DraftService {
     public DraftSession roll(Player p, RunState run) {
         double[] w = weighting.weightsFor(run.level());
         List<Card> pool = cardRegistry.offerable(run);
+        Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);
         List<Card> picks = new ArrayList<>(3);
 
         while (picks.size() < 3) {
             CardTier tier = weighting.pickTier(w);
-            Card c = pickFromTier(pool, tier, picks);
+            Card c = pickFromTierWeighted(pool, tier, picks, classWeights);
             if (c != null && !picks.contains(c)) {
                 picks.add(c);
             } else {
-                // Fallback: try lower tiers
                 boolean found = false;
                 for (CardTier fallback : CardTier.values()) {
                     if (fallback.rank() >= tier.rank()) continue;
-                    c = pickFromTier(pool, fallback, picks);
+                    c = pickFromTierWeighted(pool, fallback, picks, classWeights);
                     if (c != null && !picks.contains(c)) {
                         picks.add(c);
                         found = true;
@@ -65,7 +70,6 @@ public class DraftService {
                     }
                 }
                 if (!found) {
-                    // Last resort: any offerable card
                     for (Card any : pool) {
                         if (!picks.contains(any)) {
                             picks.add(any);
@@ -116,18 +120,19 @@ public class DraftService {
         p.setLevel(p.getLevel() - cost);
         session.useReroll();
 
+        Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);
         double[] w = weighting.weightsFor(run.level());
         List<Card> pool = cardRegistry.offerable(run);
         List<Card> newPicks = new ArrayList<>(3);
         while (newPicks.size() < 3) {
             CardTier tier = weighting.pickTier(w);
-            Card c = pickFromTier(pool, tier, newPicks);
+            Card c = pickFromTierWeighted(pool, tier, newPicks, classWeights);
             if (c != null && !newPicks.contains(c)) {
                 newPicks.add(c);
             } else {
                 for (CardTier fallback : CardTier.values()) {
                     if (fallback.rank() >= tier.rank()) continue;
-                    c = pickFromTier(pool, fallback, newPicks);
+                    c = pickFromTierWeighted(pool, fallback, newPicks, classWeights);
                     if (c != null && !newPicks.contains(c)) {
                         newPicks.add(c);
                         break;
@@ -139,12 +144,33 @@ public class DraftService {
         return true;
     }
 
-    private Card pickFromTier(List<Card> pool, CardTier tier, List<Card> exclude) {
+    private Card pickFromTierWeighted(List<Card> pool, CardTier tier, List<Card> exclude, Map<CardTag, Double> classWeights) {
         List<Card> candidates = pool.stream()
             .filter(c -> c.tier() == tier && !exclude.contains(c))
             .toList();
         if (candidates.isEmpty()) return null;
-        return candidates.get(random.nextInt(candidates.size()));
+
+        Map<Card, Double> weighted = new LinkedHashMap<>();
+        double totalWeight = 0;
+        for (Card c : candidates) {
+            double weight = 0;
+            for (CardTag tag : c.tags()) {
+                Double w = classWeights.get(tag);
+                if (w != null) weight += w;
+            }
+            if (weight <= 0) weight = 0.01;
+            weighted.put(c, weight);
+            totalWeight += weight;
+        }
+
+        double roll = random.nextDouble() * totalWeight;
+        double cumulative = 0;
+        for (Map.Entry<Card, Double> entry : weighted.entrySet()) {
+            cumulative += entry.getValue();
+            if (roll < cumulative) return entry.getKey();
+        }
+
+        return candidates.getLast();
     }
 
     private void playTierSound(Player p, CardTier tier) {
