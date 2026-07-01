@@ -1,7 +1,6 @@
 package com.project.rpgplugin.core.draft;
 
 import com.project.rpgplugin.core.card.CardTier;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public final class DraftWeighting {
@@ -22,16 +22,14 @@ public final class DraftWeighting {
             plugin.saveResource("draft.yml", false);
         }
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        List<ConfigurationSection> weightList = (List<ConfigurationSection>) config.getList("draft.weights");
-        if (weightList != null) {
-            for (ConfigurationSection entry : weightList) {
-                int from = entry.getInt("from");
-                int to = entry.getInt("to");
-                double bronze = entry.getDouble("bronze", 80);
-                double silver = entry.getDouble("silver", 18);
-                double gold = entry.getDouble("gold", 2);
-                entries.add(new TierWeightEntry(from, to, bronze, silver, gold));
-            }
+        List<Map<?, ?>> weightList = config.getMapList("draft.weights");
+        for (Map<?, ?> entry : weightList) {
+            int from = ((Number) entry.get("from")).intValue();
+            int to = ((Number) entry.get("to")).intValue();
+            double bronze = entry.containsKey("bronze") ? ((Number) entry.get("bronze")).doubleValue() : 80;
+            double silver = entry.containsKey("silver") ? ((Number) entry.get("silver")).doubleValue() : 18;
+            double gold = entry.containsKey("gold") ? ((Number) entry.get("gold")).doubleValue() : 2;
+            entries.add(new TierWeightEntry(from, to, bronze, silver, gold));
         }
         if (entries.isEmpty()) {
             entries.add(new TierWeightEntry(1, 9, 80, 18, 2));

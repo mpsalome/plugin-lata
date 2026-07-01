@@ -41,11 +41,17 @@
             <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- InvUI for modern GUI system (provided - must be installed on server) -->
+        <!-- InvUI for modern GUI system (shaded into the plugin JAR) -->
         <dependency>
             <groupId>xyz.xenondevs.invui</groupId>
             <artifactId>invui</artifactId>
             <version>${invui.version}</version>
+        </dependency>
+        <!-- JetBrains Annotations (@NotNull, @Nullable) -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.1.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- AuraSkills API -->
