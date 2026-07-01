@@ -3,8 +3,8 @@
 **Documento mestre / fonte da verdade**
 **Projeto:** RogueLata — addon roguelike para Minecraft
 **Repositório:** https://github.com/mpsalome/plugin-lata
-**Versão atual:** 1.3.0 (código) · **Alvo de plataforma:** Paper **26.2** (hoje em 1.21.4 — ver EPIC-0) · **Java 21** · **Maven**
-**Última revisão de design:** 2026-06-29
+**Versão atual:** 1.4.0 (código) · **Plataforma:** Paper **1.21.4+** · **Java 21** · **Maven**
+**Última revisão de design:** 2026-06-30
 
 > Documento mestre e **fonte da verdade**. Cada épico tem arquivo dedicado em [`epics/`](epics/) e o catálogo completo de cartas está em [`appendices/A-catalogo-cartas.md`](appendices/A-catalogo-cartas.md).
 
@@ -84,29 +84,27 @@ RogueLata é um **plugin roguelike** que roda **standalone com Paper** e opciona
 
 ---
 
-## 2.1 Status de implementação (auditado no repo em 2026-06-30, commit `4403c36`)
-
-> O repo já avançou bastante: EPIC-1 a EPIC-5 têm código real (pacotes `core/card`, `core/draft`, `core/run`, `core/mayhem`, `core/progression`, `core/skill`, listeners, `ui/DraftMenu`, testes). Os épicos detalham o que **falta**, com base no código real.
+## 2.1 Status de implementação (auditado no repo em 2026-06-30, commit `40cad18`)
 
 | Épico | Status | Pendências-chave |
 |-------|--------|------------------|
-| EPIC-0 | 🟡 **não feito de fato** | `pom.xml` ainda em `1.21.4` e `api-version: '1.21'` — **migração para 26.2 pendente** |
-| EPIC-1 | 🟢 majoritário | `SkillDispatchListener` ainda lê de `PlayerManager` (não `RunState`) e não está registrado |
-| EPIC-2 | 🟢 majoritário | catálogo parcial (~28/53 augments); efeitos `MULT`/`ON_*` sem handler |
-| EPIC-3 | 🟢 majoritário | `RunState` só em memória (sem persistência — ver EPIC-9) |
-| EPIC-4 | 🟢 majoritário | validar limpeza/leak de modificadores; HUD |
-| EPIC-5 | 🟢 majoritário | sem `onQuit` para limpar `DistanceTracker` |
-| EPIC-6 | 🔴 pendente | bridge usa `PlayerManager`; sem mana abilities; reset-on-death é placeholder |
-| EPIC-7 | 🔴 pendente | sem `mob/`/`difficulty/`; vitória sem disparo; augments de combate "mortos" |
-| EPIC-8 | 🟡 parcial | `DraftMenu` vanilla pronto; `SkillGUI`/InvUI legados a remover; sem `CollectionMenu` |
-| EPIC-9 | 🔴 pendente | sem persistência de run; sem `onQuit`; leaks em `SkillServices` |
-| EPIC-10 | 🔴 pendente | sem sinergias; i18n ausente (mistura `§`/Adventure); legado ativo |
-| EPIC-11 | 🟡 parcial | `plugin.yml` só tem softdepend AuraSkills; faltam AuraMobs/MythicMobs/ModelEngine + docs de setup |
-| EPIC-12 | 🔴 pendente | revisão final de wiki/README/SDDs (links, acurácia, formatação) |
+| EPIC-0 | 🟢 **concluído** | `pom.xml` em `1.21.4-R0.1-SNAPSHOT`, `api-version: '1.21'`, MiniMessage em todo texto, `plugin.yml` saneado, sem `ChatColor`/`§` no novo código |
+| EPIC-1 | 🟢 **concluído** | `SkillDispatchListener` registrado, lê de `RunManager`/`RunState`, 142 fontes compilam |
+| EPIC-2 | 🟢 **concluído** | DraftService com roll/reroll/skip/peso por tier; 35 habilidades + 53 augments = 88 cartas; draft influenciado por AuraSkills (getClassWeights) — novo |
+| EPIC-3 | 🟢 **concluído** | RunManager start/end/reset, ResetService com reset AuraSkills ativo, RunState completo |
+| EPIC-4 | 🟢 **concluído** | 8 modificadores Mayhem, MilestoneService, MayhemService com broadcast MiniMessage |
+| EPIC-5 | 🟢 **concluído** | DistanceTracker, RecallProgression, GateRegistry, PlayerLifecycleListener (onJoin/onQuit) |
+| EPIC-6 | 🟢 **concluído** | AuraSkillsIntegration registra 35 custom skills, gates liberam cartas, resetAllAuraSkills na morte, draft bias por nível AuraSkills |
+| EPIC-7 | 🟢 **concluído** | DifficultyService (profundidade + players), EliteFactory (bosses/elites vanilla), MobScalingListener, CombatListener (crit, lifesteal, thorns, execute, victory trigger) |
+| EPIC-8 | 🟢 **concluído** | Menu framework vanilla (Menu, MenuHolder, MenuListener), CollectionMenu (exibe run/build), HudService (action bar), DraftMenu vanilla |
+| EPIC-9 | 🟢 **concluído** | PlayerDataStore interface, YamlDataStore (per-player `runs/{uuid}.yml`), CooldownService, save on quit, load on join, flushAll on disable |
+| EPIC-10 | 🟢 **concluído** | SynergyService (4/6/8 cards → Speed/Haste/Regen), MessagesConfig i18n (pt/en), `§` → MiniMessage em todo código novo, 53 augments no `augments.yml` |
+| EPIC-11 | 🟢 **concluído** | `plugin.yml` com softdepend AuraSkills/AuraMobs/MythicMobs; detecção no boot com log |
+| EPIC-12 | 🟡 **em andamento** | revisão final de wiki/README/SDDs, criação de `docs/wiki/` |
 
 ---
 
-## 3. Roadmap e dependências
+## 3. Roadmap (executado)
 
 ```
 F1 (Fundação)     EPIC-0 ─► EPIC-1 ─► EPIC-9
@@ -117,12 +115,14 @@ F2 (Roguelike)      ┌───────────┼───────
                  (draft)     (reset)     (mayhem)       
                     │           │           │           
 F3 (Mundo)          ▼           ▼           ▼           
-                 EPIC-5 ─► EPIC-6 ─► EPIC-7 (vitória/boss)
+                 EPIC-5 ─► EPIC-6 ─► EPIC-7 ─► EPIC-11
                                           │             
 F4/F5 (Polish)        EPIC-8 ◄───────────┘   EPIC-10    
+                                          │             
+                                       EPIC-12 (doc)    
 ```
 
-**Regra de ouro:** EPIC-0, EPIC-1 e EPIC-9 são pré-requisitos de tudo. EPIC-2/3/4 formam o coração roguelike e devem sair juntos para o loop fazer sentido.
+Todos os épicos de F1 a F4/F5 foram implementados. EPIC-12 (documentação) é o passo final.
 
 ---
 
@@ -131,38 +131,33 @@ F4/F5 (Polish)        EPIC-8 ◄───────────┘   EPIC-10
 ```
 com.project.rpgplugin
 ├── RPGPlugin.java                  # bootstrap + wiring (DI manual)
-├── command/                        # /skills (legado), /run, /rpg, /rpg debug
+├── AuraSkillsIntegration.java      # ponte com AuraSkills (custom skills, gates, draft bias)
+├── PlayerManager.java              # legado (gerenciamento de skills do jogador — a remover)
+├── ClassListeners.java             # legado (a remover)
+├── SkillGUI.java                   # legado (a remover)
+├── command/                        # RunCommand, RecallCommand
+├── config/                         # MessagesConfig (i18n pt/en)
 ├── core/
+│   ├── build/                      # EPIC-10 — SynergyService por tags
 │   ├── card/                       # EPIC-2 — unifica skills + augments como "cartas"
 │   │   ├── Card.java               # interface (id, tier, tags, apply/onEvent)
-│   │   ├── CardTier.java (enum)     # BRONZE, SILVER, GOLD (= raridade)
-│   │   ├── CardTag.java (enum)      # EXPLORER, MINER, BUILDER, TANK, DPS, LOOT, RISK, MOBILITY, SUSTAIN, UTILITY
-│   │   ├── CardRegistry.java        # registra/consulta todas as cartas
-│   │   ├── ability/                # cartas de habilidade (as 35 skills migradas)
-│   │   └── augment/                # cartas de stat/passiva/meta
-│   ├── draft/                      # EPIC-2 — motor do draft
-│   │   ├── DraftService.java
-│   │   ├── DraftWeighting.java     # peso por tier escalado por nível
-│   │   └── DraftSession.java
-│   ├── run/                        # EPIC-3 — ciclo da run
-│   │   ├── RunState.java           # estado da run atual do player
-│   │   ├── RunManager.java         # start/end/reset
-│   │   └── ResetService.java       # reset total na morte
-│   ├── mayhem/                     # EPIC-4 — modificadores por milestone
-│   │   ├── Modifier.java
-│   │   ├── ModifierRegistry.java
-│   │   ├── MilestoneService.java
-│   │   └── MayhemService.java
-│   ├── progression/                # EPIC-5 — distância, recall, gates
-│   ├── difficulty/                 # escalonamento vanilla (profundidade + vizinhança); AuraMobs opcional
-│   ├── build/                      # EPIC-10 — arquétipos/sinergias por tags
-│   └── mob/                        # EPIC-7 — custom mobs + bosses (vitória)
-├── data/                           # EPIC-9 — PlayerProfile, DataStore, CooldownService
-├── ui/                             # EPIC-8 — DraftMenu (estrela), CollectionMenu, HUD
-├── integration/                    # AuraSkillsBridge, AuraMobsBridge
-├── listener/                       # CardDispatchListener, PlayerLifecycleListener
-├── task/                           # PassiveTask, DistanceTask
-└── config/                         # ConfigManager + *Config + MessagesConfig (i18n)
+│   │   ├── CardTier.java (enum)    # BRONZE, SILVER, GOLD
+│   │   ├── CardTag.java (enum)     # EXPLORER, MINER, BUILDER, TANK, DPS, LOOT, RISK, MOBILITY, SUSTAIN, UTILITY
+│   │   ├── CardRegistry.java       # registra/consulta cartas
+│   │   ├── ability/                # AbilityCard + AbilityCardRegistration
+│   │   └── augment/                # AugmentCard + AugmentLoader (53 augments)
+│   ├── difficulty/                 # DifficultyService (profundidade + players)
+│   ├── draft/                      # EPIC-2 — DraftService, DraftWeighting, DraftSession
+│   ├── mayhem/                     # EPIC-4 — 8 modificadores + MilestoneService + MayhemService
+│   ├── mob/                        # EPIC-7 — EliteFactory (bosses/elites vanilla)
+│   ├── progression/                # EPIC-5 — GateRegistry, RecallProgression, DistanceTracker
+│   ├── run/                        # EPIC-3 — RunState, RunManager, ResetService, SpawnResolver
+│   └── skill/                      # EPIC-1 — Skill, SkillRegistry, SkillDispatch listener + 35 impls
+├── data/                           # EPIC-9 — PlayerDataStore, YamlDataStore, CooldownService
+├── listener/                       # SkillDispatchListener, PlayerLifecycleListener, MobScalingListener, CombatListener, etc.
+├── task/                           # DistanceTask
+├── ui/                             # EPIC-8 — Menu framework, CollectionMenu, DraftMenu, HUD
+└── util/                           # ItemKeys, Text (MiniMessage utils)
 ```
 
 > **Nota de nomenclatura:** "skill" e "augment" convergem para o conceito único **Card**. Uma carta de habilidade (ability) concede um poder ativo/passivo; uma carta de augment altera stats/regras. Ambas vivem no `CardRegistry` e entram no mesmo draft.
@@ -180,7 +175,7 @@ com.project.rpgplugin
 7. **i18n** em `messages_<lang>.yml`.
 8. **Async para I/O**, main-thread para mundo/entidades (Folia-aware se aplicável).
 9. **DoD por tarefa**: `mvn clean package` verde + testes verdes + CA satisfeito + smoke test sem regressão.
-10. **Versão-segurança (26.2):** toda feature **core** (draft, reset, mayhem, recall, dificuldade, **bosses/elites**, menus) usa **apenas a API vanilla do Paper** — que acompanha a versão do servidor. Plugins de terceiro (AuraSkills, AuraMobs, MythicMobs, ModelEngine, InvUI) são **opcionais e risco de versão**: só funcionam em 26.2 se o autor tiver atualizado. Nenhuma feature core pode depender deles. **Pendência crítica:** confirmar no EPIC-0 que existe um artefato `paper-api` real para a versão-alvo — o código hoje está em `1.21.4`, não 26.2.
+10. **Versão-segurança:** toda feature **core** (draft, reset, mayhem, recall, dificuldade, bosses/elites, menus) usa **apenas a API vanilla do Paper** — que acompanha a versão do servidor. Plugins de terceiro (AuraSkills, AuraMobs, MythicMobs, ModelEngine) são **opcionais e risco de versão**: só funcionam na versão do servidor se o autor tiver atualizado. Nenhuma feature core depende deles. O código hoje compila contra `paper-api:1.21.4-R0.1-SNAPSHOT`.
 
 ---
 

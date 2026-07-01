@@ -18,5 +18,8 @@
 - [ ] Mobs spawnam com dificuldade escalada (profundidade + players)
 - [ ] Mayhem ativa a cada 10 niveis com broadcast
 - [ ] (com AuraSkills) skills roguelata/ aparecem e gates funcionam
+- [ ] (com AuraSkills) draft favorece cartas da classe com maior nivel
 - [ ] `mvn clean package` verde
 - [ ] `mvn test` verde (57 testes)
+- [ ] `docs/wiki/` com todas as paginas criadas e navegaveis
+- [ ] README.md conciso (< 120 linhas) com links para wiki
