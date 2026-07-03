@@ -1,5 +1,6 @@
 package com.project.rpgplugin.task;
 
+import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.SchedulerUtil;
@@ -14,11 +15,13 @@ public class PassiveTask {
 
     private BukkitTask task;
 
-    public void start(JavaPlugin plugin, RunManager runManager) {
+    public void start(JavaPlugin plugin, RunManager runManager, SynergyService synergyService) {
         task = SchedulerUtil.runTimer(plugin, scheduledTask -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 RunState run = runManager.getRun(p);
                 if (run == null) continue;
+
+                synergyService.applySynergies(p, run);
 
                 for (String potionTypeName : run.activePotionTypes()) {
                     PotionEffectType type = PotionEffectType.getByName(potionTypeName);
