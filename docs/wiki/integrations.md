@@ -21,6 +21,8 @@ on_death:
   reset_xp_ratio: 0.0
 ```
 
+> ⚠️ **Alinhamento com reset da Run:** O RogueLata já chama `resetAllAuraSkills()` na morte do jogador (via `PlayerLifecycleListener`). A config acima garante que o AuraSkills também zere skills/XP nativos no mesmo momento, evitando dessincronia entre os dois sistemas. Sem `reset_skills: true`, o jogador pode ressurgir com níveis AuraSkills que o RogueLata esperava que estivessem zerados.
+
 ### Gates (exemplo de `gates.yml`)
 
 Gates vinculam níveis de AuraSkills a cartas específicas:
@@ -38,6 +40,23 @@ gates:
 ```
 
 Modos: `unlock` libera a skill para draft, `grant` dá a carta automaticamente.
+
+### Mana (`mana_abilities.yml`)
+
+Quando AuraSkills está presente, certas habilidades consumirão mana ao invés de apenas cooldown:
+
+| Habilidade | Mana |
+|-----------|------|
+| Dash | 10 |
+| Step Assist | 5 |
+| Grapple | 8 |
+| Torch Light | 3 |
+| Molten Touch | 20 |
+| Core Overdrive | 30 |
+
+O augment `mana_pool` aumenta a mana máxima em +20 por stack. Sem AuraSkills, `mana_pool` não aparece no draft e habilidades usam cooldown próprio.
+
+> A mana é gerenciada nativamente pelo AuraSkills. O RogueLata só verifica e consome antes de ativar a habilidade.
 
 ## AuraMobs
 

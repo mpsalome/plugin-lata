@@ -9,6 +9,7 @@ import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.run.RunManager;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -47,9 +48,16 @@ public class DraftService {
         activeSessions.remove(playerId);
     }
 
+    private boolean cardPluginAvailable(Card c) {
+        String req = c.requiredPlugin();
+        return req == null || Bukkit.getPluginManager().getPlugin(req) != null;
+    }
+
     public DraftSession roll(Player p, RunState run) {
         double[] w = weighting.weightsFor(run.level());
-        List<Card> pool = cardRegistry.offerable(run);
+        List<Card> pool = cardRegistry.offerable(run).stream()
+            .filter(this::cardPluginAvailable)
+            .toList();
         Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);
         List<Card> picks = new ArrayList<>(3);
 
@@ -122,7 +130,9 @@ public class DraftService {
 
         Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);
         double[] w = weighting.weightsFor(run.level());
-        List<Card> pool = cardRegistry.offerable(run);
+        List<Card> pool = cardRegistry.offerable(run).stream()
+            .filter(this::cardPluginAvailable)
+            .toList();
         List<Card> newPicks = new ArrayList<>(3);
         while (newPicks.size() < 3) {
             CardTier tier = weighting.pickTier(w);

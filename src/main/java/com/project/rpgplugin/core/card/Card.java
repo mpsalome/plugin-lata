@@ -18,4 +18,5 @@ public interface Card {
     void onRemove(Player p, RunState run);
     default String nameKey() { return "card." + id() + ".name"; }
     default String descKey() { return "card." + id() + ".desc"; }
+    default String requiredPlugin() { return null; }
 }

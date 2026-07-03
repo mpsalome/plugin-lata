@@ -21,14 +21,16 @@ public class AugmentCard implements Card {
     private final Material icon;
     private final int maxStacks;
     private final AugmentEffect effect;
+    private final String requiredPlugin;
 
-    public AugmentCard(String id, CardTier tier, List<CardTag> tags, Material icon, int maxStacks, AugmentEffect effect) {
+    public AugmentCard(String id, CardTier tier, List<CardTag> tags, Material icon, int maxStacks, AugmentEffect effect, String requiredPlugin) {
         this.id = id;
         this.tier = tier;
         this.tags = Set.copyOf(tags);
         this.icon = icon;
         this.maxStacks = maxStacks;
         this.effect = effect;
+        this.requiredPlugin = requiredPlugin;
     }
 
     @Override
@@ -71,6 +73,9 @@ public class AugmentCard implements Card {
 
     public AugmentEffect effect() { return effect; }
 
+    @Override
+    public String requiredPlugin() { return requiredPlugin; }
+
     public static AugmentCard fromConfig(String id, ConfigurationSection section) {
         CardTier tier = CardTier.valueOf(section.getString("tier", "BRONZE").toUpperCase());
         List<CardTag> tags = section.getStringList("tags").stream()
@@ -79,10 +84,11 @@ public class AugmentCard implements Card {
         Material icon = Material.getMaterial(section.getString("icon", "BARRIER"));
         if (icon == null) icon = Material.BARRIER;
         int maxStacks = section.getInt("max_stacks", 1);
+        String requiredPlugin = section.getString("require_plugin", null);
 
         AugmentEffect effect = parseEffect(id, section.getConfigurationSection("effect"));
 
-        return new AugmentCard(id, tier, tags, icon, maxStacks, effect);
+        return new AugmentCard(id, tier, tags, icon, maxStacks, effect, requiredPlugin);
     }
 
     private static AugmentEffect parseEffect(String id, ConfigurationSection eff) {

@@ -1,6 +1,7 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.config.MessagesConfig;
+import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.Skill;
@@ -34,12 +35,17 @@ public class SkillDispatchListener implements Listener {
     private final SkillServices services;
     private final RunManager runManager;
     private final MessagesConfig messages;
+    private ManaService manaService;
 
     public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, MessagesConfig messages) {
         this.registry = registry;
         this.services = services;
         this.runManager = runManager;
         this.messages = messages;
+    }
+
+    public void setManaService(ManaService manaService) {
+        this.manaService = manaService;
     }
 
     @EventHandler
@@ -130,6 +136,13 @@ public class SkillDispatchListener implements Listener {
 
             SkillContext ctx = new SkillContext(player, services, item, block, event);
             if (skill.trigger().matches(skill, ctx)) {
+                if (manaService != null && manaService.isEnabled()) {
+                    double cost = manaService.getManaCost(skillId);
+                    if (cost > 0 && !manaService.tryConsumeMana(player, cost)) {
+                        player.sendMessage(Text.mm("<red>Mana insuficiente! Necessario: " + (int) cost));
+                        return;
+                    }
+                }
                 if (event instanceof Cancellable c) c.setCancelled(true);
                 skill.activate(ctx);
                 return;

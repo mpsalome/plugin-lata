@@ -186,6 +186,7 @@ mana_pool:
   kind: augment
   icon: EXPERIENCE_BOTTLE
   max_stacks: 3
+  require_plugin: AuraSkills
   effect: { type: MULT, key: mana_max, add: 20 }
 second_wind:
   tier: silver

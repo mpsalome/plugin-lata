@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.card.CardTag;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class AuraSkillsIntegration implements Listener {
     private AuraSkillsApi auraSkills;
     private NamespacedRegistry registry;
     private boolean enabled;
+    private ManaService manaService;
 
     // All our custom skill keys registered in AuraSkills
     private final Set<String> registeredSkillKeys = new HashSet<>();
@@ -71,9 +73,14 @@ public class AuraSkillsIntegration implements Listener {
             String displayName = card.id().replace("_", " ");
             Material mat = card.icon();
 
+            String desc = "";
+            if (manaService != null && manaService.hasCost(key)) {
+                desc = "Mana: " + (int) manaService.getManaCost(key);
+            }
+
             CustomSkill skill = CustomSkill.builder(NamespacedId.of(NAMESPACE, key))
                     .displayName(displayName)
-                    .description("")
+                    .description(desc)
                     .item(ItemContext.builder().material(mat.name().toLowerCase()).build())
                     .build();
 
@@ -175,6 +182,10 @@ public class AuraSkillsIntegration implements Listener {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setManaService(ManaService manaService) {
+        this.manaService = manaService;
     }
 
     public static String marker(String skillKey) {

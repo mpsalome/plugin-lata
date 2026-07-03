@@ -12,6 +12,7 @@ import com.project.rpgplugin.core.card.augment.AugmentLoader;
 import com.project.rpgplugin.core.difficulty.DifficultyService;
 import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftWeighting;
+import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.mayhem.MayhemConfig;
 import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.core.mayhem.MilestoneService;
@@ -119,6 +120,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     // EPIC-10: Synergies
     private SynergyService synergyService;
 
+    // EPIC-6: Mana system
+    private ManaService manaService;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -198,6 +202,11 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // Prepare SkillDispatchListener with RunManager
         RunManager rm = this.runManager;
         this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, messagesConfig);
+
+        // EPIC-6: Mana system
+        this.manaService = new ManaService(this, auraSkillsIntegration);
+        this.skillDispatchListener.setManaService(manaService);
+        this.auraSkillsIntegration.setManaService(manaService);
 
         // Register listeners
         getServer().getPluginManager().registerEvents(playerLevelListener, this);
