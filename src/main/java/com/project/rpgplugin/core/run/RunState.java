@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class RunState {
@@ -26,6 +27,7 @@ public class RunState {
     private int milestonesReached;
     private final Set<String> activeModifiers = new LinkedHashSet<>();
     private Set<String> sharedModifiers = Set.of();
+    private final Set<String> activePotionTypes = new TreeSet<>();
     private int xpMultTotal;
     private double cooldownMultTotal;
     private RunOutcome outcome = RunOutcome.ONGOING;
@@ -103,6 +105,12 @@ public class RunState {
 
     public List<OnKillEffect> onKillEffects() { return List.copyOf(onKillEffects); }
 
+    public Set<String> activePotionTypes() { return activePotionTypes; }
+
+    public void addPotionType(String type) { activePotionTypes.add(type); }
+
+    public void removePotionType(String type) { activePotionTypes.remove(type); }
+
     public int xpMultTotal() { return xpMultTotal; }
     public void setXpMultTotal(int value) { this.xpMultTotal = value; }
 
@@ -147,6 +155,7 @@ public class RunState {
         ownedAbilities.clear();
         multipliers.clear();
         onKillEffects.clear();
+        activePotionTypes.clear();
         level = 1;
         pendingDrafts = 0;
         milestonesReached = 0;

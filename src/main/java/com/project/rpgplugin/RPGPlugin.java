@@ -2,6 +2,7 @@ package com.project.rpgplugin;
 
 import com.project.rpgplugin.command.RecallCommand;
 import com.project.rpgplugin.command.RunCommand;
+import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.core.card.CardRegistry;
@@ -16,6 +17,7 @@ import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.core.mayhem.MilestoneService;
 import com.project.rpgplugin.core.mayhem.ModifierRegistration;
 import com.project.rpgplugin.core.mayhem.ModifierRegistry;
+import com.project.rpgplugin.core.mob.MobSpawnService;
 import com.project.rpgplugin.core.progression.DistanceTracker;
 import com.project.rpgplugin.core.progression.GateRegistry;
 import com.project.rpgplugin.core.progression.RecallProgression;
@@ -29,6 +31,7 @@ import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.data.CooldownService;
 import com.project.rpgplugin.data.PlayerDataStore;
 import com.project.rpgplugin.data.YamlDataStore;
+import com.project.rpgplugin.listener.AugmentListener;
 import com.project.rpgplugin.listener.CombatListener;
 import com.project.rpgplugin.listener.MobScalingListener;
 import com.project.rpgplugin.listener.PlayerLevelListener;
@@ -36,6 +39,7 @@ import com.project.rpgplugin.listener.PlayerLifecycleListener;
 import com.project.rpgplugin.listener.RecallListener;
 import com.project.rpgplugin.listener.SkillDispatchListener;
 import com.project.rpgplugin.task.DistanceTask;
+import com.project.rpgplugin.task.PassiveTask;
 import com.project.rpgplugin.ui.CollectionMenu;
 import com.project.rpgplugin.ui.DraftMenuListener;
 import com.project.rpgplugin.ui.HudService;
@@ -57,9 +61,8 @@ import java.util.List;
 
 public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
-    private PlayerManager playerManager;
-    private ClassListeners classListeners;
     private AuraSkillsIntegration auraSkillsIntegration;
+    private MessagesConfig messagesConfig;
 
     private SkillRegistry skillRegistry;
     private SkillServices skillServices;
@@ -99,14 +102,19 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private DifficultyService difficultyService;
     private MobScalingListener mobScalingListener;
     private CombatListener combatListener;
+    private MobSpawnService mobSpawnService;
+
+    // EPIC-10: Augment handlers
+    private AugmentListener augmentListener;
 
     // EPIC-8: Menus & HUD
     private HudService hudService;
     private MenuListener menuListener;
 
-    // EPIC-9: Persistence
+    // EPIC-9: Persistence & tasks
     private PlayerDataStore dataStore;
     private CooldownService cooldownService;
+    private PassiveTask passiveTask;
 
     // EPIC-10: Synergies
     private SynergyService synergyService;
@@ -116,11 +124,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         saveDefaultConfig();
         ItemKeys.init(this);
         this.cooldownService = new CooldownService();
+        this.messagesConfig = new MessagesConfig(this);
 
-        this.playerManager = new PlayerManager(this);
         this.gateRegistry = new GateRegistry(this);
-        this.auraSkillsIntegration = new AuraSkillsIntegration(this, playerManager, gateRegistry);
-        this.classListeners = new ClassListeners(this, playerManager, auraSkillsIntegration);
+        this.auraSkillsIntegration = new AuraSkillsIntegration(this, gateRegistry);
 
         // EPIC-1: Data-driven skill architecture
         this.skillsConfig = new SkillsConfig(this);
@@ -153,7 +160,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // EPIC-2 listeners
         this.playerLevelListener = new PlayerLevelListener(runManager, draftService, draftWeighting, this, milestoneService);
-        this.draftMenuListener = new DraftMenuListener(runManager, draftService, draftWeighting, playerLevelListener);
+        this.draftMenuListener = new DraftMenuListener(runManager, draftService, playerLevelListener);
 
         // EPIC-3: Run lifecycle
         this.playerLifecycleListener = new PlayerLifecycleListener(runManager);
@@ -170,6 +177,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.difficultyService = new DifficultyService(runManager);
         this.mobScalingListener = new MobScalingListener(difficultyService);
         this.combatListener = new CombatListener(runManager);
+        this.mobSpawnService = new MobSpawnService(this, runManager);
+
+        // EPIC-10: Augment handlers
+        this.augmentListener = new AugmentListener(runManager);
 
         // EPIC-8: HUD & Menu framework
         this.hudService = new HudService(this, runManager, recallProgression);
@@ -181,12 +192,14 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // EPIC-10: Synergies
         this.synergyService = new SynergyService(cardRegistry);
 
+        // EPIC-9: Passive task for maintaining potion effects
+        this.passiveTask = new PassiveTask();
+
         // Prepare SkillDispatchListener with RunManager
         RunManager rm = this.runManager;
-        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm);
+        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, messagesConfig);
 
         // Register listeners
-        getServer().getPluginManager().registerEvents(classListeners, this);
         getServer().getPluginManager().registerEvents(playerLevelListener, this);
         getServer().getPluginManager().registerEvents(draftMenuListener, this);
         getServer().getPluginManager().registerEvents(playerLifecycleListener, this);
@@ -194,10 +207,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         getServer().getPluginManager().registerEvents(skillDispatchListener, this);
         getServer().getPluginManager().registerEvents(mobScalingListener, this);
         getServer().getPluginManager().registerEvents(combatListener, this);
+        getServer().getPluginManager().registerEvents(augmentListener, this);
         getServer().getPluginManager().registerEvents(menuListener, this);
 
-        // Start distance tracking & HUD
-        this.distanceTask.start(this, distanceTracker);
+        // Start periodic tasks
+        this.distanceTask.start(this, distanceTracker, augmentListener);
+        this.passiveTask.start(this, runManager);
         this.hudService.start();
 
         getCommand("skills").setExecutor(this);
@@ -226,6 +241,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     @Override
     public void onDisable() {
         if (distanceTask != null) distanceTask.stop();
+        if (passiveTask != null) passiveTask.stop();
         if (hudService != null) hudService.stop();
         if (dataStore != null) dataStore.flushAll();
         getLogger().info("RogueLata Plugin desativado.");
@@ -233,6 +249,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     public AuraSkillsIntegration getAuraSkillsIntegration() {
         return auraSkillsIntegration;
+    }
+
+    public MessagesConfig getMessagesConfig() {
+        return messagesConfig;
     }
 
     public SkillRegistry getSkillRegistry() {
@@ -288,7 +308,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             }
             RunState run = runManager.getRun(player);
             if (run != null) {
-                new CollectionMenu(player, run);
+                new CollectionMenu(player, run, this.messagesConfig);
             }
             return true;
         }
@@ -311,7 +331,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
                     return true;
                 }
                 Player player = (Player) sender;
-                playerManager.clearPlayerData(player);
+                if (runManager.hasActiveRun(player)) {
+                    RunState run = runManager.getRun(player);
+                    if (run != null) {
+                        resetService.fullReset(player, run);
+                    }
+                }
                 player.sendMessage(Component.text("[RogueLata] Todos os dados RPG foram resetados!").color(NamedTextColor.RED));
                 return true;
             }
@@ -374,10 +399,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     }
 
     public ItemStack createRpgBook() {
-        ItemStack book = new ItemStack(Material.BOOK, 1);
+        ItemStack book = new ItemStack(Material.BREAD, 1);
         ItemMeta meta = book.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.mm("<gold><bold>Livro de RPG"));
+            meta.displayName(Text.mm("<gold><bold>Lata de Pão"));
             meta.lore(List.of(
                     Text.mm("<gray>Use para abrir o Menu de Habilidades!"),
                     Text.mm("<yellow>Clique com o direito para abrir.")
@@ -388,11 +413,8 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         return book;
     }
 
-    public PlayerManager getPlayerManager() {
-        return playerManager;
-    }
-
     public DifficultyService getDifficultyService() { return difficultyService; }
+    public MobSpawnService getMobSpawnService() { return mobSpawnService; }
     public PlayerDataStore getDataStore() { return dataStore; }
     public CooldownService getCooldownService() { return cooldownService; }
     public SynergyService getSynergyService() { return synergyService; }

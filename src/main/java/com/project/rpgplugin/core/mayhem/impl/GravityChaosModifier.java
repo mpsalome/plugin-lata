@@ -3,6 +3,7 @@ package com.project.rpgplugin.core.mayhem.impl;
 import com.project.rpgplugin.core.mayhem.MayhemContext;
 import com.project.rpgplugin.core.mayhem.ModifierSeverity;
 import com.project.rpgplugin.core.mayhem.ModifierTag;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -22,7 +23,7 @@ public class GravityChaosModifier extends BaseModifier {
 
     @Override
     public void onActivate(MayhemContext ctx) {
-        task = Bukkit.getScheduler().runTaskTimer(ctx.plugin(), () -> {
+        task = SchedulerUtil.runTimer(ctx.plugin(), () -> {
             int effect = random.nextInt(3);
             for (Player p : Bukkit.getOnlinePlayers()) {
                 switch (effect) {

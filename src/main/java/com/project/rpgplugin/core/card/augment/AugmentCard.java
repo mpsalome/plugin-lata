@@ -118,6 +118,12 @@ public class AugmentCard implements Card {
                 int amplifier = eff.getInt("amplifier", 0);
                 yield new PotionEffectAugment(potionType, amplifier);
             }
+            case "GIANT" -> {
+                double health = eff.getDouble("health_per_stack", 20);
+                double damage = eff.getDouble("damage_per_stack", 0.1);
+                double slow = eff.getDouble("slow_amplifier", 1);
+                yield new GiantEffect(health, damage, slow);
+            }
             default -> null;
         };
     }

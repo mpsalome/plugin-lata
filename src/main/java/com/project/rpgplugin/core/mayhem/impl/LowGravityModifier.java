@@ -3,6 +3,7 @@ package com.project.rpgplugin.core.mayhem.impl;
 import com.project.rpgplugin.core.mayhem.MayhemContext;
 import com.project.rpgplugin.core.mayhem.ModifierSeverity;
 import com.project.rpgplugin.core.mayhem.ModifierTag;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -19,7 +20,7 @@ public class LowGravityModifier extends BaseModifier {
 
     @Override
     public void onActivate(MayhemContext ctx) {
-        task = Bukkit.getScheduler().runTaskTimer(ctx.plugin(), () -> {
+        task = SchedulerUtil.runTimer(ctx.plugin(), () -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1, true, false, false));
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 200, 0, true, false, false));

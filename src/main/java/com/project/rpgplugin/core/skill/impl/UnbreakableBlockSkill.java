@@ -6,6 +6,7 @@ import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
 import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -51,7 +52,7 @@ public class UnbreakableBlockSkill extends AbstractSkill {
             services.addReinforcedBlock(targetLoc);
             p.playSound(targetLoc, Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f);
             feedback(ctx, "§aBloco Reforçado: Inquebrável por 15s!", null);
-            org.bukkit.Bukkit.getScheduler().runTaskLater(services.plugin(), () -> {
+            SchedulerUtil.runLater(services.plugin(), () -> {
                 services.removeReinforcedBlock(targetLoc);
             }, 300L);
         }

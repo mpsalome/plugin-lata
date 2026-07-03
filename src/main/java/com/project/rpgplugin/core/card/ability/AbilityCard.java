@@ -53,10 +53,12 @@ public class AbilityCard implements Card {
     @Override
     public void onAcquire(Player p, RunState run) {
         run.addCard(id());
+        run.ownedAbilities().add(id());
     }
 
     @Override
     public void onRemove(Player p, RunState run) {
         run.removeCard(id());
+        run.ownedAbilities().remove(id());
     }
 }

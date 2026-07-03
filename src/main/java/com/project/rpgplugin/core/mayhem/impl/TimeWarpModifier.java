@@ -3,6 +3,7 @@ package com.project.rpgplugin.core.mayhem.impl;
 import com.project.rpgplugin.core.mayhem.MayhemContext;
 import com.project.rpgplugin.core.mayhem.ModifierSeverity;
 import com.project.rpgplugin.core.mayhem.ModifierTag;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
@@ -21,7 +22,7 @@ public class TimeWarpModifier extends BaseModifier {
         for (World w : Bukkit.getWorlds()) {
             w.setGameRule(org.bukkit.GameRule.RANDOM_TICK_SPEED, 6);
         }
-        task = Bukkit.getScheduler().runTaskTimer(ctx.plugin(), () -> {
+        task = SchedulerUtil.runTimer(ctx.plugin(), () -> {
             accelerated = !accelerated;
             for (World w : Bukkit.getWorlds()) {
                 if (accelerated) {

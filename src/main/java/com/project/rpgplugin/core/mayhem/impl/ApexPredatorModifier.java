@@ -3,6 +3,7 @@ package com.project.rpgplugin.core.mayhem.impl;
 import com.project.rpgplugin.core.mayhem.MayhemContext;
 import com.project.rpgplugin.core.mayhem.ModifierSeverity;
 import com.project.rpgplugin.core.mayhem.ModifierTag;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +27,7 @@ public class ApexPredatorModifier extends BaseModifier {
 
     @Override
     public void onActivate(MayhemContext ctx) {
-        task = Bukkit.getScheduler().runTaskTimer(ctx.plugin(), () -> {
+        task = SchedulerUtil.runTimer(ctx.plugin(), () -> {
             if (apex == null || !apex.isValid() || apex.isDead()) {
                 spawnApex(ctx);
             }

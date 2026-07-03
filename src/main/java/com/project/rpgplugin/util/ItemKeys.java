@@ -1,6 +1,5 @@
 package com.project.rpgplugin.util;
 
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,7 +32,7 @@ public final class ItemKeys {
     public static NamespacedKey skillItem() { return SKILL_ITEM; }
 
     public static boolean isRpgBook(ItemStack is) {
-        if (is == null || is.getType() != Material.BOOK || !is.hasItemMeta()) return false;
+        if (is == null || !is.hasItemMeta()) return false;
         return is.getItemMeta().getPersistentDataContainer()
                 .has(RPG_BOOK, PersistentDataType.BYTE);
     }

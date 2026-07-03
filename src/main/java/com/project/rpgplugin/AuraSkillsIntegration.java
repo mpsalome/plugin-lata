@@ -1,6 +1,11 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.core.card.Card;
+import com.project.rpgplugin.core.card.CardRegistry;
+import com.project.rpgplugin.core.card.CardKind;
 import com.project.rpgplugin.core.progression.GateRegistry;
+import com.project.rpgplugin.core.skill.SkillRegistry;
+import com.project.rpgplugin.util.Text;
 import dev.aurelium.auraskills.api.AuraSkillsApi;
 import dev.aurelium.auraskills.api.event.skill.SkillLevelUpEvent;
 import dev.aurelium.auraskills.api.item.ItemContext;
@@ -27,7 +32,6 @@ public class AuraSkillsIntegration implements Listener {
     public static final String SKILL_PREFIX = NAMESPACE + "/";
 
     private final RPGPlugin plugin;
-    private final PlayerManager playerManager;
     private final GateRegistry gateRegistry;
     private AuraSkillsApi auraSkills;
     private NamespacedRegistry registry;
@@ -36,9 +40,8 @@ public class AuraSkillsIntegration implements Listener {
     // All our custom skill keys registered in AuraSkills
     private final Set<String> registeredSkillKeys = new HashSet<>();
 
-    public AuraSkillsIntegration(RPGPlugin plugin, PlayerManager playerManager, GateRegistry gateRegistry) {
+    public AuraSkillsIntegration(RPGPlugin plugin, GateRegistry gateRegistry) {
         this.plugin = plugin;
-        this.playerManager = playerManager;
         this.gateRegistry = gateRegistry;
         this.enabled = false;
 
@@ -61,15 +64,16 @@ public class AuraSkillsIntegration implements Listener {
     }
 
     private void registerCustomSkills() {
-        List<String> allKeys = playerManager.getAllSkillKeys();
-        for (String key : allKeys) {
-            String displayName = playerManager.getSkillDisplayName(key);
-            String desc = playerManager.getSkillDescription(key);
-            Material mat = playerManager.determineSkillMaterial(key);
+        CardRegistry cardRegistry = plugin.getCardRegistry();
+        for (Card card : cardRegistry.all()) {
+            if (card.kind() != CardKind.ABILITY) continue;
+            String key = card.id();
+            String displayName = card.id().replace("_", " ");
+            Material mat = card.icon();
 
             CustomSkill skill = CustomSkill.builder(NamespacedId.of(NAMESPACE, key))
-                    .displayName(stripColorCodes(displayName))
-                    .description(desc)
+                    .displayName(displayName)
+                    .description("")
                     .item(ItemContext.builder().material(mat.name().toLowerCase()).build())
                     .build();
 
@@ -188,7 +192,4 @@ public class AuraSkillsIntegration implements Listener {
         return skillId;
     }
 
-    private String stripColorCodes(String input) {
-        return input.replaceAll("§[0-9a-fklmnor]", "").trim();
-    }
 }

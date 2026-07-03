@@ -1,0 +1,25 @@
+# Mobs configuracao - elites e mobs especiais
+# Formatos de entidade: ZOMBIE, SKELETON, SPIDER, CREEPER, etc.
+elites:
+  zombie_king:
+    base_type: ZOMBIE
+    display_name: "<gold>Rei Zumbi"
+    health: 80
+    damage: 8
+    scale: 1.5
+    equipment:
+      helmet: DIAMOND_HELMET
+      chestplate: DIAMOND_CHESTPLATE
+      mainhand: IRON_SWORD
+  creeper_colossus:
+    base_type: CREEPER
+    display_name: "<dark_green>Colosso Explosivo"
+    health: 120
+    damage: 6
+    scale: 2.0
+  spider_queen:
+    base_type: SPIDER
+    display_name: "<light_purple>Rainha Aranha"
+    health: 60
+    damage: 10
+    scale: 1.8

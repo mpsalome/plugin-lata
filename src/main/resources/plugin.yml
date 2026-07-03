@@ -8,6 +8,7 @@ softdepend:
   - AuraSkills
   - AuraMobs
   - MythicMobs
+  - ModelEngine
 commands:
   skills:
     description: Abre o menu visual de selecao de habilidades.

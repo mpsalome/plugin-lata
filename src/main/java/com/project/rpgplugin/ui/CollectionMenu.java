@@ -1,5 +1,6 @@
 package com.project.rpgplugin.ui;
 
+import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.ui.menu.MenuHolder;
@@ -16,9 +17,11 @@ import java.util.Map;
 public class CollectionMenu extends Menu {
 
     private static final int SIZE = 54;
+    private final MessagesConfig messages;
 
-    public CollectionMenu(Player p, RunState run) {
-        super(SIZE, "<gold><bold>Run - Colecao");
+    public CollectionMenu(Player p, RunState run, MessagesConfig messages) {
+        super(SIZE, messages.get("collection.title"));
+        this.messages = messages;
         MenuHolder holder = new MenuHolder(this);
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         var fillerMeta = filler.getItemMeta();
@@ -35,9 +38,13 @@ public class CollectionMenu extends Menu {
             ItemStack icon = new ItemStack(Material.ENCHANTED_BOOK);
             ItemMeta meta = icon.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.mm("<yellow>" + cardId.replace("_", " ")));
+                String displayName = messages.get(cardId + ".name");
+                if (displayName.startsWith("<red>msg")) {
+                    displayName = cardId.replace("_", " ");
+                }
+                meta.displayName(Text.mm("<yellow>" + displayName));
                 List<String> lore = new ArrayList<>();
-                if (count > 1) lore.add("<gray>Stacks: <white>" + count);
+                if (count > 1) lore.add("<gray>" + messages.get("collection.stacks", String.valueOf(count)));
                 lore.add("<dark_gray>" + cardId);
                 meta.lore(lore.stream().map(l -> Text.mm(l)).toList());
                 icon.setItemMeta(meta);
@@ -48,15 +55,15 @@ public class CollectionMenu extends Menu {
         ItemStack infoBook = new ItemStack(Material.KNOWLEDGE_BOOK);
         var infoMeta = infoBook.getItemMeta();
         if (infoMeta != null) {
-            infoMeta.displayName(Text.mm("<gold>Resumo da Run"));
+            infoMeta.displayName(Text.mm(messages.get("collection.summary")));
             List<String> infoLore = new ArrayList<>();
-            infoLore.add("<gray>Nivel: <white>" + run.level());
-            infoLore.add("<gray>Cartas: <white>" + run.ownedCards().size());
-            infoLore.add("<gray>Milestones: <white>" + run.milestonesReached());
-            infoLore.add("<gray>Andados: <white>" + run.blocksWalked());
+            infoLore.add(messages.get("collection.level", String.valueOf(run.level())));
+            infoLore.add(messages.get("collection.cards", String.valueOf(run.ownedCards().size())));
+            infoLore.add(messages.get("collection.milestones", String.valueOf(run.milestonesReached())));
+            infoLore.add(messages.get("collection.distance", String.valueOf(run.blocksWalked())));
             if (!run.multipliers().isEmpty()) {
                 infoLore.add("");
-                infoLore.add("<yellow>Multiplicadores:");
+                infoLore.add(messages.get("collection.multipliers"));
                 for (Map.Entry<String, Double> e : run.multipliers().entrySet()) {
                     infoLore.add("<gray>  " + e.getKey() + ": <white>+" + String.format("%.0f%%", e.getValue() * 100));
                 }
@@ -70,7 +77,7 @@ public class CollectionMenu extends Menu {
             ItemStack mayhemIcon = new ItemStack(Material.TOTEM_OF_UNDYING);
             var mayhemMeta = mayhemIcon.getItemMeta();
             if (mayhemMeta != null) {
-                mayhemMeta.displayName(Text.mm("<red>Mayhem Ativos"));
+                mayhemMeta.displayName(Text.mm(messages.get("collection.mayhem_active")));
                 List<String> mayhemLore = new ArrayList<>();
                 for (String mod : run.activeModifiers()) {
                     mayhemLore.add("<red>  - " + mod.replace("_", " "));

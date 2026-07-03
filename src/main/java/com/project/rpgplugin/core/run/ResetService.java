@@ -7,13 +7,9 @@ import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.util.ItemKeys;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.List;
 
 public class ResetService {
 
@@ -39,6 +35,10 @@ public class ResetService {
         }
         run.ownedCards().clear();
         run.ownedAbilities().clear();
+
+        // T9.5: Clean leaked state from SkillServices
+        plugin.getSkillServices().reinforcedBlocks().clear();
+        plugin.getSkillServices().clearPlayerCooldowns(p.getUniqueId());
 
         // 2. Stats: recompute with zero cards → baseline
         statService.resetToBaseline(p);
@@ -76,8 +76,8 @@ public class ResetService {
         // 10. Ensure RPG book
         ensureRpgBook(p);
 
-        p.sendMessage(Component.text("RUN ENCERRADA").color(net.kyori.adventure.text.format.NamedTextColor.RED).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
-        p.sendMessage(Component.text("Todos os poderes foram perdidos. Uma nova run comeca!").color(net.kyori.adventure.text.format.NamedTextColor.GRAY));
+        p.sendMessage(com.project.rpgplugin.util.Text.mm("<red><bold>RUN ENCERRADA"));
+        p.sendMessage(com.project.rpgplugin.util.Text.mm("<gray>Todos os poderes foram perdidos. Uma nova run começa!"));
     }
 
     private void removeTaggedSkillItems(Player p) {
@@ -105,18 +105,7 @@ public class ResetService {
             }
         }
         if (!hasBook) {
-            ItemStack book = new ItemStack(Material.BOOK, 1);
-            ItemMeta meta = book.getItemMeta();
-            if (meta != null) {
-                meta.displayName(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<gold><bold>Livro de RPG"));
-                meta.lore(List.of(
-                    net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<gray>Use para abrir o Menu de Habilidades!"),
-                    net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<yellow>Clique com o direito para abrir.")
-                ));
-                meta.getPersistentDataContainer().set(ItemKeys.rpgBook(), org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
-                book.setItemMeta(meta);
-            }
-            p.getInventory().addItem(book);
+            p.getInventory().addItem(plugin.createRpgBook());
         }
     }
 }

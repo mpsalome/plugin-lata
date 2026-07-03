@@ -277,7 +277,7 @@ giant:
   kind: augment
   icon: IRON_BLOCK
   max_stacks: 1
-  effect: { type: ATTRIBUTE, attribute: MAX_HEALTH, add_per_stack: 20 }
+  effect: { type: GIANT, health_per_stack: 20, damage_per_stack: 0.1, slow_amplifier: 1 }
 max_health_max:
   tier: gold
   tags: [tank]

@@ -2,17 +2,31 @@ package com.project.rpgplugin.core.mob;
 
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class EliteFactory {
+
+    private final JavaPlugin plugin;
+
+    public EliteFactory(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     public LivingEntity spawnBoss(Location loc, BossDef def) {
         LivingEntity e = (LivingEntity) loc.getWorld().spawnEntity(loc, def.baseType());
@@ -45,7 +59,44 @@ public class EliteFactory {
         e.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
         e.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
 
+        trackBossBar(e, def);
+
         return e;
+    }
+
+    private void trackBossBar(LivingEntity boss, BossDef def) {
+        BossBar bar = Bukkit.createBossBar(def.displayName(), BarColor.RED, BarStyle.SOLID);
+        bar.setVisible(true);
+        UUID bossId = boss.getUniqueId();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (boss.isDead() || !boss.isValid()) {
+                    bar.removeAll();
+                    cancel();
+                    return;
+                }
+                double pct = boss.getHealth() / boss.getMaxHealth();
+                bar.setProgress(Math.max(0, Math.min(1, pct)));
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!bar.getPlayers().contains(p) && p.getWorld().equals(boss.getWorld())
+                            && p.getLocation().distance(boss.getLocation()) < 64) {
+                        bar.addPlayer(p);
+                    }
+                }
+
+                // Phase triggers
+                if (pct <= 0.5 && pct > 0.25) {
+                    bar.setColor(BarColor.YELLOW);
+                    bar.setTitle(def.id() + " | Fase 2");
+                } else if (pct <= 0.25) {
+                    bar.setColor(BarColor.WHITE);
+                    bar.setTitle(def.id() + " | Fase 3");
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 10L);
     }
 
     public LivingEntity spawnElite(Location loc, MobDef def) {

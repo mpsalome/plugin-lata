@@ -1,5 +1,6 @@
 package com.project.rpgplugin.listener;
 
+import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.Skill;
@@ -7,9 +8,9 @@ import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
+import com.project.rpgplugin.ui.CollectionMenu;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -32,11 +33,13 @@ public class SkillDispatchListener implements Listener {
     private final SkillRegistry registry;
     private final SkillServices services;
     private final RunManager runManager;
+    private final MessagesConfig messages;
 
-    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager) {
+    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, MessagesConfig messages) {
         this.registry = registry;
         this.services = services;
         this.runManager = runManager;
+        this.messages = messages;
     }
 
     @EventHandler
@@ -46,6 +49,13 @@ public class SkillDispatchListener implements Listener {
 
         if (ItemKeys.isRpgBook(item)) {
             e.setCancelled(true);
+            if (!runManager.hasActiveRun(p)) {
+                runManager.startRun(p);
+            }
+            RunState run = runManager.getRun(p);
+            if (run != null) {
+                new CollectionMenu(p, run, messages);
+            }
             return;
         }
 
@@ -65,7 +75,7 @@ public class SkillDispatchListener implements Listener {
 
         if (services.isReinforced(block.getLocation())) {
             e.setCancelled(true);
-            p.sendMessage(Component.text("Este bloco foi reforcado e esta temporariamente indestrutivel!").color(net.kyori.adventure.text.format.NamedTextColor.RED));
+            p.sendMessage(Text.mm("<red>Este bloco foi reforçado e está temporariamente indestrutível!"));
             return;
         }
 

@@ -67,6 +67,6 @@ public class PlayerLevelListener implements Listener {
         run.consumePendingDraft();
 
         DraftSession session = draftService.roll(p, run);
-        new DraftMenu(p, session, draftService, run, runManager, weighting, plugin).open();
+        new DraftMenu(p, session, draftService, run, runManager, weighting, plugin, this).open();
     }
 }

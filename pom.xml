@@ -6,7 +6,7 @@
 
     <groupId>com.project</groupId>
     <artifactId>RogueLata</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>
 
     <name>RogueLata</name>
@@ -16,7 +16,6 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <paper.version>1.21.4-R0.1-SNAPSHOT</paper.version>
-        <invui.version>2.2.0</invui.version>
         <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
@@ -25,11 +24,6 @@
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-        <!-- xenondevs for InvUI -->
-        <repository>
-            <id>xenondevs</id>
-            <url>https://repo.xenondevs.xyz/releases</url>
         </repository>
     </repositories>
 
@@ -40,12 +34,6 @@
             <artifactId>paper-api</artifactId>
             <version>${paper.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- InvUI for modern GUI system (shaded into the plugin JAR) -->
-        <dependency>
-            <groupId>xyz.xenondevs.invui</groupId>
-            <artifactId>invui</artifactId>
-            <version>${invui.version}</version>
         </dependency>
         <!-- JetBrains Annotations (@NotNull, @Nullable) -->
         <dependency>
@@ -81,31 +69,6 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>21</release>
-                </configuration>
-            </plugin>
-            <!-- Shade Plugin to bundle InvUI dependency -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals><goal>shade</goal></goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/MANIFEST.MF</exclude>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
                 </configuration>
             </plugin>
             <plugin>

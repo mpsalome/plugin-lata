@@ -1,9 +1,9 @@
 package com.project.rpgplugin.core.progression;
 
 import com.project.rpgplugin.AuraSkillsIntegration;
-import com.project.rpgplugin.PlayerManager;
 import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.card.Card;
+import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.run.RunState;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -45,9 +45,8 @@ public class GateRegistry {
     }
 
     public void check(Player p, String auraSkillName, int auraLevel) {
-        PlayerManager playerManager = plugin.getPlayerManager();
         AuraSkillsIntegration auraSkills = plugin.getAuraSkillsIntegration();
-        if (playerManager == null || auraSkills == null) return;
+        if (auraSkills == null) return;
 
         RunState run = null;
         if (plugin.getRunManager() != null) {
@@ -55,22 +54,18 @@ public class GateRegistry {
         }
         if (run == null) return;
 
+        CardRegistry cardRegistry = plugin.getCardRegistry();
+
         for (Gate gate : gates) {
             if (!gate.skill.equalsIgnoreCase(auraSkillName)) continue;
             if (auraLevel < gate.level) continue;
 
-            if (!playerManager.hasSkill(p, gate.card)) {
-                playerManager.unlockSkill(p, gate.card);
-                p.sendMessage(com.project.rpgplugin.util.Text.mm("<green><bold>[RogueLata] <green>Nova habilidade desbloqueada: "
-                        + playerManager.getSkillDisplayName(gate.card)));
-                auraSkills.syncAuraSkillLevel(p, gate.card, 1);
-            }
-
             if ("grant".equalsIgnoreCase(gate.mode) && !run.hasCard(gate.card)) {
-                Card card = plugin.getCardRegistry().byId(gate.card).orElse(null);
+                Card card = cardRegistry.byId(gate.card).orElse(null);
                 if (card != null) {
                     card.onAcquire(p, run);
-                    p.sendMessage(com.project.rpgplugin.util.Text.mm("<green><bold>✦ Carta adicionada: " + gate.card.replace("_", " ")));
+                    String displayName = gate.card.replace("_", " ");
+                    p.sendMessage(com.project.rpgplugin.util.Text.mm("<green><bold>✦ Carta adicionada: " + displayName));
                 }
             }
         }

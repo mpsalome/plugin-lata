@@ -1,9 +1,11 @@
 package com.project.rpgplugin.listener;
 
+import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunOutcome;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.ItemKeys;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,9 +17,15 @@ import org.bukkit.persistence.PersistentDataType;
 public class CombatListener implements Listener {
 
     private final RunManager runManager;
+    private final RPGPlugin plugin;
 
     public CombatListener(RunManager runManager) {
         this.runManager = runManager;
+        if (runManager.plugin() instanceof RPGPlugin rpg) {
+            this.plugin = rpg;
+        } else {
+            this.plugin = null;
+        }
     }
 
     @EventHandler
@@ -66,6 +74,12 @@ public class CombatListener implements Listener {
             }
         }
 
+        double lifestealPct = run.getMultiplier("lifesteal");
+        if (lifestealPct > 0 && !(target instanceof Player)) {
+            double heal = damage * lifestealPct;
+            damager.setHealth(Math.min(damager.getMaxHealth(), damager.getHealth() + heal));
+        }
+
         if (target instanceof Player) {
             double dmgTakenMult = run.getMultiplier("damage_taken");
             if (dmgTakenMult > 0) {
@@ -89,8 +103,12 @@ public class CombatListener implements Listener {
 
             boolean isBoss = target.getPersistentDataContainer().has(ItemKeys.isBoss(), PersistentDataType.BYTE);
             if (isBoss) {
+                run.setMilestonesReached(run.milestonesReached() + 1);
+                if (plugin != null && plugin.getMayhemService() != null) {
+                    plugin.getMayhemService().rollAndApply(run, target.getWorld());
+                }
                 runManager.endRun(killer, RunOutcome.VICTORY);
-                killer.sendMessage(net.kyori.adventure.text.Component.text("Boss derrotado! Vitoria!").color(net.kyori.adventure.text.format.NamedTextColor.GOLD));
+                killer.sendMessage(Text.mm("<gold><bold>Boss derrotado! Vitória!"));
             }
         }
     }

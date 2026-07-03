@@ -1,0 +1,25 @@
+# Bosses configuracao - bosses da run
+# Formatos de entidade: ZOMBIE, SKELETON, WITHER, RAVAGER, etc.
+bosses:
+  frostmaw:
+    base_type: ZOMBIE
+    display_name: "<bold><aqua>Frostmaw"
+    health: 200
+    damage: 12
+    speed: 0.25
+    scale: 2.5
+    knockback_resist: 1.0
+    victory: true
+    equipment:
+      helmet: ICE
+      chestplate: DIAMOND_CHESTPLATE
+      mainhand: DIAMOND_SWORD
+  magma_tyrant:
+    base_type: MAGMA_CUBE
+    display_name: "<bold><red>Tirano Magmático"
+    health: 300
+    damage: 15
+    speed: 0.3
+    scale: 4.0
+    knockback_resist: 0.8
+    victory: true

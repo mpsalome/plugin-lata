@@ -3,6 +3,7 @@ package com.project.rpgplugin.data;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.run.RunOutcome;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -46,11 +47,13 @@ public class YamlDataStore implements PlayerDataStore {
         }
         config.set("multipliers", mults);
 
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save run for " + playerId + ": " + e.getMessage());
-        }
+        SchedulerUtil.runAsync(plugin, () -> {
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                plugin.getLogger().warning("Failed to save run for " + playerId + ": " + e.getMessage());
+            }
+        });
     }
 
     @Override
@@ -113,7 +116,7 @@ public class YamlDataStore implements PlayerDataStore {
 
     @Override
     public void flushAll() {
-        plugin.getLogger().info("YamlDataStore: flush completed.");
+        plugin.getLogger().info("YamlDataStore: flush completed (async saves were dispatched).");
     }
 
     private File getFile(UUID playerId) {

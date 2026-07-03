@@ -3,6 +3,7 @@ package com.project.rpgplugin.ui;
 import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.util.SchedulerUtil;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class HudService {
     }
 
     public void start() {
-        task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 40L, 40L);
+        task = SchedulerUtil.runTimer(plugin, this::tick, 40L, 40L);
     }
 
     public void stop() {

@@ -6,6 +6,7 @@ import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
 import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -54,7 +55,7 @@ public class ScaffoldSkill extends AbstractSkill {
         Location bloc = p.getLocation().clone().subtract(0, 1, 0);
         if (bloc.getBlock().getType() == Material.AIR) {
             bloc.getBlock().setType(Material.HAY_BLOCK);
-            org.bukkit.Bukkit.getScheduler().runTaskLater(services.plugin(), () -> {
+            SchedulerUtil.runLater(services.plugin(), () -> {
                 if (bloc.getBlock().getType() == Material.HAY_BLOCK) {
                     bloc.getBlock().setType(Material.AIR);
                 }
