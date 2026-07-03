@@ -6,6 +6,7 @@ import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.mayhem.MayhemService;
+import com.project.rpgplugin.util.ItemKeys;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -40,9 +41,23 @@ public class RunManager {
         activeRuns.put(p.getUniqueId(), run);
 
         rollInitialKit(p, run);
+        giveBook(p);
 
         statService.recompute(p, run);
         p.sendMessage(Component.text("Nova Run Iniciada!").color(net.kyori.adventure.text.format.NamedTextColor.GREEN).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+    }
+
+    private void giveBook(Player p) {
+        boolean hasBook = false;
+        for (var item : p.getInventory().getContents()) {
+            if (item != null && ItemKeys.isRpgBook(item)) {
+                hasBook = true;
+                break;
+            }
+        }
+        if (!hasBook) {
+            p.getInventory().addItem(plugin.createRpgBook());
+        }
     }
 
     public void endRun(Player p, RunOutcome outcome) {
