@@ -1,6 +1,5 @@
 package com.project.rpgplugin.ui;
 
-import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.core.card.Card;
 import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.draft.DraftService;
@@ -32,12 +31,11 @@ public class DraftMenu extends Menu {
     private final DraftWeighting weighting;
     private final RPGPlugin plugin;
     private final PlayerLevelListener levelListener;
-    private final MessagesConfig messages;
 
     public DraftMenu(Player player, DraftSession session, DraftService draftService, RunState run,
                      RunManager runManager, DraftWeighting weighting, RPGPlugin plugin,
                      PlayerLevelListener levelListener) {
-        super(SIZE, plugin.getMessagesConfig().get("draft.title"));
+        super(SIZE, "<gold><bold>Selecione sua carta");
         this.player = player;
         this.session = session;
         this.draftService = draftService;
@@ -46,7 +44,6 @@ public class DraftMenu extends Menu {
         this.weighting = weighting;
         this.plugin = plugin;
         this.levelListener = levelListener;
-        this.messages = plugin.getMessagesConfig();
 
         build();
 
@@ -82,38 +79,35 @@ public class DraftMenu extends Menu {
             setItem(11 + i * 3, buildCardItem(card, i));
         }
 
-        // Reroll button (slot 22)
         if (DraftWeighting.isRerollEnabled(plugin) && session.rerollsUsed() < DraftWeighting.getMaxRerollPerDraft(plugin)) {
             int cost = DraftWeighting.getRerollCostLevels(plugin);
             ItemStack rerollItem = new ItemStack(Material.ENDER_EYE);
             ItemMeta meta = rerollItem.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.mm(messages.get("draft.reroll")));
+                meta.displayName(Text.mm("<light_purple>Reroll"));
                 meta.lore(List.of(
-                    Text.mm(messages.get("draft.reroll_cost", String.valueOf(cost))),
-                    Text.mm(messages.get("draft.reroll_used", String.valueOf(session.rerollsUsed()), String.valueOf(DraftWeighting.getMaxRerollPerDraft(plugin))))
+                    Text.mm("<gray>Custo: <white>" + cost + " niveis"),
+                    Text.mm("<gray>Usados: <white>" + session.rerollsUsed() + "/" + DraftWeighting.getMaxRerollPerDraft(plugin))
                 ));
                 rerollItem.setItemMeta(meta);
             }
             setItem(22, rerollItem);
         }
 
-        // Skip button (slot 26)
         if (DraftWeighting.isSkipAllowed(plugin)) {
             ItemStack skipItem = new ItemStack(Material.BARRIER);
             ItemMeta meta = skipItem.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.mm(messages.get("draft.skip")));
+                meta.displayName(Text.mm("<red>Pular"));
                 meta.lore(List.of(
-                    Text.mm(messages.get("draft.skip_heal", "6")),
-                    Text.mm(messages.get("draft.skip_nocard"))
+                    Text.mm("<gray>Cura: <white>6 coracoes"),
+                    Text.mm("<gray>Nenhuma carta sera ganha")
                 ));
                 skipItem.setItemMeta(meta);
             }
             setItem(26, skipItem);
         }
 
-        // Fill border
         ItemStack border = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta bMeta = border.getItemMeta();
         if (bMeta != null) {
@@ -142,30 +136,24 @@ public class DraftMenu extends Menu {
             case GOLD -> "<gradient:#FFD700:#FFA500>";
         };
 
-        String tierLabel = switch (card.tier()) {
+        String tierEmoji = switch (card.tier()) {
             case BRONZE -> "\uD83E\uDD48";
             case SILVER -> "\uD83E\uDD47";
-            case GOLD -> "\uD83E\uDD47";
+            case GOLD -> "\uD83C\uDFC6";
         };
 
-        String kindLabel = switch (card.kind()) {
+        String kindIcon = switch (card.kind()) {
             case ABILITY -> "\u26A1";
             case AUGMENT -> "\u2726";
         };
 
-        String cardName = messages.get(card.nameKey());
-        String cardDesc = messages.get(card.descKey());
+        String cardName = card.id().replace("_", " ");
 
-        meta.displayName(Text.mm(tierColor + "<bold>" + kindLabel + " " + cardName));
+        meta.displayName(Text.mm(tierColor + "<bold>" + kindIcon + " " + cardName));
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Text.mm(tierColor + tierLabel + " " + card.tier().name()));
+        lore.add(Text.mm(tierColor + tierEmoji + " " + card.tier().name()));
         lore.add(Text.mm("<gray>" + card.kind().name()));
-
-        if (!cardDesc.isEmpty() && !cardDesc.startsWith("<red>msg")) {
-            lore.add(Component.empty());
-            lore.add(Text.mm("<gray>" + cardDesc));
-        }
 
         StringBuilder tagsStr = new StringBuilder();
         for (var tag : card.tags()) {
@@ -177,9 +165,9 @@ public class DraftMenu extends Menu {
         }
 
         lore.add(Component.empty());
-        lore.add(Text.mm(messages.get("draft.click_choose")));
+        lore.add(Text.mm("<yellow>Clique para escolher"));
         if (card.maxStacks() > 1) {
-            lore.add(Text.mm(messages.get("draft.max_stacks", String.valueOf(card.maxStacks()))));
+            lore.add(Text.mm("<gray>Maximo: " + card.maxStacks() + " pilhas"));
         }
 
         meta.lore(lore);

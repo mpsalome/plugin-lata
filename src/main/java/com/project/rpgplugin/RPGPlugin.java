@@ -2,7 +2,6 @@ package com.project.rpgplugin;
 
 import com.project.rpgplugin.command.RecallCommand;
 import com.project.rpgplugin.command.RunCommand;
-import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.integration.AuraMobsBridge;
@@ -66,8 +65,6 @@ import java.util.List;
 public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     private AuraSkillsIntegration auraSkillsIntegration;
-    private MessagesConfig messagesConfig;
-
     private AuraMobsBridge auraMobsBridge;
     private MythicMobsBridge mythicMobsBridge;
     private ModelEngineBridge modelEngineBridge;
@@ -135,7 +132,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         saveDefaultConfig();
         ItemKeys.init(this);
         this.cooldownService = new CooldownService();
-        this.messagesConfig = new MessagesConfig(this);
 
         this.gateRegistry = new GateRegistry(this);
         this.auraSkillsIntegration = new AuraSkillsIntegration(this, gateRegistry);
@@ -283,10 +279,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     public AuraMobsBridge getAuraMobsBridge() { return auraMobsBridge; }
     public MythicMobsBridge getMythicMobsBridge() { return mythicMobsBridge; }
     public ModelEngineBridge getModelEngineBridge() { return modelEngineBridge; }
-
-    public MessagesConfig getMessagesConfig() {
-        return messagesConfig;
-    }
 
     public SkillRegistry getSkillRegistry() {
         return skillRegistry;
