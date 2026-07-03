@@ -36,6 +36,7 @@ public class RunState {
     private long blocksWalked;
     private long blocksSinceRecall;
     private int recallUses;
+    private int extraSkillSlots;
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
         this.playerId = playerId;
@@ -149,6 +150,9 @@ public class RunState {
     public void setRecallUses(int v) { this.recallUses = v; }
     public void incrementRecallUses() { this.recallUses++; }
 
+    public int extraSkillSlots() { return extraSkillSlots; }
+    public void setExtraSkillSlots(int v) { this.extraSkillSlots = Math.max(0, v); }
+
     public void reset() {
         ownedCards.clear();
         cardCounts.clear();
@@ -169,5 +173,6 @@ public class RunState {
         blocksWalked = 0;
         blocksSinceRecall = 0;
         recallUses = 0;
+        extraSkillSlots = 0;
     }
 }

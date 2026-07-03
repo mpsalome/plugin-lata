@@ -37,6 +37,13 @@ public class SynergyService {
         int minerCount = counts.getOrDefault(CardTag.MINER, 0);
         int builderCount = counts.getOrDefault(CardTag.BUILDER, 0);
 
+        int maxCount = Math.max(Math.max(explorerCount, minerCount), builderCount);
+        int slots;
+        if (maxCount >= 8) slots = 2;
+        else if (maxCount >= 6) slots = 1;
+        else slots = 0;
+        run.setExtraSkillSlots(slots);
+
         int duration = 120;
         if (explorerCount >= 8) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 2, true, false, false));

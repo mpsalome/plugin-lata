@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
 
 import com.project.rpgplugin.core.mana.ManaService;
@@ -41,6 +42,8 @@ public class AuraSkillsIntegration implements Listener {
 
     // All our custom skill keys registered in AuraSkills
     private final Set<String> registeredSkillKeys = new HashSet<>();
+
+    private final Map<UUID, PermissionAttachment> slotAttachments = new HashMap<>();
 
     public AuraSkillsIntegration(RPGPlugin plugin, GateRegistry gateRegistry) {
         this.plugin = plugin;
@@ -182,6 +185,29 @@ public class AuraSkillsIntegration implements Listener {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void syncSkillSlots(Player player, int totalSlots) {
+        if (!enabled) return;
+        UUID uuid = player.getUniqueId();
+        PermissionAttachment old = slotAttachments.remove(uuid);
+        if (old != null) {
+            old.remove();
+        }
+        if (totalSlots <= 0) return;
+        PermissionAttachment att = player.addAttachment(plugin);
+        for (int i = 1; i <= totalSlots; i++) {
+            att.setPermission("auraskills.slot." + i, true);
+        }
+        slotAttachments.put(uuid, att);
+    }
+
+    public void removeSkillSlotAttachment(Player player) {
+        UUID uuid = player.getUniqueId();
+        PermissionAttachment old = slotAttachments.remove(uuid);
+        if (old != null) {
+            old.remove();
+        }
     }
 
     public void setManaService(ManaService manaService) {

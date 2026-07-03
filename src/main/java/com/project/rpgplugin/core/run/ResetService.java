@@ -49,9 +49,10 @@ public class ResetService {
         // 3. Mayhem: clear active modifiers
         mayhemService.clear(p, run);
 
-        // 4. AuraSkills: reset if bridge available
+        // 4. AuraSkills: reset + remove slot attachments
         if (plugin.getAuraSkillsIntegration().isEnabled()) {
             plugin.getAuraSkillsIntegration().resetAllAuraSkills(p);
+            plugin.getAuraSkillsIntegration().removeSkillSlotAttachment(p);
         }
 
         // 5. Level/XP vanilla → 0

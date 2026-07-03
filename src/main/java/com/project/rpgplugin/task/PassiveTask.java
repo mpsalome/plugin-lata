@@ -1,5 +1,6 @@
 package com.project.rpgplugin.task;
 
+import com.project.rpgplugin.AuraSkillsIntegration;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
@@ -15,13 +16,14 @@ public class PassiveTask {
 
     private BukkitTask task;
 
-    public void start(JavaPlugin plugin, RunManager runManager, SynergyService synergyService) {
+    public void start(JavaPlugin plugin, RunManager runManager, SynergyService synergyService, AuraSkillsIntegration auraSkills) {
         task = SchedulerUtil.runTimer(plugin, scheduledTask -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 RunState run = runManager.getRun(p);
                 if (run == null) continue;
 
                 synergyService.applySynergies(p, run);
+                auraSkills.syncSkillSlots(p, run.extraSkillSlots());
 
                 for (String potionTypeName : run.activePotionTypes()) {
                     PotionEffectType type = PotionEffectType.getByName(potionTypeName);

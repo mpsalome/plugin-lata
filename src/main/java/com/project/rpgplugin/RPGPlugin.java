@@ -221,7 +221,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // Start periodic tasks
         this.distanceTask.start(this, distanceTracker, augmentListener);
-        this.passiveTask.start(this, runManager, synergyService);
+        this.passiveTask.start(this, runManager, synergyService, auraSkillsIntegration);
         this.hudService.start();
 
         getCommand("skills").setExecutor(this);
@@ -253,6 +253,11 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         if (passiveTask != null) passiveTask.stop();
         if (hudService != null) hudService.stop();
         if (dataStore != null) dataStore.flushAll();
+        if (auraSkillsIntegration != null) {
+            for (Player p : getServer().getOnlinePlayers()) {
+                auraSkillsIntegration.removeSkillSlotAttachment(p);
+            }
+        }
         getLogger().info("RogueLata Plugin desativado.");
     }
 
