@@ -37,6 +37,7 @@ public class RunState {
     private long blocksSinceRecall;
     private int recallUses;
     private int extraSkillSlots;
+    private final Set<String> toggledOff = new HashSet<>();
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
         this.playerId = playerId;
@@ -153,6 +154,13 @@ public class RunState {
     public int extraSkillSlots() { return extraSkillSlots; }
     public void setExtraSkillSlots(int v) { this.extraSkillSlots = Math.max(0, v); }
 
+    public Set<String> toggledOff() { return toggledOff; }
+    public boolean isToggledOn(String skillId) { return !toggledOff.contains(skillId); }
+    public void toggle(String skillId) {
+        if (!toggledOff.remove(skillId)) toggledOff.add(skillId);
+    }
+    public void setToggledOn(String skillId) { toggledOff.remove(skillId); }
+
     public void reset() {
         ownedCards.clear();
         cardCounts.clear();
@@ -174,5 +182,6 @@ public class RunState {
         blocksSinceRecall = 0;
         recallUses = 0;
         extraSkillSlots = 0;
+        toggledOff.clear();
     }
 }

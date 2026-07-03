@@ -213,7 +213,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // Prepare SkillDispatchListener with RunManager
         RunManager rm = this.runManager;
-        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, messagesConfig);
+        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, cardRegistry);
 
         // EPIC-6: Mana system
         this.manaService = new ManaService(this, auraSkillsIntegration);
@@ -341,7 +341,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             }
             RunState run = runManager.getRun(player);
             if (run != null) {
-                new CollectionMenu(player, run, this.messagesConfig);
+                new CollectionMenu(player, run, this.cardRegistry);
             }
             return true;
         }

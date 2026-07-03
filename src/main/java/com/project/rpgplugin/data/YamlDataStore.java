@@ -41,6 +41,7 @@ public class YamlDataStore implements PlayerDataStore {
         config.set("cardCounts", new HashMap<>(run.cardCounts()));
         config.set("ownedAbilities", new ArrayList<>(run.ownedAbilities()));
         config.set("activeModifiers", new ArrayList<>(run.activeModifiers()));
+        config.set("toggledOff", new ArrayList<>(run.toggledOff()));
         Map<String, Double> mults = new HashMap<>();
         for (Map.Entry<String, Double> e : run.multipliers().entrySet()) {
             mults.put(e.getKey(), e.getValue());
@@ -97,6 +98,9 @@ public class YamlDataStore implements PlayerDataStore {
 
         List<String> modifiers = config.getStringList("activeModifiers");
         modifiers.forEach(m -> run.addModifier(m));
+
+        List<String> toggled = config.getStringList("toggledOff");
+        toggled.forEach(t -> run.toggle(t));
 
         var multipliers = config.getConfigurationSection("multipliers");
         if (multipliers != null) {

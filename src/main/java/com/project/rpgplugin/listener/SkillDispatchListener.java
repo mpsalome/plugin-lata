@@ -1,6 +1,6 @@
 package com.project.rpgplugin.listener;
 
-import com.project.rpgplugin.config.MessagesConfig;
+import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
@@ -34,14 +34,14 @@ public class SkillDispatchListener implements Listener {
     private final SkillRegistry registry;
     private final SkillServices services;
     private final RunManager runManager;
-    private final MessagesConfig messages;
+    private final CardRegistry cardRegistry;
     private ManaService manaService;
 
-    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, MessagesConfig messages) {
+    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, CardRegistry cardRegistry) {
         this.registry = registry;
         this.services = services;
         this.runManager = runManager;
-        this.messages = messages;
+        this.cardRegistry = cardRegistry;
     }
 
     public void setManaService(ManaService manaService) {
@@ -60,7 +60,7 @@ public class SkillDispatchListener implements Listener {
             }
             RunState run = runManager.getRun(p);
             if (run != null) {
-                new CollectionMenu(p, run, messages);
+                new CollectionMenu(p, run, cardRegistry);
             }
             return;
         }
@@ -129,9 +129,9 @@ public class SkillDispatchListener implements Listener {
         if (owned.isEmpty()) return;
 
         for (String skillId : owned) {
+            if (!run.isToggledOn(skillId)) continue;
             Skill skill = registry.byId(skillId).orElse(null);
             if (skill == null) continue;
-            if (skill.passive() && kind == TriggerKind.INTERACT) continue;
             if (!skill.trigger().kinds().contains(kind)) continue;
 
             SkillContext ctx = new SkillContext(player, services, item, block, event);
