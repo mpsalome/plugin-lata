@@ -1,5 +1,7 @@
 package com.project.rpgplugin.core.mob;
 
+import com.project.rpgplugin.integration.ModelEngineBridge;
+import com.project.rpgplugin.integration.MythicMobsBridge;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import org.bukkit.Location;
@@ -24,9 +26,9 @@ public class MobSpawnService {
     private final Map<String, EliteFactory.BossDef> bossDefs = new HashMap<>();
     private final Map<String, EliteFactory.MobDef> mobDefs = new HashMap<>();
 
-    public MobSpawnService(JavaPlugin plugin, RunManager runManager) {
+    public MobSpawnService(JavaPlugin plugin, RunManager runManager, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
-        this.eliteFactory = new EliteFactory(plugin);
+        this.eliteFactory = new EliteFactory(plugin, mythicMobs, modelEngine);
         this.runManager = runManager;
         loadConfigs();
     }

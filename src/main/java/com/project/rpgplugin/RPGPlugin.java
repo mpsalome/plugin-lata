@@ -5,6 +5,9 @@ import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.config.MessagesConfig;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
+import com.project.rpgplugin.integration.AuraMobsBridge;
+import com.project.rpgplugin.integration.ModelEngineBridge;
+import com.project.rpgplugin.integration.MythicMobsBridge;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.card.ability.AbilityCardRegistration;
@@ -64,6 +67,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     private AuraSkillsIntegration auraSkillsIntegration;
     private MessagesConfig messagesConfig;
+
+    private AuraMobsBridge auraMobsBridge;
+    private MythicMobsBridge mythicMobsBridge;
+    private ModelEngineBridge modelEngineBridge;
 
     private SkillRegistry skillRegistry;
     private SkillServices skillServices;
@@ -133,6 +140,11 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.gateRegistry = new GateRegistry(this);
         this.auraSkillsIntegration = new AuraSkillsIntegration(this, gateRegistry);
 
+        // EPIC-7: Optional bridges
+        this.auraMobsBridge = new AuraMobsBridge();
+        this.mythicMobsBridge = new MythicMobsBridge();
+        this.modelEngineBridge = new ModelEngineBridge();
+
         // EPIC-1: Data-driven skill architecture
         this.skillsConfig = new SkillsConfig(this);
         this.skillServices = new SkillServices(this);
@@ -179,9 +191,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // EPIC-7: Difficulty & Combat
         this.difficultyService = new DifficultyService(runManager);
-        this.mobScalingListener = new MobScalingListener(difficultyService);
+        this.mobScalingListener = new MobScalingListener(difficultyService, auraMobsBridge);
         this.combatListener = new CombatListener(runManager);
-        this.mobSpawnService = new MobSpawnService(this, runManager);
+        this.mobSpawnService = new MobSpawnService(this, runManager, mythicMobsBridge, modelEngineBridge);
 
         // EPIC-10: Augment handlers
         this.augmentListener = new AugmentListener(runManager);
@@ -239,11 +251,14 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         } else {
             getLogger().info("RogueLata ativado em modo standalone (sem AuraSkills).");
         }
-        if (getServer().getPluginManager().getPlugin("AuraMobs") != null) {
+        if (auraMobsBridge.isEnabled()) {
             getLogger().info("RogueLata + AuraMobs detectado (reforco de dificuldade).");
         }
-        if (getServer().getPluginManager().getPlugin("MythicMobs") != null) {
+        if (mythicMobsBridge.isEnabled()) {
             getLogger().info("RogueLata + MythicMobs detectado (enriquecimento de bosses).");
+        }
+        if (modelEngineBridge.isEnabled()) {
+            getLogger().info("RogueLata + ModelEngine detectado (modelos 3D).");
         }
     }
 
@@ -264,6 +279,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     public AuraSkillsIntegration getAuraSkillsIntegration() {
         return auraSkillsIntegration;
     }
+
+    public AuraMobsBridge getAuraMobsBridge() { return auraMobsBridge; }
+    public MythicMobsBridge getMythicMobsBridge() { return mythicMobsBridge; }
+    public ModelEngineBridge getModelEngineBridge() { return modelEngineBridge; }
 
     public MessagesConfig getMessagesConfig() {
         return messagesConfig;

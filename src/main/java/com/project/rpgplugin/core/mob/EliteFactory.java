@@ -1,5 +1,7 @@
 package com.project.rpgplugin.core.mob;
 
+import com.project.rpgplugin.integration.ModelEngineBridge;
+import com.project.rpgplugin.integration.MythicMobsBridge;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
@@ -23,12 +25,26 @@ import java.util.UUID;
 public class EliteFactory {
 
     private final JavaPlugin plugin;
+    private final MythicMobsBridge mythicMobs;
+    private final ModelEngineBridge modelEngine;
 
-    public EliteFactory(JavaPlugin plugin) {
+    public EliteFactory(JavaPlugin plugin, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
+        this.mythicMobs = mythicMobs;
+        this.modelEngine = modelEngine;
     }
 
     public LivingEntity spawnBoss(Location loc, BossDef def) {
+        if (mythicMobs.isEnabled()) {
+            LivingEntity mm = mythicMobs.trySpawnMob(def.id(), loc).orElse(null);
+            if (mm != null) {
+                mm.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
+                mm.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
+                modelEngine.applyModel(mm, def.id());
+                trackBossBar(mm, def);
+                return mm;
+            }
+        }
         LivingEntity e = (LivingEntity) loc.getWorld().spawnEntity(loc, def.baseType());
         e.customName(Text.mm(def.displayName()));
         e.setCustomNameVisible(true);
@@ -59,6 +75,7 @@ public class EliteFactory {
         e.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
         e.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
 
+        modelEngine.applyModel(e, def.id());
         trackBossBar(e, def);
 
         return e;
@@ -124,6 +141,7 @@ public class EliteFactory {
         }
 
         e.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
+        modelEngine.applyModel(e, def.id());
         return e;
     }
 
