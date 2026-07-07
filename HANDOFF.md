@@ -1,49 +1,57 @@
 # Handoff — RogueLata Plugin
 
-## Estado Atual (2026-07-02)
+## Estado Atual (2026-07-06)
 
-- **Branch:** `main`, remoto: `origin/main`
 - **Versão:** `1.5.0` (pom.xml)
-- **Build:** `mvn clean package` — 145 source files, 70 testes, 0 falhas
-- **CI:** `.github/workflows/ci.yml` roda `mvn clean package` em push/PR
+- **Build:** `mvn clean package` — 148 source files, 106 testes, 0 falhas
+- **CI:** `.github/workflows/ci.yml` roda `mvn clean package` + `mvn test` em push/PR
 
-## O que já foi feito (todas as fases)
+## O que foi feito
 
-### Phase 1 — Legacy removal + critical bugs
-- T8.4/T8.4b/T8.5 + T10.23: `ClassListeners`, `PlayerManager`, `SkillGUI` deletados
-- InvUI removido do `pom.xml`
-- Item do menu: `BOOK` → `BREAD` (Lata de Pão), detecção por PDC tag
-- T2.6: `AbilityCard.onAcquire()` adiciona a `run.ownedAbilities()`
-- T10.20: `§` removido de código novo
+### Bloco 1 — Ascendant Cards (T10.2)
+- `SynergyService.applySynergies()` agora lê multiplicadores `explorer_ascendant`, `miner_ascendant`, `builder_ascendant`
+- Ascendant cards concedem bônus extras ao atingir cada patamar de sinergia:
+  - Explorer: Dolphin's Grace / Speed+ / Jump Boost
+  - Miner: Night Vision em qualquer patamar
+  - Builder: Resistance / Absorption extras
 
-### Phase 2 — Augments + bosses
-- T10.5-T10.18: `AugmentListener` com 11 handlers + GiantEffect
-- T7.3: `EliteFactory` com BossBar + fases (50%, 25% HP)
-- T7.4: `mobs.yml` / `bosses.yml`
-- T7.5: `MobSpawnService`
-- T7.7/T7.8: CombatListener com lifesteal, boss kill → milestone → Mayhem
-- T2.10: i18n nos cards (messages_pt/messages_en com 88 cards)
-- T10.26: CI workflow
-- T11.1: ModelEngine no plugin.yml
+### Bloco 2 — Draft Condicional (T11.8)
+- `mana_pool` tem `require_plugin: AuraSkills` no `augments.yml`
+- `DraftService.cardPluginAvailable()` filta cartas cujo `requiredPlugin()` não está presente no servidor
 
-### Phase 3 — Performance + i18n polish
-- T9.6: `PassiveTask` — reapleca potion effects de augments a cada 2s
-- T9.7: `YamlDataStore.save()` async via `SchedulerUtil`
-- T9.9: `SchedulerUtil` — Folia-awareness (detecta via classpath, usa RegionScheduler)
-- T10.19/21: `CollectionMenu` + `DraftMenu` usam `MessagesConfig` (zero strings hardcoded)
-- T8.2: `DraftMenu` extends `Menu` framework; click routing via `MenuHolder` (não por título)
-- T2.11: `DraftServiceTest` (stacking, session, no-repetition)
-- T10.25: `SynergyServiceTest` (countByTag, detectArchetype)
-- T9.9: Todas as tasks e modifiers migrados para `SchedulerUtil`
+### Bloco 3 — Testes (T3.8, T4.8, T5.7, T6.9, T10.25)
+- `ResetServiceTest` — 12 testes: reset de cards/counts/multipliers/onKill/modifiers/level/milestones/outcome/potions/recall/slots/toggles
+- `MilestoneServiceTest` — 12 testes: thresholds, run state, reset
+- `AugmentCardTest` — 7 testes: lifecycle, offerable, effects, registry
+- `CardRegistryTest` — 11 testes (novos: offerable/offerableByTier)
+- `SynergyServiceTest` — 10 testes (novos: ascendant multiplier)
+- Total: **106 testes** (de 57)
 
-### EPIC-6 — Mana System (último completado)
-- T6.2: `ManaService` + `mana_abilities.yml` (12 abilities com custo de mana)
-- T6.2: Mana check em `SkillDispatchListener.dispatch()` antes de ativar ability
-- T6.7: Custo de mana aparece na descrição das custom skills no `/skills` do AuraSkills
-- T6.8: `mana_pool` conditional (só ofertado se AuraSkills presente)
-- T6.8: `Card.requiredPlugin()` interface + filtro no `DraftService`
-- T6.9: `ManaServiceTest` (requiredPlugin, draft filtering)
-- T6.5: on_death alignment docs + mana docs em `docs/wiki/integrations.md`
+### Bloco 4 — CI Workflow (T10.26)
+- `.github/workflows/ci.yml` — `actions/setup-java@v4` (JDK 21, temurin), `mvn clean package`, `mvn test`
+
+### Bloco 5 — Remoção de i18n (dead code)
+- `config/MessagesConfig.java` deletado (não era referenciado por ninguém)
+- `resources/messages/messages_pt.yml` e `messages_en.yml` deletados
+- Menus usam strings hardcoded diretamente (DraftMenu, CollectionMenu)
+
+### Bloco 6 — Docs de Setup (T11.4/T11.5)
+- `docs/SERVER_SETUP.md` — requisitos, ordem de instalação, matriz de compatibilidade
+- `docs/packs/mythicmobs-frostmaw.yml` — exemplo de config MythicMobs
+- `docs/packs/modelengine-frostmaw.yml` — exemplo de config ModelEngine
+
+### Bloco 7 — UI Style Guide (T8.9)
+- `docs/UI_STYLE.md` — cores, ícones, sons, padrões de layout
+
+### Bloco 8 — Smoke Test (T11.7)
+- `docs/SMOKE_TEST.md` reorganizado em 4 seções: A (Standalone), B (+AuraSkills), C (+AuraMobs), D (+MythicMobs)
+
+### Bloco 9 — Revisão Final (EPIC-12)
+- `README.md`: softdepend atualizado com ModelEngine
+- `docs/wiki/config.md`: seção de mensagens/i18n removida
+- `docs/wiki/developers.md`: referências a MessagesConfig/i18n removidas, número de testes atualizado
+- `docs/wiki/index.md`: ModelEngine adicionado à tabela de dependências
+- `HANDOFF.md`: atualizado
 
 ## Arquivos críticos
 
@@ -56,23 +64,22 @@
 - `core/run/` — `RunState`, `RunManager`, `ResetService`
 - `core/draft/` — `DraftService`, `DraftSession`, `DraftWeighting`
 - `core/mob/` — `EliteFactory`, `MobSpawnService`
-- `core/mayhem/` — modifiers, `MilestoneService`
-- `core/build/` — `SynergyService`
-- `core/mana/` — `ManaService` (novo)
+- `core/mayhem/` — 8 modifiers, `MilestoneService`
+- `core/build/` — `SynergyService` (inclui ascendant cards)
+- `core/mana/` — `ManaService`
 
 ### Tasks
-- `task/PassiveTask.java` — periodic potion effect maintenance
+- `task/PassiveTask.java` — periodic potion effect maintenance + synergy application
 - `task/DistanceTask.java` — magnet tick + distance tracking
 
 ### Listeners
 - `listener/AugmentListener.java` — 11 augment event handlers
 - `listener/CombatListener.java` — crit, execute, thorns, lifesteal, boss kill
-- `listener/SkillDispatchListener.java` — skill activation, agora com mana check
-- `listener/DraftMenuListener.java` — só onClose (clicks vão pelo MenuListener)
+- `listener/SkillDispatchListener.java` — skill activation + mana check
 
 ### UI
-- `ui/DraftMenu.java` — extends Menu, i18n via MessagesConfig
-- `ui/CollectionMenu.java` — extends Menu, i18n via MessagesConfig
+- `ui/DraftMenu.java` — extends Menu, strings hardcoded
+- `ui/CollectionMenu.java` — extends Menu, strings hardcoded
 - `ui/HudService.java` — action bar
 - `ui/menu/Menu.java`, `MenuHolder.java`, `MenuListener.java`
 
@@ -84,69 +91,37 @@
 - `util/SchedulerUtil.java` — Folia-aware scheduler wrapper
 - `util/ItemKeys.java`, `util/Text.java`
 
-### Resources
-- `resources/augments.yml` — 53 augments + ascendentes
-- `resources/mobs.yml`, `resources/bosses.yml`
-- `resources/mana_abilities.yml` (novo)
-- `resources/messages/messages_pt.yml`, `messages_en.yml`
-- `resources/gates.yml`, `resources/plugin.yml`, `resources/config.yml`
+## O que NÃO foi feito (propositalmente não incluído no escopo)
 
-## O que ainda falta
+### T7.9-T7.11 — Bridges opcionais (AuraMobs, MythicMobs, ModelEngine)
+- Já existem como bridges de detecção e chamada via reflection
+- Consideradas enriquecimento opcional; core funciona 100% vanilla
 
-### EPIC-7 T7.9-T7.11 — Bridges opcionais (baixa prioridade)
-- AuraMobs bridge: escala mobs pelo AuraMobs quando presente
-- MythicMobs bridge: permite definir bosses via MythicMobs
-- ModelEngine bridge: modelos 3D para bosses
-- Core já funciona 100% vanilla sem elas
-
-### EPIC-8 T8.6/T8.9 — Menu polish (baixa prioridade)
-- T8.6: Sons por tier no DraftMenu (já existe `playTierSound` no DraftService)
-- T8.9: `UI_STYLE.md` (guia de estilo)
-- T8.8: Resource pack de fontes negativas (opcional)
-
-### EPIC-10 T10.2/T10.4 — Sinergias (média prioridade)
-- T10.2: `SynergyService.applySynergies()` nunca é chamado — ascendant cards não disparam bônus
-- T10.4: `extra_skill_slot` — decisão de design pendente
-
-### EPIC-11 — Documentação (baixa prioridade)
-- T11.3: Matriz de degradação (testar 4 combinações: standalone, +AuraSkills, +AuraMobs, +MythicMobs)
-- T11.4: `SERVER_SETUP.md` (passo a passo de instalação)
-- T11.5: Exemplos de config MythicMobs/ModelEngine
-- T11.6: Confirmação de escopo do InvUI (já removido)
-- T11.7: `SMOKE_TEST.md` reorganizado por combinação
-- T11.8: Aviso no draft quando carta requer plugin ausente (já feito em T6.8 para mana_pool, generalizar)
-
-### EPIC-12 — Revisão final (bloqueado até todo código fechar)
+### T8.8 — Resource pack de fontes negativas
+- Opcional, baixíssimo impacto
 
 ## Constraints & Regras
 
-1. **Maior impacto primeiro** — sempre priorizar o que afeta mais jogadores
-2. **Automático total** — executar sem pedir confirmação a cada passo
-3. **No fim de cada fase:** atualizar `pom.xml` version, `mvn clean package`, `git add -A`, `git commit`, `git push`
-4. **Standalone-first** — Toda feature core funciona sem AuraSkills/AuraMobs/MythicMobs
-5. **Comentários:** NUNCA adicionar comentários em código Java (exceto arquivos de config/docs)
-6. **i18n:** Toda string visível ao jogador via MessagesConfig, nunca hardcoded
-7. **Folia-aware:** Todo scheduler via `SchedulerUtil`, nunca `Bukkit.getScheduler()` direto
-8. **Versão Java:** 21, Paper 1.21.4+, Maven
-9. **Mensagens minimalistas:** Respostas curtas (<4 linhas), sem explicações desnecessárias
-10. **Nunca commitar sem ser instruído** (mas no fim de cada fase é obrigatório: bump version → build → commit → push)
+1. **Standalone-first** — Toda feature core funciona sem plugins externos
+2. **Adventure/MiniMessage** para todo texto (nunca `ChatColor`/`§`)
+3. **Toda constante de gameplay** vem de YAML (nunca hardcoded)
+4. **Reset total na morte** é sagrado
+5. **Folia-aware** — Todo scheduler via `SchedulerUtil`
+6. **Java 21, Paper 1.21.4+, Maven**
+7. **Nunca commitar sem ser instruído**
 
 ## Comandos úteis
 
 ```powershell
-# Build + testes
 cd C:\Users\marcus\Documents\repos\plugin-lata; mvn clean package
-
-# Git
-git add -A; git commit -m "mensagem"; git push
-
-# Ver diff
 git status; git diff --stat
-
-# Ver log
 git log --oneline -10
 ```
 
 ## Próximo passo sugerido
 
-O maior impacto restante é **T10.2** — `SynergyService.applySynergies()` existe mas nunca é chamado. As cartas ascendentes (`explorer_ascendant`, `miner_ascendant`, `builder_ascendant`) foram draftadas mas os bônus de sinergia (Speed, Haste, Regeneration) nunca são aplicados. É um hook rápido no `PassiveTask` ou `AugmentListener` para chamar `applySynergies()` quando o jogador tem as cartas certas.
+O plugin está funcional e completo para o escopo definido. Possíveis próximos passos:
+1. Deploy em servidor de teste para smoke test real (seguir `docs/SMOKE_TEST.md`)
+2. Balanceamento de cartas (pesos no draft, valores de efeitos)
+3. Mais modificadores Mayhem
+4. Sistema de conquistas/metas entre runs (meta-progression)

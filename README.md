@@ -6,7 +6,7 @@ Inspirado no **ARAM Mayhem** e no **Modo Arena** do LoL. Roda **standalone** (sÃ
 
 ```yaml
 # plugin.yml (soft-depend â€” tudo funciona sem)
-softdepend: [AuraSkills, AuraMobs, MythicMobs]
+softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
 ```
 
 ---

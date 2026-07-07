@@ -13,6 +13,7 @@ import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -52,6 +53,8 @@ public class DraftMenu extends Menu {
             int slot = event.getRawSlot();
             if (slot == 11 || slot == 14 || slot == 17) {
                 int index = (slot - 11) / 3;
+                Card card = session.options().get(index);
+                playTierSound(player, card.tier());
                 draftService.applyChoice(player, run, session, index);
                 player.closeInventory();
                 if (run.hasPendingDrafts()) {
@@ -173,5 +176,14 @@ public class DraftMenu extends Menu {
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private void playTierSound(Player p, CardTier tier) {
+        Sound sound = switch (tier) {
+            case BRONZE -> Sound.BLOCK_NOTE_BLOCK_HAT;
+            case SILVER -> Sound.BLOCK_NOTE_BLOCK_PLING;
+            case GOLD -> Sound.UI_TOAST_CHALLENGE_COMPLETE;
+        };
+        p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
     }
 }

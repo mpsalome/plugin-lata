@@ -1,0 +1,20 @@
+# MythicMobs example — Frostmaw boss
+# Place in MythicMobs/Mobs/ directory
+Frostmaw:
+  Type: ZOMBIE
+  Display: '&b&lFrostmaw'
+  Health: 200
+  Damage: 12
+  Options:
+    MovementSpeed: 0.25
+    KnockbackResistance: 1
+    Scale: 2.5
+    PreventOtherDrops: true
+  Equipment:
+    - DIAMOND_SWORD MAIN_HAND
+    - ICE HELMET
+    - DIAMOND_CHESTPLATE CHESTPLATE
+  Drops:
+    - diamond 1-3
+  Skills:
+    - message{m="<aqua>Frostmaw roars!"} @trigger ~onSpawn

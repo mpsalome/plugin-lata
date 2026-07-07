@@ -1,0 +1,12 @@
+# ModelEngine example — Frostmaw boss model
+# Place in ModelEngine/models/ directory
+frostmaw:
+  model: frostmaw.gecko
+  animations:
+    idle: idle.json
+    walk: walk.json
+    attack: attack.json
+  scale: 2.5
+  hitbox:
+    width: 1.5
+    height: 3.0

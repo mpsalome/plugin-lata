@@ -12,9 +12,6 @@ Arquivos em `plugins/RogueLata/` (gerados automaticamente na primeira execução
 | `gates.yml` | Gates: quais skills/níveis do AuraSkills liberam quais cartas | GateRegistry |
 | `mayhem.yml` | Modificadores Mayhem, marcos e severidade | MayhemConfig |
 | `run.yml` | Configuração de spawn da run | RunManager |
-| `messages/messages_pt.yml` | Textos em português | MessagesConfig |
-| `messages/messages_en.yml` | Textos em inglês | MessagesConfig |
-
 ## Uso
 
 Edite os arquivos desejados e execute `/rpg reload` para aplicar as mudanças sem reiniciar o servidor.
@@ -60,8 +57,4 @@ weight:
   epic: 10
 ```
 
-## Mensagens (i18n)
 
-Os arquivos em `messages/` usam o formato MiniMessage do Adventure. Para adicionar um novo idioma, crie `messages_<lang>.yml` baseado no `messages_en.yml` e recarregue.
-
-> Em implementação: suporte a locale automático baseado no cliente do jogador.

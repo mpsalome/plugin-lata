@@ -11,7 +11,9 @@ import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,6 +94,48 @@ class CardRegistryTest {
     void cardKindValuesAreCorrect() {
         assertEquals(CardKind.ABILITY, CardKind.valueOf("ABILITY"));
         assertEquals(CardKind.AUGMENT, CardKind.valueOf("AUGMENT"));
+    }
+
+    @Test
+    void offerableFiltersByCardOfferable() {
+        RunState run = new RunState(UUID.randomUUID(), registry);
+        Card always = mockCard("always", CardTier.BRONZE, CardKind.AUGMENT);
+        Card never = new Card() {
+            public String id() { return "never"; }
+            public CardTier tier() { return CardTier.BRONZE; }
+            public Set<CardTag> tags() { return Set.of(); }
+            public CardKind kind() { return CardKind.AUGMENT; }
+            public Material icon() { return Material.STONE; }
+            public int maxStacks() { return 1; }
+            public boolean offerable(RunState r) { return false; }
+            public void onAcquire(org.bukkit.entity.Player p, RunState r) {}
+            public void onRemove(org.bukkit.entity.Player p, RunState r) {}
+        };
+        registry.register(always);
+        registry.register(never);
+        List<Card> offerable = registry.offerable(run);
+        assertEquals(1, offerable.size());
+        assertEquals("always", offerable.getFirst().id());
+    }
+
+    @Test
+    void offerableByTierFiltersByBothTierAndOfferable() {
+        RunState run = new RunState(UUID.randomUUID(), registry);
+        registry.register(mockCard("a", CardTier.BRONZE, CardKind.AUGMENT));
+        registry.register(mockCard("b", CardTier.GOLD, CardKind.AUGMENT));
+        registry.register(new Card() {
+            public String id() { return "c"; }
+            public CardTier tier() { return CardTier.BRONZE; }
+            public Set<CardTag> tags() { return Set.of(); }
+            public CardKind kind() { return CardKind.AUGMENT; }
+            public Material icon() { return Material.STONE; }
+            public int maxStacks() { return 1; }
+            public boolean offerable(RunState r) { return false; }
+            public void onAcquire(org.bukkit.entity.Player p, RunState r) {}
+            public void onRemove(org.bukkit.entity.Player p, RunState r) {}
+        });
+        assertEquals(1, registry.offerableByTier(run, CardTier.BRONZE).size());
+        assertEquals(1, registry.offerableByTier(run, CardTier.GOLD).size());
     }
 
     private Card mockCard(String id, CardTier tier, CardKind kind) {

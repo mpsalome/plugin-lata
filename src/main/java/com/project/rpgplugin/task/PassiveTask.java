@@ -23,7 +23,7 @@ public class PassiveTask {
                 if (run == null) continue;
 
                 synergyService.applySynergies(p, run);
-                auraSkills.syncSkillSlots(p, run.extraSkillSlots());
+                auraSkills.syncSkillSlots(p, 3 + run.extraSkillSlots());
 
                 for (String potionTypeName : run.activePotionTypes()) {
                     PotionEffectType type = PotionEffectType.getByName(potionTypeName);

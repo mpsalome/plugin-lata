@@ -37,6 +37,10 @@ public class SynergyService {
         int minerCount = counts.getOrDefault(CardTag.MINER, 0);
         int builderCount = counts.getOrDefault(CardTag.BUILDER, 0);
 
+        boolean hasExplorerAsc = run.getMultiplier("explorer_ascendant") >= 1;
+        boolean hasMinerAsc = run.getMultiplier("miner_ascendant") >= 1;
+        boolean hasBuilderAsc = run.getMultiplier("builder_ascendant") >= 1;
+
         int maxCount = Math.max(Math.max(explorerCount, minerCount), builderCount);
         int slots;
         if (maxCount >= 8) slots = 2;
@@ -47,28 +51,46 @@ public class SynergyService {
         int duration = 120;
         if (explorerCount >= 8) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 2, true, false, false));
+            if (hasExplorerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, duration, 0, true, false, false));
         } else if (explorerCount >= 6) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 1, true, false, false));
             p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, duration, 0, true, false, false));
+            if (hasExplorerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 2, true, false, false));
         } else if (explorerCount >= 4) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 0, true, false, false));
+            if (hasExplorerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, duration, 0, true, false, false));
         }
 
         if (minerCount >= 8) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, duration, 2, true, false, false));
+            if (hasMinerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true, false, false));
         } else if (minerCount >= 6) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, duration, 1, true, false, false));
+            if (hasMinerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true, false, false));
         } else if (minerCount >= 4) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, duration, 0, true, false, false));
+            if (hasMinerAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, duration, 0, true, false, false));
         }
 
         if (builderCount >= 8) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, duration, 1, true, false, false));
+            if (hasBuilderAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, duration, 0, true, false, false));
         } else if (builderCount >= 6) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, duration, 0, true, false, false));
             p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, duration, 0, true, false, false));
+            if (hasBuilderAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, duration, 0, true, false, false));
         } else if (builderCount >= 4) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, duration, 0, true, false, false));
+            if (hasBuilderAsc)
+                p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, duration, 0, true, false, false));
         }
     }
 

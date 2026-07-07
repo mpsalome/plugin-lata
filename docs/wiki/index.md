@@ -29,5 +29,6 @@ RogueLata roda **standalone** (só Paper 1.21.4+) e opcionalmente se integra a A
 | AuraSkills | ➖ Opcional | Skills nativas + gates que liberam cartas + draft bias |
 | AuraMobs | ➖ Opcional | Reforça escala de dificuldade dos mobs |
 | MythicMobs | ➖ Opcional | AI avançada para bosses |
+| ModelEngine | ➖ Opcional | Modelos 3D para bosses |
 
 > Sem os opcionais, o plugin funciona **completo** — o draft, reset na morte, mayhem, recall, bosses e HUD são nativos (API Paper vanilla).

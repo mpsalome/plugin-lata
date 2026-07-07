@@ -17,7 +17,7 @@ com.project.rpgplugin
 ├── RPGPlugin.java                  # Bootstrap + DI manual
 ├── AuraSkillsIntegration.java      # Ponte AuraSkills (custom skills, gates, draft bias)
 ├── command/                        # RunCommand, RecallCommand
-├── config/                         # MessagesConfig (i18n)
+├── config/                         # SkillsConfig
 ├── core/
 │   ├── build/       SynergyService           # Sinergias por tags
 │   ├── card/        Card, CardRegistry...    # 88 cartas (35 ability + 53 augment)
@@ -67,7 +67,6 @@ com.project.rpgplugin
 - **Toda constante de gameplay** vem de YAML (nunca hardcoded)
 - **Standalone-first** — AuraSkills/AuraMobs são soft-deps
 - **Reset total na morte** é sagrado
-- **i18n** em `messages_<lang>.yml`
 - **Limpeza de estado** em quit/death para evitar leaks de UUID
 
 ## Testes
@@ -76,4 +75,4 @@ com.project.rpgplugin
 mvn test
 ```
 
-Atualmente 57 testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression).
+Atualmente 106 testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression, ResetService, MilestoneService, SynergyService, AugmentCard).

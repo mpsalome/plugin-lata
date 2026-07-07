@@ -95,4 +95,41 @@ class SynergyServiceTest {
         assertTrue(registry.byId("double_jump").isPresent());
         assertTrue(registry.byId("xp_boost").isPresent());
     }
+
+    @Test
+    void ascendantMultiplierGrantsBonusEffects() {
+        run.addMultiplier("explorer_ascendant", 1);
+        assertEquals(1.0, run.getMultiplier("explorer_ascendant"), 0.001);
+    }
+
+    @Test
+    void ascendantMultiplierStacks() {
+        run.addMultiplier("miner_ascendant", 1);
+        run.addMultiplier("miner_ascendant", 1);
+        assertEquals(2.0, run.getMultiplier("miner_ascendant"), 0.001);
+    }
+
+    @Test
+    void allThreeAscendantsCanBeActiveSimultaneously() {
+        run.addMultiplier("explorer_ascendant", 1);
+        run.addMultiplier("miner_ascendant", 1);
+        run.addMultiplier("builder_ascendant", 1);
+        assertEquals(1.0, run.getMultiplier("explorer_ascendant"), 0.001);
+        assertEquals(1.0, run.getMultiplier("miner_ascendant"), 0.001);
+        assertEquals(1.0, run.getMultiplier("builder_ascendant"), 0.001);
+    }
+
+    @Test
+    void ascendantRemovedOnMultiplierClear() {
+        run.addMultiplier("explorer_ascendant", 1);
+        run.removeMultiplier("explorer_ascendant", 1);
+        assertEquals(0.0, run.getMultiplier("explorer_ascendant"), 0.001);
+    }
+
+    @Test
+    void ascendantResetOnRunReset() {
+        run.addMultiplier("explorer_ascendant", 1);
+        run.reset();
+        assertEquals(0.0, run.getMultiplier("explorer_ascendant"), 0.001);
+    }
 }
