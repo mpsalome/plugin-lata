@@ -4,8 +4,9 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.CompositeTriggerHelper;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
+import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,6 +15,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SonarSkill extends AbstractSkill {
 
@@ -37,25 +40,36 @@ public class SonarSkill extends AbstractSkill {
     public boolean passive() { return false; }
 
     @Override
-    public Duration cooldown() { return Duration.ofSeconds(20); }
+    public Duration cooldown() { return Duration.ofSeconds(25); }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.AMETHYST_SHARD); }
+    public SkillTrigger trigger() {
+        return CompositeTriggerHelper.sneakRightClick();
+    }
 
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "§cSonar em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            feedback(ctx, "<red>Sonar em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
             return;
         }
         Player p = ctx.player();
-        consume(ctx, 1);
         startCooldown(ctx);
-        for (Entity entity : p.getNearbyEntities(15, 15, 15)) {
-            if (entity instanceof LivingEntity && entity != p) {
-                entity.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, entity.getLocation().add(0, 1, 0), 10, 0.2, 0.5, 0.2, 0);
+        int range = cfg().getInt("range", 20);
+        int duration = cfg().getInt("glow_duration", 10) * 20;
+        List<LivingEntity> revealed = new ArrayList<>();
+        for (Entity entity : p.getNearbyEntities(range, range, range)) {
+            if (entity instanceof LivingEntity le && entity != p) {
+                le.setGlowing(true);
+                revealed.add(le);
+                le.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, le.getLocation().add(0, 1, 0), 15, 0.3, 0.5, 0.3, 0);
             }
         }
-        feedback(ctx, "§5Sonar ativo! Localizando entidades...", Sound.BLOCK_AMETHYST_BLOCK_CHIME);
+        SchedulerUtil.runLater(services.plugin(), () -> {
+            for (LivingEntity le : revealed) {
+                le.setGlowing(false);
+            }
+        }, duration);
+        feedback(ctx, "<light_purple>Sonar: inimigos revelados por " + duration/20 + "s.", Sound.BLOCK_AMETHYST_BLOCK_CHIME);
     }
 }

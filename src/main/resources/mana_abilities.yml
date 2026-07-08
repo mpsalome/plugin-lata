@@ -1,16 +1,17 @@
 # Mana custo por ability (só funciona com AuraSkills)
 # Formato: <ability_id>: <custo_de_mana>
 # Abilities sem entrada aqui usam só cooldown (sem custo de mana)
-dash: 10
-step_assist: 5
+dash: 15
 grapple: 8
 torch_light: 3
-ore_repair: 15
-molten_touch: 20
+ore_repair: 0
 transmutation: 25
 core_overdrive: 30
-lumberjack: 12
-wind_burst: 10
+wind_burst: 15
 dim_shift: 15
-sonar: 8
+sonar: 10
+seismic_slam: 30
+sentry_turret: 50
+entangling_roots: 25
+harpoon_pull: 0
 recall: 0

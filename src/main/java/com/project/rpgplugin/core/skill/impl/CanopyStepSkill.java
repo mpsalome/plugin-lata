@@ -40,12 +40,21 @@ public class CanopyStepSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ZERO; }
 
     @Override
-    public SkillTrigger trigger() { return MoveTrigger.whenOn(Tag.LEAVES); }
+    public SkillTrigger trigger() { return MoveTrigger.always(); }
 
     @Override
     public void activate(SkillContext ctx) {
         Block under = ctx.targetBlock();
-        if (under != null && (under.getType() == Material.GRASS_BLOCK || Tag.LEAVES.isTagged(under.getType()))) {
+        if (under == null) return;
+        Material type = under.getType();
+        boolean natural = switch (type) {
+            case GRASS_BLOCK, DIRT, ROOTED_DIRT, PODZOL, MYCELIUM, SAND, RED_SAND,
+                 GRAVEL, CLAY, MUD, PACKED_MUD, SOUL_SAND, SOUL_SOIL -> true;
+            default -> Tag.LEAVES.isTagged(type) || Tag.LOGS.isTagged(type)
+                || type == Material.COARSE_DIRT || type == Material.FARMLAND
+                || type == Material.DIRT_PATH || Tag.SAND.isTagged(type);
+        };
+        if (natural) {
             Player p = ctx.player();
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1, true, false, false));
         }

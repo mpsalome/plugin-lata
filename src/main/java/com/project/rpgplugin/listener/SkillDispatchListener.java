@@ -1,6 +1,7 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.core.card.CardRegistry;
+import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
@@ -8,6 +9,7 @@ import com.project.rpgplugin.core.skill.Skill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillRegistry;
 import com.project.rpgplugin.core.skill.SkillServices;
+import com.project.rpgplugin.core.skill.impl.BladeDanceSkill;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.ui.CollectionMenu;
 import com.project.rpgplugin.util.ItemKeys;
@@ -19,8 +21,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -69,6 +73,18 @@ public class SkillDispatchListener implements Listener {
     }
 
     @EventHandler
+    public void onBlockPlace(BlockPlaceEvent e) {
+        Player p = e.getPlayer();
+        dispatch(p, TriggerKind.INTERACT, e, p.getInventory().getItemInMainHand(), e.getBlockPlaced());
+    }
+
+    @EventHandler
+    public void onFish(PlayerFishEvent e) {
+        Player p = e.getPlayer();
+        dispatch(p, TriggerKind.INTERACT, e, p.getInventory().getItemInMainHand(), null);
+    }
+
+    @EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         Player p = e.getPlayer();
         dispatch(p, TriggerKind.CONSUME, e, e.getItem(), null);
@@ -81,7 +97,7 @@ public class SkillDispatchListener implements Listener {
 
         if (services.isReinforced(block.getLocation())) {
             e.setCancelled(true);
-            p.sendMessage(Text.mm("<red>Este bloco foi reforçado e está temporariamente indestrutível!"));
+            p.sendMessage(Text.mm("<red>Este bloco foi reforcado e esta temporariamente indestrutivel!"));
             return;
         }
 
@@ -145,8 +161,17 @@ public class SkillDispatchListener implements Listener {
                 }
                 if (event instanceof Cancellable c) c.setCancelled(true);
                 skill.activate(ctx);
+                trackBladeDanceMobility(player, skillId);
                 return;
             }
         }
+    }
+
+    private void trackBladeDanceMobility(Player player, String skillId) {
+        cardRegistry.byId(skillId).ifPresent(card -> {
+            if (card.tags().contains(CardTag.MOBILITY)) {
+                BladeDanceSkill.recordMobility(player.getUniqueId());
+            }
+        });
     }
 }

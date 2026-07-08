@@ -4,7 +4,7 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.PassiveTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -32,19 +32,19 @@ public class WaterBreathingSkill extends AbstractSkill {
     public Material icon() { return Material.LAPIS_LAZULI; }
 
     @Override
-    public boolean passive() { return false; }
+    public boolean passive() { return true; }
 
     @Override
     public Duration cooldown() { return Duration.ZERO; }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.LAPIS_LAZULI); }
+    public SkillTrigger trigger() { return PassiveTrigger.instance(); }
 
     @Override
     public void activate(SkillContext ctx) {
         Player p = ctx.player();
-        consume(ctx, 1);
-        p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 300, 2));
-        feedback(ctx, "§9Respiração Aquática Ativada!", null);
+        if (!p.isInWaterOrBubbleColumn() && !p.getLocation().getBlock().isLiquid()) return;
+        p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 100, 0, true, false, false));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 100, 0, true, false, false));
     }
 }

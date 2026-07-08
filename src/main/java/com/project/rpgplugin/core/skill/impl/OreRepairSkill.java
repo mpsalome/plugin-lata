@@ -4,10 +4,11 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.BlockBreakTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -40,27 +41,38 @@ public class OreRepairSkill extends AbstractSkill {
 
     @Override
     public SkillTrigger trigger() {
-        return InteractTrigger.custom(ctx -> {
-            if (ctx.usedItem() == null || ctx.usedItem().getType() != Material.IRON_INGOT) return false;
-            ItemStack mainHand = ctx.player().getInventory().getItemInMainHand();
-            return mainHand.getType() == Material.IRON_PICKAXE
-                || mainHand.getType() == Material.DIAMOND_PICKAXE
-                || mainHand.getType() == Material.NETHERITE_PICKAXE;
-        }, "Clique com: <white>Barra de Ferro</white> (segurando uma Picareta)");
+        return BlockBreakTrigger.custom(ctx -> {
+            Block block = ctx.targetBlock();
+            if (block == null) return false;
+            return switch (block.getType()) {
+                case IRON_ORE, DEEPSLATE_IRON_ORE, GOLD_ORE, DEEPSLATE_GOLD_ORE,
+                     DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE -> true;
+                default -> false;
+            };
+        }, "Quebre <gold>minerios</gold> de Fe/Au/Dia para reparar equipamentos");
     }
 
     @Override
     public void activate(SkillContext ctx) {
         Player p = ctx.player();
+        boolean repaired = false;
+        for (ItemStack item : p.getInventory().getArmorContents()) {
+            if (item != null && item.getItemMeta() instanceof Damageable dmg && dmg.getDamage() > 0) {
+                int rep = (int) (item.getType().getMaxDurability() * 0.05);
+                dmg.setDamage(Math.max(0, dmg.getDamage() - rep));
+                item.setItemMeta(dmg);
+                repaired = true;
+            }
+        }
         ItemStack mainHand = p.getInventory().getItemInMainHand();
-        Damageable dmg = (Damageable) mainHand.getItemMeta();
-        if (dmg != null && dmg.getDamage() > 0) {
-            consume(ctx, 1);
-            int rep = (int) (mainHand.getType().getMaxDurability() * 0.30);
+        if (mainHand.getItemMeta() instanceof Damageable dmg && dmg.getDamage() > 0) {
+            int rep = (int) (mainHand.getType().getMaxDurability() * 0.05);
             dmg.setDamage(Math.max(0, dmg.getDamage() - rep));
             mainHand.setItemMeta(dmg);
-            p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
-            feedback(ctx, "§aPicareta reparada +30%!", null);
+            repaired = true;
+        }
+        if (repaired) {
+            p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 0.5f, 1.5f);
         }
     }
 }

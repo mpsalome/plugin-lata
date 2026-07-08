@@ -4,16 +4,21 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.CompositeTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
+import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class UnbreakableBlockSkill extends AbstractSkill {
 
@@ -37,24 +42,46 @@ public class UnbreakableBlockSkill extends AbstractSkill {
     public boolean passive() { return false; }
 
     @Override
-    public Duration cooldown() { return Duration.ZERO; }
+    public Duration cooldown() { return Duration.ofSeconds(30); }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.CLAY_BALL); }
+    public SkillTrigger trigger() {
+        return new CompositeTrigger(Set.of(TriggerKind.INTERACT), ctx -> {
+            if (!(ctx.sourceEvent() instanceof BlockPlaceEvent e)) return false;
+            return ctx.player().isSneaking();
+        }, "<gray>Agache e coloque um bloco para criar barreira");
+    }
 
     @Override
     public void activate(SkillContext ctx) {
-        Player p = ctx.player();
-        Block target = p.getTargetBlockExact(5);
-        if (target != null && target.getType() != Material.AIR && target.getType() != Material.BEDROCK) {
-            consume(ctx, 1);
-            Location targetLoc = target.getLocation();
-            services.addReinforcedBlock(targetLoc);
-            p.playSound(targetLoc, Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f);
-            feedback(ctx, "§aBloco Reforçado: Inquebrável por 15s!", null);
-            SchedulerUtil.runLater(services.plugin(), () -> {
-                services.removeReinforcedBlock(targetLoc);
-            }, 300L);
+        if (onCooldown(ctx)) {
+            feedback(ctx, "<red>Barreira em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            return;
         }
+        Player p = ctx.player();
+        if (!(ctx.sourceEvent() instanceof BlockPlaceEvent event)) return;
+        Location origin = event.getBlockPlaced().getLocation();
+        List<Location> barrier = new ArrayList<>();
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                Location loc = origin.clone().add(x, 0, z);
+                Block b = loc.getBlock();
+                if (b.getType() == Material.AIR || b.isReplaceable()) {
+                    b.setType(Material.OBSIDIAN);
+                    barrier.add(loc);
+                    services.addReinforcedBlock(loc);
+                }
+            }
+        }
+        startCooldown(ctx);
+        p.getWorld().spawnParticle(org.bukkit.Particle.PORTAL, origin.add(0, 1, 0), 50, 1.5, 0.5, 1.5, 0.1);
+        p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
+        feedback(ctx, "<bold>Barreira de Obsidiana ativada! 10s de protecao.</bold>", null);
+        SchedulerUtil.runLater(services.plugin(), () -> {
+            for (Location loc : barrier) {
+                loc.getBlock().setType(Material.AIR);
+                services.removeReinforcedBlock(loc);
+            }
+        }, 200L);
     }
 }
