@@ -91,6 +91,10 @@ public class RunResetService {
     }
 
     public void fullReset(Player p, RunState run) {
+        // 0. Mayhem Absolution — reduce global mayhem if player reached level 10+
+        // (must check run.level() BEFORE any state cleanup)
+        mayhemService.tryRelieveMayhem(p, run);
+
         // 1. Remove all cards — call onRemove for each
         for (String cardId : List.copyOf(run.ownedCards())) {
             Card c = cardRegistry.byId(cardId).orElse(null);
@@ -131,37 +135,34 @@ public class RunResetService {
         // 8. Remove tagged skill items from inventory
         removeTaggedSkillItems(p);
 
-        // 9. Mayhem — clear active modifiers
-        mayhemService.clear(p, run);
-
-        // 10. AuraSkills — reset + remove slot attachments
+        // 9. AuraSkills — reset + remove slot attachments
         if (plugin.getAuraSkillsIntegration().isEnabled()) {
             plugin.getAuraSkillsIntegration().resetAllAuraSkills(p);
             plugin.getAuraSkillsIntegration().removeSkillSlotAttachment(p);
         }
 
-        // 11. Reset run state
+        // 10. Reset run state
         run.reset();
 
-        // 12. Clean tracked blocks (Folia-aware: use region scheduler per chunk)
+        // 11. Clean tracked blocks (Folia-aware: use region scheduler per chunk)
         cleanTrackedBlocks();
 
-        // 13. Clean tracked entities (Folia-aware: use entity scheduler)
+        // 12. Clean tracked entities (Folia-aware: use entity scheduler)
         cleanTrackedEntities();
 
-        // 14. Teleport to spawn (use entity scheduler for Folia compatibility)
+        // 13. Teleport to spawn (use entity scheduler for Folia compatibility)
         Location spawn = spawnResolver.resolve(p);
         p.teleportAsync(spawn);
 
-        // 15. Clear PDC persisted run data
+        // 14. Clear PDC persisted run data
         if (persistence != null) {
             persistence.clearRun(p);
         }
 
-        // 16. Ensure RPG book
+        // 15. Ensure RPG book
         ensureRpgBook(p);
 
-        // 17. Feedback
+        // 16. Feedback
         p.sendMessage(com.project.rpgplugin.util.Text.mm("<red><bold>RUN ENCERRADA"));
         p.sendMessage(com.project.rpgplugin.util.Text.mm("<gray>Todos os poderes foram perdidos. Uma nova run comeca!"));
     }

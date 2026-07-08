@@ -4,6 +4,7 @@ import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunState;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -65,6 +66,56 @@ public class MayhemService {
         playerModifiers.remove(p.getUniqueId());
         if (scopeIsServer()) {
             globalModifiers.clear();
+        }
+    }
+
+    public void tryRelieveMayhem(Player deadPlayer, RunState run) {
+        World world = deadPlayer.getWorld();
+
+        // Anti-cheese: only reduce mayhem if player died at level 10+
+        if (run.level() < 10) {
+            clear(deadPlayer, run);
+            return;
+        }
+
+        boolean relieved = false;
+
+        // Server scope: remove the LAST global modifier
+        if (scopeIsServer() && !globalModifiers.isEmpty()) {
+            String lastModId = globalModifiers.stream()
+                .reduce((first, second) -> second)
+                .orElse(null);
+            if (lastModId != null) {
+                registry.byId(lastModId).ifPresent(m -> {
+                    MayhemContext ctx = new MayhemContext(plugin, run, world);
+                    m.onDeactivate(ctx);
+                });
+                globalModifiers.remove(lastModId);
+                Set<String> updatedShared = Set.copyOf(globalModifiers);
+                for (RunState otherRun : plugin.getRunManager().getAllRuns()) {
+                    otherRun.setSharedModifiers(updatedShared);
+                }
+                relieved = true;
+            }
+        }
+
+        // Clear dead player's personal modifier state
+        for (String modId : run.activeModifiers()) {
+            registry.byId(modId).ifPresent(m -> {
+                MayhemContext ctx = new MayhemContext(plugin, run, world);
+                m.onDeactivate(ctx);
+            });
+        }
+        run.activeModifiers().clear();
+        run.setMilestonesReached(0);
+        playerModifiers.remove(deadPlayer.getUniqueId());
+
+        if (relieved) {
+            int newLevel = globalModifiers.size();
+            String msg = "<gradient:#00ff87:#60efff>⬇ O sacrifício de <white>" + deadPlayer.getName()
+                + "</white> acalmou a tempestade!</gradient> <gray>Mayhem reduzido para</gray> <yellow>Lv " + newLevel + "</yellow>";
+            Bukkit.broadcast(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(msg));
+            world.playSound(deadPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 0.8f);
         }
     }
 
