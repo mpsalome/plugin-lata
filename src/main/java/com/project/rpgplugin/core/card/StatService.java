@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public final class StatService {
 
-    private static final String MODIFIER_PREFIX = "roguelata:";
+    private static final String MODIFIER_PREFIX = "roguelata_";
 
     public void recompute(Player p, RunState run) {
         // 1. Remove all RogueLata attribute modifiers
@@ -97,7 +97,7 @@ public final class StatService {
         Collection<AttributeModifier> mods = attr.getModifiers();
         if (mods.isEmpty()) return;
         attr.getModifiers().stream()
-            .filter(m -> m.getName().startsWith(MODIFIER_PREFIX))
+            .filter(m -> m.getName().startsWith("roguelata:" + MODIFIER_PREFIX))
             .toList()
             .forEach(attr::removeModifier);
     }
