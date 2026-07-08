@@ -67,6 +67,9 @@ public class SeismicSlamSkill extends AbstractSkill {
         }
         Player p = ctx.player();
         startCooldown(ctx);
+        if (ctx.usedItem() != null) {
+            p.setCooldown(ctx.usedItem().getType(), (int) cooldown().toSeconds() * 20);
+        }
         Location origin = p.getLocation().add(0, 0.5, 0);
         Vector direction = p.getLocation().getDirection().normalize().setY(0);
         origin.getWorld().spawnParticle(Particle.SONIC_BOOM, origin, 3, 0, 0, 0, 0);
@@ -83,6 +86,6 @@ public class SeismicSlamSkill extends AbstractSkill {
                 }
             }
         }
-        feedback(ctx, "<green><bold>Onda Sismica!</bold></green>", Sound.ENTITY_WARDEN_SONIC_BOOM);
+        p.playSound(p.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 0.5f, 0.5f);
     }
 }

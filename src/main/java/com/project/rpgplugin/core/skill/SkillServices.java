@@ -1,7 +1,6 @@
 package com.project.rpgplugin.core.skill;
 
 import com.project.rpgplugin.RPGPlugin;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -107,7 +106,9 @@ public class SkillServices {
     // -- Feedback --
 
     public void feedback(Player player, String message, Sound sound) {
-        player.sendActionBar(Component.text(message));
+        if (plugin.getHudService() != null) {
+            plugin.getHudService().addFeedback(player, message);
+        }
         if (sound != null) {
             player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
         }

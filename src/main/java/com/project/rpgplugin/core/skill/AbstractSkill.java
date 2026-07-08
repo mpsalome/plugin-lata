@@ -83,7 +83,9 @@ public abstract class AbstractSkill implements Skill {
     }
 
     protected void feedback(SkillContext ctx, String message, Sound sound) {
-        ctx.player().sendActionBar(net.kyori.adventure.text.Component.text(message));
+        if (services.plugin().getHudService() != null) {
+            services.plugin().getHudService().addFeedback(ctx.player(), message);
+        }
         if (sound != null) {
             ctx.player().playSound(ctx.player().getLocation(), sound, 1.0f, 1.0f);
         }

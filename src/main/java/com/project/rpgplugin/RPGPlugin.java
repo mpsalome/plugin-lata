@@ -211,7 +211,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.augmentListener = new AugmentListener(runManager);
 
         // EPIC-8: HUD & Menu framework
-        this.hudService = new HudService(this, runManager, recallProgression, skillServices, skillRegistry);
+        this.hudService = new HudService(this, manaService, runManager);
         this.menuListener = new MenuListener();
 
         // EPIC-9: Persistence
@@ -245,7 +245,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // Start periodic tasks
         this.distanceTask.start(this, distanceTracker, augmentListener);
         this.passiveTask.start(this, runManager, synergyService, auraSkillsIntegration);
-        this.hudService.start();
+        this.hudService.startAll();
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
@@ -277,7 +277,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     public void onDisable() {
         if (distanceTask != null) distanceTask.stop();
         if (passiveTask != null) passiveTask.stop();
-        if (hudService != null) hudService.stop();
+        if (hudService != null) hudService.stopAll();
         if (dataStore != null) dataStore.flushAll();
         if (auraSkillsIntegration != null) {
             for (Player p : getServer().getOnlinePlayers()) {
