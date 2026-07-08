@@ -4,13 +4,13 @@ import com.project.rpgplugin.core.card.augment.AttributeEffect;
 import com.project.rpgplugin.core.card.augment.AugmentCard;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.ItemKeys;
-import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
+import java.util.List;
 
 public final class StatService {
 
@@ -52,33 +52,21 @@ public final class StatService {
         // 3. Apply skip health bonus (from draft skip)
         healthBonus += run.skipHealthBonus();
 
-        // 4. Apply as AttributeModifier
+        // 4. Apply as AttributeModifier with unique NamespacedKey
         if (maxHealth != null && healthBonus != 0) {
-            maxHealth.addModifier(new AttributeModifier(
-                ItemKeys.withKey(MODIFIER_PREFIX + "max_health"),
-                healthBonus, AttributeModifier.Operation.ADD_NUMBER
-            ));
+            applyModifier(maxHealth, MODIFIER_PREFIX + "max_health", healthBonus, AttributeModifier.Operation.ADD_NUMBER);
         }
         if (attackDamage != null && damageBonus != 0) {
-            attackDamage.addModifier(new AttributeModifier(
-                ItemKeys.withKey(MODIFIER_PREFIX + "attack_damage"),
-                damageBonus, AttributeModifier.Operation.ADD_NUMBER
-            ));
+            applyModifier(attackDamage, MODIFIER_PREFIX + "attack_damage", damageBonus, AttributeModifier.Operation.ADD_NUMBER);
         }
         if (movementSpeed != null && speedBonus != 0) {
-            movementSpeed.addModifier(new AttributeModifier(
-                ItemKeys.withKey(MODIFIER_PREFIX + "movement_speed"),
-                speedBonus, AttributeModifier.Operation.ADD_SCALAR
-            ));
+            applyModifier(movementSpeed, MODIFIER_PREFIX + "movement_speed", speedBonus, AttributeModifier.Operation.ADD_SCALAR);
         }
         if (armor != null && armorBonus != 0) {
-            armor.addModifier(new AttributeModifier(
-                ItemKeys.withKey(MODIFIER_PREFIX + "armor"),
-                armorBonus, AttributeModifier.Operation.ADD_NUMBER
-            ));
+            applyModifier(armor, MODIFIER_PREFIX + "armor", armorBonus, AttributeModifier.Operation.ADD_NUMBER);
         }
 
-        // 4. Ensure health doesn't exceed new max
+        // 5. Ensure health doesn't exceed new max
         double newMax = maxHealth != null ? maxHealth.getValue() : 20.0;
         if (p.getHealth() > newMax) {
             p.setHealth(newMax);
@@ -98,11 +86,26 @@ public final class StatService {
     }
 
     private void clearModifiers(AttributeInstance attr) {
-        Collection<AttributeModifier> mods = attr.getModifiers();
-        if (mods.isEmpty()) return;
+        List<AttributeModifier> toRemove = attr.getModifiers().stream()
+            .filter(m -> {
+                NamespacedKey key = m.getKey();
+                return key != null
+                    && key.getNamespace().equals("roguelata")
+                    && key.getKey().startsWith(MODIFIER_PREFIX);
+            })
+            .toList();
+        for (AttributeModifier mod : toRemove) {
+            attr.removeModifier(mod);
+        }
+    }
+
+    private void applyModifier(AttributeInstance attr, String keySuffix, double value, AttributeModifier.Operation operation) {
+        NamespacedKey key = ItemKeys.withKey(keySuffix);
+        // Remove existing modifier with the same key before adding (defensive cleanup)
         attr.getModifiers().stream()
-            .filter(m -> m.getName().startsWith("roguelata:" + MODIFIER_PREFIX))
-            .toList()
-            .forEach(attr::removeModifier);
+            .filter(m -> key.equals(m.getKey()))
+            .findFirst()
+            .ifPresent(attr::removeModifier);
+        attr.addModifier(new AttributeModifier(key, value, operation));
     }
 }

@@ -134,7 +134,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.cooldownService = new CooldownService();
 
         this.gateRegistry = new GateRegistry(this);
-        this.auraSkillsIntegration = new AuraSkillsIntegration(this, gateRegistry);
 
         // EPIC-7: Optional bridges
         this.auraMobsBridge = new AuraMobsBridge();
@@ -167,6 +166,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // Load augment cards from augments.yml
         AugmentLoader.load(this, cardRegistry);
+
+        // AuraSkills integration — MUST come after CardRegistry is fully populated
+        this.auraSkillsIntegration = new AuraSkillsIntegration(this, gateRegistry);
 
         this.draftService = new DraftService(cardRegistry, draftWeighting, statService, runManager, auraSkillsIntegration);
 
