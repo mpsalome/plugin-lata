@@ -56,7 +56,6 @@ public class SentryTurretSkill extends AbstractSkill {
         }
         Player p = ctx.player();
         startCooldown(ctx);
-        ctx.services().plugin().getHudService().setCooldown(p, "Torreta", (int) cooldown().toSeconds());
         Location turretLoc = p.getLocation().add(0, 1, 0).add(p.getLocation().getDirection().normalize().multiply(2));
         turretLoc.getBlock().setType(Material.DISPENSER);
         turretLoc.getWorld().spawnParticle(Particle.PORTAL, turretLoc, 30, 0.5, 0.5, 0.5, 1);

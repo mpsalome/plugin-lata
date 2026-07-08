@@ -68,7 +68,6 @@ public class UnbreakableBlockSkill extends AbstractSkill {
             }
         }
         startCooldown(ctx);
-        ctx.services().plugin().getHudService().setCooldown(p, "Barreira", (int) cooldown().toSeconds());
         p.getWorld().spawnParticle(org.bukkit.Particle.PORTAL, origin.add(0, 1, 0), 50, 1.5, 0.5, 1.5, 0.1);
         p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
         SchedulerUtil.runLater(services.plugin(), () -> {

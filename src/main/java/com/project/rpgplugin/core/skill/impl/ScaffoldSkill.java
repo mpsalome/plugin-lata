@@ -61,7 +61,6 @@ public class ScaffoldSkill extends AbstractSkill {
         Player p = ctx.player();
         p.setVelocity(new Vector(0, 1.0, 0));
         startCooldown(ctx);
-        ctx.services().plugin().getHudService().setCooldown(p, "Andaime", (int) cooldown().toSeconds());
         Location bloc = p.getLocation().clone().subtract(0, 1, 0);
         if (bloc.getBlock().getType() == Material.AIR) {
             bloc.getBlock().setType(Material.HAY_BLOCK);
