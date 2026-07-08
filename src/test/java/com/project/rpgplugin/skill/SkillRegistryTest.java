@@ -141,7 +141,7 @@ class SkillRegistryTest {
     @Test
     void allSkillsHaveUniqueIdsWhenRegistered() {
         var full = TestRegistries.createFullRegistry();
-        assertEquals(35, full.size());
+        assertEquals(38, full.size());
         Set<String> ids = new HashSet<>();
         for (Skill s : full.all()) {
             assertTrue(ids.add(s.id()), "Duplicate skill id: " + s.id());
@@ -151,9 +151,9 @@ class SkillRegistryTest {
     @Test
     void bronzeSilverGoldCountsMatchExpected() {
         var full = TestRegistries.createFullRegistry();
-        assertEquals(11, full.byTier(SkillTier.BRONZE).size());
-        assertEquals(11, full.byTier(SkillTier.SILVER).size());
-        assertEquals(13, full.byTier(SkillTier.GOLD).size());
+        assertEquals(10, full.byTier(SkillTier.BRONZE).size());
+        assertEquals(14, full.byTier(SkillTier.SILVER).size());
+        assertEquals(14, full.byTier(SkillTier.GOLD).size());
     }
 
     @Test
@@ -174,7 +174,7 @@ class SkillRegistryTest {
     @Test
     void passiveSkillsAreCorrectlyMarked() {
         var full = TestRegistries.createFullRegistry();
-        Set<String> passives = Set.of("jump_boost", "sight", "canopy_step", "safe_fall");
+        Set<String> passives = Set.of("jump_boost", "sight", "canopy_step", "safe_fall", "water_breathing");
         for (Skill s : full.all()) {
             boolean expected = passives.contains(s.id());
             assertEquals(expected, s.passive(), "Skill " + s.id() + " passive flag mismatch");

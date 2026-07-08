@@ -28,7 +28,6 @@ public final class TestRegistries {
 
         // Register all skills — they store ref to services but metadata is self-contained
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.DashSkill(services));
-        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.StepAssistSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.GrappleSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.WaterBreathingSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.RecallSkill(services));
@@ -36,27 +35,31 @@ public final class TestRegistries {
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.SonarSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.WindBurstSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.DimShiftSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.HarpoonPullSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.BladeDanceSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.DietSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.StoneSmashSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.TorchLightSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.OreSonarSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.HasteSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.OreRepairSkill(services));
-        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.MoltenTouchSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.TransmutationSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.GravityShieldSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.CoreOverdriveSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.SeismicSlamSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.GoldRushShieldSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.UnstableCoreSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.FeastSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.WoodcutterSkill(services));
-        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.FertilizeSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.FloraShieldSkill(services));
-        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.LumberjackSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.SilkTouchSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.ScaffoldSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.ArchitectFocusSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.UnbreakableBlockSkill(services));
-        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.GraceSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.GravityDefianceSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.SentryTurretSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.EntanglingRootsSkill(services));
+        registerSkill(registry, new com.project.rpgplugin.core.skill.impl.FortressProtocolSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.HydrationSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.JumpBoostSkill(services));
         registerSkill(registry, new com.project.rpgplugin.core.skill.impl.SightSkill(services));
