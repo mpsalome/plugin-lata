@@ -13,9 +13,9 @@ public class ResetService {
 
     public ResetService(RPGPlugin plugin, CardRegistry cardRegistry, StatService statService,
                         MayhemService mayhemService, SpawnResolver spawnResolver,
-                        ManaService manaService) {
+                        ManaService manaService, RunPersistenceService persistence) {
         this.delegate = new RunResetService(plugin, cardRegistry, statService,
-            mayhemService, spawnResolver, manaService);
+            mayhemService, spawnResolver, manaService, persistence);
     }
 
     public void fullReset(Player p, RunState run) {

@@ -158,10 +158,12 @@ public class RunState {
 
     public double skipHealthBonus() { return skipHealthBonus; }
     public void addSkipHealthBonus(double v) { this.skipHealthBonus += v; }
+    public void setSkipHealthBonus(double v) { this.skipHealthBonus = v; }
 
     public int extraDraftSlots() { return extraDraftSlots; }
     public void addExtraDraftSlot() { this.extraDraftSlots++; }
     public void useExtraDraftSlot() { if (extraDraftSlots > 0) extraDraftSlots--; }
+    public void setExtraDraftSlots(int v) { this.extraDraftSlots = Math.max(0, v); }
 
     public Set<String> toggledOff() { return toggledOff; }
     public boolean isToggledOn(String skillId) { return !toggledOff.contains(skillId); }

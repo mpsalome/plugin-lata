@@ -3,8 +3,8 @@ package com.project.rpgplugin.listener;
 import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunOutcome;
+import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
-import com.project.rpgplugin.data.PlayerDataStore;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,15 +17,13 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 public class PlayerLifecycleListener implements Listener {
 
     private final RunManager runManager;
-    private PlayerDataStore dataStore;
-    private RPGPlugin plugin;
+    private final RunPersistenceService persistence;
+    private final RPGPlugin plugin;
 
-    public PlayerLifecycleListener(RunManager runManager) {
+    public PlayerLifecycleListener(RunManager runManager, RunPersistenceService persistence) {
         this.runManager = runManager;
+        this.persistence = persistence;
         this.plugin = runManager.plugin();
-        if (plugin instanceof RPGPlugin rpg) {
-            this.dataStore = rpg.getDataStore();
-        }
     }
 
     @EventHandler
@@ -52,32 +50,33 @@ public class PlayerLifecycleListener implements Listener {
         Player p = e.getPlayer();
         if (!runManager.hasActiveRun(p)) {
             runManager.startRun(p);
+            if (plugin.getHudService() != null) {
+                plugin.getHudService().startPlayer(p);
+            }
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (dataStore != null) {
-            var loaded = dataStore.load(p.getUniqueId());
-            if (loaded.isPresent()) {
-                RunState run = loaded.get();
-                runManager.restoreRun(p, run);
-                return;
-            }
-        }
-        if (!runManager.hasActiveRun(p)) {
+        RunState run = persistence.loadRun(p);
+        if (run != null) {
+            runManager.restoreRun(p, run);
+        } else if (!runManager.hasActiveRun(p)) {
             runManager.startRun(p);
+        }
+        if (plugin.getHudService() != null) {
+            plugin.getHudService().startPlayer(p);
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        if (dataStore != null && runManager.hasActiveRun(p)) {
+        if (runManager.hasActiveRun(p)) {
             RunState run = runManager.getRun(p);
             if (run != null) {
-                dataStore.save(p.getUniqueId(), run);
+                persistence.saveRun(p, run);
             }
         }
         runManager.removeRun(p);

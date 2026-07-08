@@ -57,18 +57,21 @@ public class RunResetService {
     private final MayhemService mayhemService;
     private final SpawnResolver spawnResolver;
     private final ManaService manaService;
+    private final RunPersistenceService persistence;
 
     private final Set<Location> trackedBlocks = new HashSet<>();
     private final Set<UUID> trackedEntities = new HashSet<>();
 
     public RunResetService(RPGPlugin plugin, CardRegistry cardRegistry, StatService statService,
-                           MayhemService mayhemService, SpawnResolver spawnResolver, ManaService manaService) {
+                           MayhemService mayhemService, SpawnResolver spawnResolver, ManaService manaService,
+                           RunPersistenceService persistence) {
         this.plugin = plugin;
         this.cardRegistry = cardRegistry;
         this.statService = statService;
         this.mayhemService = mayhemService;
         this.spawnResolver = spawnResolver;
         this.manaService = manaService;
+        this.persistence = persistence;
     }
 
     public void trackBlock(Location loc) {
@@ -150,10 +153,15 @@ public class RunResetService {
         Location spawn = spawnResolver.resolve(p);
         p.teleportAsync(spawn);
 
-        // 15. Ensure RPG book
+        // 15. Clear PDC persisted run data
+        if (persistence != null) {
+            persistence.clearRun(p);
+        }
+
+        // 16. Ensure RPG book
         ensureRpgBook(p);
 
-        // 16. Feedback
+        // 17. Feedback
         p.sendMessage(com.project.rpgplugin.util.Text.mm("<red><bold>RUN ENCERRADA"));
         p.sendMessage(com.project.rpgplugin.util.Text.mm("<gray>Todos os poderes foram perdidos. Uma nova run comeca!"));
     }

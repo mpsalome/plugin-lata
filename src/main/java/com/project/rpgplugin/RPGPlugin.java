@@ -27,6 +27,7 @@ import com.project.rpgplugin.core.progression.GateRegistry;
 import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.ResetService;
 import com.project.rpgplugin.core.run.RunManager;
+import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.run.SpawnResolver;
 import com.project.rpgplugin.core.skill.SkillRegistry;
@@ -119,6 +120,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     // EPIC-9: Persistence & tasks
     private PlayerDataStore dataStore;
+    private RunPersistenceService runPersistence;
     private CooldownService cooldownService;
     private PassiveTask passiveTask;
 
@@ -171,7 +173,8 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.cardRegistry = new CardRegistry();
         this.statService = new StatService();
         this.spawnResolver = new SpawnResolver(this);
-        this.resetService = new ResetService(this, cardRegistry, statService, mayhemService, spawnResolver, manaService);
+        this.runPersistence = new RunPersistenceService(this, cardRegistry);
+        this.resetService = new ResetService(this, cardRegistry, statService, mayhemService, spawnResolver, manaService, runPersistence);
         this.runManager = new RunManager(this, cardRegistry, statService, resetService, mayhemService);
         this.draftWeighting = new DraftWeighting(this);
 
@@ -191,7 +194,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.draftMenuListener = new DraftMenuListener(runManager, draftService, playerLevelListener);
 
         // EPIC-3: Run lifecycle
-        this.playerLifecycleListener = new PlayerLifecycleListener(runManager);
+        this.playerLifecycleListener = new PlayerLifecycleListener(runManager, runPersistence);
         this.runCommand = new RunCommand(runManager);
 
         // EPIC-5: Gameplay triggers
