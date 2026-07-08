@@ -1,15 +1,14 @@
 package com.project.rpgplugin.core.skill.impl;
 
+import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.MoveTrigger;
+import com.project.rpgplugin.core.skill.trigger.PassiveTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 
@@ -38,11 +37,14 @@ public class JumpBoostSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ZERO; }
 
     @Override
-    public SkillTrigger trigger() { return MoveTrigger.always(); }
+    public SkillTrigger trigger() { return PassiveTrigger.instance(); }
 
     @Override
     public void activate(SkillContext ctx) {
         Player p = ctx.player();
-        p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 0, true, false, false));
+        RunState run = services.plugin().getRunManager().getRun(p);
+        if (run != null) {
+            run.addPotionType("JUMP_BOOST");
+        }
     }
 }

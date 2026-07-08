@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 public class SilkTouchSkill extends AbstractSkill {
@@ -65,7 +66,10 @@ public class SilkTouchSkill extends AbstractSkill {
             if (!drops.isEmpty()) {
                 event.setDropItems(false);
                 for (ItemStack d : drops) {
-                    block.getWorld().dropItemNaturally(block.getLocation(), d);
+                    Map<Integer, ItemStack> remaining = p.getInventory().addItem(d);
+                    for (ItemStack leftover : remaining.values()) {
+                        block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0.5, 0.5), leftover);
+                    }
                 }
                 feedback(ctx, "§aToque de Seda Manual!", null);
             }

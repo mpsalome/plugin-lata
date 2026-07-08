@@ -159,7 +159,9 @@ public class SkillDispatchListener implements Listener {
                         return;
                     }
                 }
-                if (event instanceof Cancellable c) c.setCancelled(true);
+                if (event instanceof Cancellable c && (kind == TriggerKind.INTERACT || kind == TriggerKind.CONSUME)) {
+                    c.setCancelled(true);
+                }
                 skill.activate(ctx);
                 trackBladeDanceMobility(player, skillId);
                 return;

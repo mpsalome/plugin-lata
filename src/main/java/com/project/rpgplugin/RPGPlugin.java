@@ -247,7 +247,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // Start periodic tasks
         this.distanceTask.start(this, distanceTracker, augmentListener);
-        this.passiveTask.start(this, runManager, synergyService, auraSkillsIntegration);
+        this.passiveTask.start(this, runManager, synergyService, auraSkillsIntegration, skillRegistry, skillServices);
         this.hudService.startAll();
 
         getCommand("skills").setExecutor(this);

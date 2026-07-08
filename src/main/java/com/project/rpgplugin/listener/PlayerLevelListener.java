@@ -46,9 +46,8 @@ public class PlayerLevelListener implements Listener {
 
         run.setLevel(newLevel);
 
-        // EPIC-2: Draft trigger
-        int everyLevels = DraftWeighting.getEveryLevels(plugin);
-        int draftsEarned = newLevel / everyLevels - oldLevel / everyLevels;
+        // EPIC-2: Draft trigger — 1 augment per level
+        int draftsEarned = newLevel - oldLevel;
         if (draftsEarned > 0) {
             run.addPendingDrafts(draftsEarned);
             openNextDraft(p, run);
