@@ -1,8 +1,6 @@
 package com.project.rpgplugin.core.mana;
 
-import com.project.rpgplugin.AuraSkillsIntegration;
 import com.project.rpgplugin.core.run.RunState;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,13 +12,13 @@ import java.util.Map;
 public class ManaService {
 
     private final JavaPlugin plugin;
-    private final AuraSkillsIntegration auraSkills;
+    private final ManaProvider provider;
     private final Map<String, Double> manaCosts = new HashMap<>();
     private boolean enabled;
 
-    public ManaService(JavaPlugin plugin, AuraSkillsIntegration auraSkills) {
+    public ManaService(JavaPlugin plugin, ManaProvider provider) {
         this.plugin = plugin;
-        this.auraSkills = auraSkills;
+        this.provider = provider;
         loadConfig();
     }
 
@@ -37,8 +35,12 @@ public class ManaService {
                 manaCosts.put(key, cost);
             }
         }
-        enabled = auraSkills != null && auraSkills.isEnabled() && !manaCosts.isEmpty();
-        plugin.getLogger().info("ManaService loaded " + manaCosts.size() + " ability costs. AuraSkills=" + enabled);
+        enabled = provider.isAvailable() && !manaCosts.isEmpty();
+        plugin.getLogger().info("ManaService loaded " + manaCosts.size() + " ability costs. Provider=" + provider.name() + " enabled=" + enabled);
+    }
+
+    public ManaProvider provider() {
+        return provider;
     }
 
     public boolean isEnabled() {
@@ -54,50 +56,23 @@ public class ManaService {
     }
 
     public boolean hasEnoughMana(Player p, double cost) {
-        if (!enabled) return true;
-        try {
-            var user = dev.aurelium.auraskills.api.AuraSkillsApi.get().getUser(p.getUniqueId());
-            return user.getMana() >= cost;
-        } catch (Exception e) {
-            return true;
-        }
+        if (!enabled || cost <= 0) return true;
+        return provider.hasEnoughMana(p, cost);
     }
 
     public boolean tryConsumeMana(Player p, double cost) {
         if (!enabled || cost <= 0) return true;
-        try {
-            var user = dev.aurelium.auraskills.api.AuraSkillsApi.get().getUser(p.getUniqueId());
-            if (user.getMana() < cost) return false;
-            user.setMana(user.getMana() - cost);
-            return true;
-        } catch (Exception e) {
-            return true;
-        }
+        return provider.consumeMana(p, cost);
     }
 
     public double getMana(Player p) {
         if (!enabled) return 0;
-        try {
-            var user = dev.aurelium.auraskills.api.AuraSkillsApi.get().getUser(p.getUniqueId());
-            return user.getMana();
-        } catch (Exception e) {
-            return 0;
-        }
+        return provider.getMana(p);
     }
 
     public double getMaxMana(Player p, RunState run) {
-        double base = 100;
-        double bonus = run.getMultiplier("mana_max"); // from mana_pool augment
-        double total = base + bonus;
-        if (enabled) {
-            try {
-                var user = dev.aurelium.auraskills.api.AuraSkillsApi.get().getUser(p.getUniqueId());
-                double regenMult = 1.0 + run.getMultiplier("mana_regen_mult"); // from mayhem modifiers
-                // AuraSkills handles its own regen, we just sync max mana if possible
-                total = Math.max(total, user.getMaxMana());
-            } catch (Exception ignored) {
-            }
-        }
-        return total;
+        double base = provider.isAvailable() ? provider.getMaxMana(p) : 100;
+        double bonus = run != null ? run.getMultiplier("mana_max") : 0;
+        return Math.max(100, base + bonus);
     }
 }

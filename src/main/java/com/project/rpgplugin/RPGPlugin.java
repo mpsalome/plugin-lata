@@ -14,6 +14,7 @@ import com.project.rpgplugin.core.card.augment.AugmentLoader;
 import com.project.rpgplugin.core.difficulty.DifficultyService;
 import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftWeighting;
+import com.project.rpgplugin.core.mana.ManaProvider;
 import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.mayhem.MayhemConfig;
 import com.project.rpgplugin.core.mayhem.MayhemService;
@@ -153,11 +154,24 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.milestoneService = new MilestoneService(mayhemConfig);
         this.mayhemService = new MayhemService(this, modifierRegistry, milestoneService, mayhemConfig);
 
+        // EPIC-6: Mana system — init provider BEFORE ResetService and RunManager
+        ManaProvider manaProvider;
+        try {
+            Class.forName("dev.aurelium.auraskills.api.AuraSkillsApi");
+            manaProvider = new com.project.rpgplugin.core.mana.AuraSkillsManaProvider(this);
+            if (!manaProvider.isAvailable()) {
+                manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
+            }
+        } catch (ClassNotFoundException e) {
+            manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
+        }
+        this.manaService = new com.project.rpgplugin.core.mana.ManaService(this, manaProvider);
+
         // EPIC-2: Card system
         this.cardRegistry = new CardRegistry();
         this.statService = new StatService();
         this.spawnResolver = new SpawnResolver(this);
-        this.resetService = new ResetService(this, cardRegistry, statService, mayhemService, spawnResolver);
+        this.resetService = new ResetService(this, cardRegistry, statService, mayhemService, spawnResolver, manaService);
         this.runManager = new RunManager(this, cardRegistry, statService, resetService, mayhemService);
         this.draftWeighting = new DraftWeighting(this);
 
@@ -212,10 +226,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // Prepare SkillDispatchListener with RunManager
         RunManager rm = this.runManager;
         this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, cardRegistry);
-
-        // EPIC-6: Mana system
-        this.manaService = new ManaService(this, auraSkillsIntegration);
         this.skillDispatchListener.setManaService(manaService);
+
+        // Pass ManaService to AuraSkillsIntegration for skill descriptions
         this.auraSkillsIntegration.setManaService(manaService);
 
         // Register listeners
