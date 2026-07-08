@@ -4,6 +4,8 @@ import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.util.Text;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,10 +24,47 @@ public class HudService {
     private final RunManager runManager;
     private final Map<UUID, PlayerHud> sessions = new ConcurrentHashMap<>();
 
+    // Visual cooldown display registry: player UUID -> skill display name -> expiry timestamp
+    private final Map<UUID, Map<String, Long>> cooldownDisplays = new ConcurrentHashMap<>();
+
     public HudService(JavaPlugin plugin, ManaService manaService, RunManager runManager) {
         this.plugin = plugin;
         this.manaService = manaService;
         this.runManager = runManager;
+    }
+
+    /**
+     * Registers a visual cooldown for display on the HUD actionbar.
+     * The actionbar will show "⏳ SkillName: X.Xs" until the cooldown expires.
+     * <p>
+     * For item-based skills (e.g. pickaxe, fishing rod), prefer using
+     * {@link Player#setCooldown(Material, int)} for the native hotbar
+     * cooldown overlay instead. See {@link #setItemCooldown(Player, Material, int)}.
+     *
+     * @param player          the player
+     * @param displayName     human-readable skill name (e.g. "Dash", "Sonar")
+     * @param durationSeconds cooldown duration in seconds
+     */
+    public void setCooldown(Player player, String displayName, int durationSeconds) {
+        if (durationSeconds <= 0) return;
+        long expiry = System.currentTimeMillis() + durationSeconds * 1000L;
+        cooldownDisplays.computeIfAbsent(player.getUniqueId(), k -> new ConcurrentHashMap<>())
+            .put(displayName, expiry);
+        startPlayer(player);
+    }
+
+    /**
+     * Convenience helper for item-based skills.
+     * Uses the native Minecraft hotbar cooldown overlay instead of actionbar text.
+     * Call this in the skill's activate() method when the skill is triggered by a
+     * physical item (e.g. pickaxe for SeismicSlam, fishing rod for HarpoonPull).
+     *
+     * @param player        the player
+     * @param material      the item material to put on cooldown
+     * @param durationTicks cooldown duration in ticks (20 ticks = 1 second)
+     */
+    public static void setItemCooldown(Player player, Material material, int durationTicks) {
+        player.setCooldown(material, durationTicks);
     }
 
     public void startPlayer(Player player) {
@@ -41,6 +80,7 @@ public class HudService {
         if (hud != null && hud.task != null) {
             hud.task.cancel();
         }
+        cooldownDisplays.remove(player.getUniqueId());
     }
 
     public void startAll() {
@@ -53,21 +93,7 @@ public class HudService {
             if (player != null) stopPlayer(player);
         });
         sessions.clear();
-    }
-
-    public void addTemporaryStatus(Player player, String rawText, int durationTicks) {
-        String converted = rawText.contains("\u00a7") ? Text.legacyToMiniMessage(rawText) : rawText;
-        PlayerHud hud = sessions.get(player.getUniqueId());
-        if (hud == null) {
-            startPlayer(player);
-            hud = sessions.get(player.getUniqueId());
-            if (hud == null) return;
-        }
-        hud.statuses.add(new TempStatus(converted, System.currentTimeMillis() + durationTicks * 50L));
-    }
-
-    public void addFeedback(Player player, String rawText) {
-        addTemporaryStatus(player, rawText, 35);
+        cooldownDisplays.clear();
     }
 
     private void tick(Player player) {
@@ -78,50 +104,66 @@ public class HudService {
         PlayerHud hud = sessions.get(player.getUniqueId());
         if (hud == null) return;
 
-        long now = System.currentTimeMillis();
-        hud.statuses.removeIf(s -> s.expiryMillis <= now);
+        boolean hasRun = runManager.getRun(player) != null;
+        Map<String, Long> playerCooldowns = cooldownDisplays.get(player.getUniqueId());
 
-        if (runManager.getRun(player) == null && hud.statuses.isEmpty()) {
+        cleanup(playerCooldowns);
+
+        boolean hasCooldowns = playerCooldowns != null && !playerCooldowns.isEmpty();
+        if (!hasRun && !hasCooldowns) {
             if (!hud.lastSent.isEmpty()) {
-                player.sendActionBar(net.kyori.adventure.text.Component.empty());
+                player.sendActionBar(Component.empty());
                 hud.lastSent = "";
             }
             stopPlayer(player);
             return;
         }
 
-        String composed = compose(player, hud);
+        String composed = compose(player, hasRun, playerCooldowns);
         if (!composed.equals(hud.lastSent)) {
             player.sendActionBar(Text.mm(composed));
             hud.lastSent = composed;
         }
     }
 
-    private String compose(Player player, PlayerHud hud) {
+    private void cleanup(Map<String, Long> cooldowns) {
+        if (cooldowns == null || cooldowns.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        cooldowns.values().removeIf(v -> v <= now);
+    }
+
+    private String compose(Player player, boolean hasRun, Map<String, Long> playerCooldowns) {
         StringBuilder sb = new StringBuilder();
 
-        boolean showMana = manaService != null && manaService.isEnabled()
-            && runManager.getRun(player) != null;
-
+        boolean showMana = hasRun && manaService != null && manaService.isEnabled();
         if (showMana) {
             double mana = manaService.getMana(player);
             double maxMana = manaService.getMaxMana(player, runManager.getRun(player));
-            sb.append("\u26a1 <aqua>").append((int) mana).append("/").append((int) maxMana);
-            if (hud.statuses.isEmpty()) {
-                sb.append(" Mana");
-            }
-            sb.append("</aqua> <dark_gray>|</dark_gray> ");
+            sb.append("\u26a1 <aqua>").append((int) mana).append("/").append((int) maxMana).append("</aqua>");
+            sb.append(" <dark_gray>|</dark_gray> ");
         }
 
         sb.append("<green>\u2764 ").append((int) player.getHealth())
             .append("/").append((int) player.getMaxHealth()).append("</green>");
 
-        if (!hud.statuses.isEmpty()) {
-            sb.append(" <dark_gray>|</dark_gray> ");
-            List<String> texts = hud.statuses.stream()
-                .map(s -> "<white>" + s.text + "</white>")
-                .toList();
-            sb.append(String.join(" <gray>\u00b7</gray> ", texts));
+        if (playerCooldowns != null && !playerCooldowns.isEmpty()) {
+            long now = System.currentTimeMillis();
+            List<String> parts = new ArrayList<>();
+            int idx = 0;
+
+            for (Map.Entry<String, Long> entry : playerCooldowns.entrySet()) {
+                long remaining = entry.getValue() - now;
+                if (remaining <= 0) continue;
+                double secs = remaining / 1000.0;
+                String color = (idx++ % 2 == 0) ? "yellow" : "gold";
+                parts.add("<" + color + ">\u231b " + entry.getKey() + ": "
+                    + String.format("%.1f", secs) + "s</" + color + ">");
+            }
+
+            if (!parts.isEmpty()) {
+                sb.append(" <dark_gray>|</dark_gray> ");
+                sb.append(String.join(" <dark_gray>|</dark_gray> ", parts));
+            }
         }
 
         return sb.toString();
@@ -130,8 +172,5 @@ public class HudService {
     private static class PlayerHud {
         ScheduledTask task;
         String lastSent = "";
-        List<TempStatus> statuses = new ArrayList<>();
     }
-
-    private record TempStatus(String text, long expiryMillis) {}
 }

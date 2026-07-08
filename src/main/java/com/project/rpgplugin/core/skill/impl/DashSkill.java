@@ -49,7 +49,7 @@ public class DashSkill extends AbstractSkill {
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "<red>Dash em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            ctx.player().playSound(ctx.player().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
             return;
         }
         Player p = ctx.player();
@@ -57,8 +57,9 @@ public class DashSkill extends AbstractSkill {
         p.setVelocity(dir.multiply(1.5).setY(0.4));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 1, true, false, false));
         startCooldown(ctx);
+        ctx.services().plugin().getHudService().setCooldown(p, "Dash", (int) cooldown().toSeconds());
         p.getWorld().spawnParticle(Particle.CLOUD, p.getLocation().add(0, 0.5, 0), 20, 0.3, 0.3, 0.3, 0.05);
         p.getWorld().spawnParticle(Particle.SWEEP_ATTACK, p.getLocation(), 5, 0.5, 0.5, 0.5, 0);
-        feedback(ctx, "<b>Dash!</b>", Sound.ENTITY_BAT_TAKEOFF);
+        p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 1.0f, 1.0f);
     }
 }

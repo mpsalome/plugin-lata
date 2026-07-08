@@ -106,9 +106,6 @@ public class SkillServices {
     // -- Feedback --
 
     public void feedback(Player player, String message, Sound sound) {
-        if (plugin.getHudService() != null) {
-            plugin.getHudService().addFeedback(player, message);
-        }
         if (sound != null) {
             player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
         }

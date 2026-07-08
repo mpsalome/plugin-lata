@@ -50,11 +50,12 @@ public class SonarSkill extends AbstractSkill {
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "<red>Sonar em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            ctx.player().playSound(ctx.player().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
             return;
         }
         Player p = ctx.player();
         startCooldown(ctx);
+        ctx.services().plugin().getHudService().setCooldown(p, "Sonar", (int) cooldown().toSeconds());
         int range = cfg().getInt("range", 20);
         int duration = cfg().getInt("glow_duration", 10) * 20;
         List<LivingEntity> revealed = new ArrayList<>();
@@ -70,6 +71,6 @@ public class SonarSkill extends AbstractSkill {
                 le.setGlowing(false);
             }
         }, duration);
-        feedback(ctx, "<light_purple>Sonar: inimigos revelados por " + duration/20 + "s.", Sound.BLOCK_AMETHYST_BLOCK_CHIME);
+        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
     }
 }
