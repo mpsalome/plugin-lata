@@ -47,7 +47,7 @@ public class StoneSmashSkill extends AbstractSkill {
             Block block = ctx.targetBlock();
             if (block == null) return false;
             return block.getType() == Material.STONE || block.getType() == Material.COBBLESTONE || block.getType() == Material.DEEPSLATE;
-        });
+        }, "Quebre pedra segurando <gray>Pedra</gray> ou <dark_gray>Pedregulho");
     }
 
     @Override

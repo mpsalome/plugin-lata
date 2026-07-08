@@ -55,7 +55,7 @@ public class MoltenTouchSkill extends AbstractSkill {
                 };
             }
             return ctx.usedItem() != null && ctx.usedItem().getType() == Material.FLINT;
-        });
+        }, "Clique em <dark_gray>Pedra</dark_gray> para ativar (30s), depois quebre minerios");
     }
 
     @Override

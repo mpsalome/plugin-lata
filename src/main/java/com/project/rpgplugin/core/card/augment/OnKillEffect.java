@@ -19,10 +19,10 @@ public record OnKillEffect(String effect, double value) implements AugmentEffect
     @Override
     public List<String> description() {
         String desc = switch (effect) {
-            case "gold_drop" -> "Dropa ouro ao matar mobs";
-            case "heal_and_mana" -> "Cura e recupera mana ao matar";
+            case "gold_drop" -> "<gold>Dropa ouro ao derrotar mobs";
+            case "heal_and_mana" -> "<red>Cura " + (int) value + " coracoes ao derrotar mobs";
             default -> effect;
         };
-        return List.of("<dark_red>Ao matar: <red>" + desc);
+        return List.of("<dark_red>Ao derrotar um mob:", desc);
     }
 }

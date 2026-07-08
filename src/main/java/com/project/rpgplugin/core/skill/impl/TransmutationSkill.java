@@ -46,7 +46,7 @@ public class TransmutationSkill extends AbstractSkill {
             Material type = ctx.usedItem().getType();
             return (type == Material.IRON_INGOT || type == Material.GOLD_INGOT)
                 && ctx.usedItem().getAmount() >= 5;
-        });
+        }, "Clique com: <white>5x Barra de Ferro</white> ou <gold>5x Barra de Ouro</gold>");
     }
 
     @Override

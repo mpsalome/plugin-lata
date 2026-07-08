@@ -38,6 +38,7 @@ public record PotionEffectAugment(String potionType, int amplifier) implements A
             case "WATER_BREATHING" -> "Respiracao Aquatica";
             default -> potionType;
         };
-        return List.of("<aqua>Efeito: " + name + " " + (amplifier + 1));
+        String level = amplifier == 0 ? "" : " " + (amplifier + 1);
+        return List.of("<aqua>Concede " + name + level + " permanentemente");
     }
 }

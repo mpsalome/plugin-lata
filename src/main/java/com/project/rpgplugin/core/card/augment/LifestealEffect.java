@@ -21,6 +21,8 @@ public record LifestealEffect(double healPct) implements AugmentEffect {
         return List.of("<red>Rouba " + formatPct(healPct) + "% do dano causado como vida");
     }
 
+    public double healPct() { return healPct; }
+
     private static String formatPct(double v) {
         return String.valueOf((int) (v * 100));
     }

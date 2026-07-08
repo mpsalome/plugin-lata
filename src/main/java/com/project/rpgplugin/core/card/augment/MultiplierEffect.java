@@ -18,6 +18,12 @@ public record MultiplierEffect(String key, double addPerStack) implements Augmen
 
     @Override
     public List<String> description() {
+        if (addPerStack == 1.0) {
+            return List.of("<gray>" + displayKey() + ": <green>Ativado");
+        }
+        if (addPerStack == (long) addPerStack && addPerStack > 1) {
+            return List.of("<gray>" + displayKey() + ": <white>+" + (long) addPerStack);
+        }
         int pct = (int) (addPerStack * 100);
         String sign = pct >= 0 ? "+" : "";
         return List.of("<gray>" + displayKey() + ": <white>" + sign + pct + "% por pilha");

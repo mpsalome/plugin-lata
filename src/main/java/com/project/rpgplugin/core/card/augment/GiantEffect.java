@@ -33,7 +33,8 @@ public record GiantEffect(double healthPerStack, double damagePerStack, double s
     @Override
     public List<String> description() {
         return List.of(
-            "<green>+" + (long) healthPerStack + " <green>de vida",
+            "<green>Aumenta o tamanho do jogador",
+            "<green>+" + (long) healthPerStack + " de vida",
             "<red>+" + (int) (damagePerStack * 100) + "% dano causado",
             "<gray>Lentidao " + ((int) slowAmplifier + 1)
         );

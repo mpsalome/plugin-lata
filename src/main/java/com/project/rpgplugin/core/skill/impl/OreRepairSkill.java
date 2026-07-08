@@ -46,7 +46,7 @@ public class OreRepairSkill extends AbstractSkill {
             return mainHand.getType() == Material.IRON_PICKAXE
                 || mainHand.getType() == Material.DIAMOND_PICKAXE
                 || mainHand.getType() == Material.NETHERITE_PICKAXE;
-        });
+        }, "Clique com: <white>Barra de Ferro</white> (segurando uma Picareta)");
     }
 
     @Override

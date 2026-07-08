@@ -80,7 +80,6 @@ public class DraftMenu extends Menu {
         for (int i = 0; i < Math.min(3, options.size()); i++) {
             Card card = options.get(i);
             setItem(20 + i * 3, buildCardItem(card, i));
-            setItem(29 + i * 3, buildDescriptionItem(card));
         }
 
         if (DraftWeighting.isRerollEnabled(plugin) && session.rerollsUsed() < DraftWeighting.getMaxRerollPerDraft(plugin)) {
@@ -168,32 +167,19 @@ public class DraftMenu extends Menu {
             lore.add(Text.mm(tagsStr.toString()));
         }
 
+        List<String> descLines = card.lore(run);
+        if (!descLines.isEmpty()) {
+            lore.add(Component.empty());
+            for (String line : descLines) {
+                lore.add(Text.mm(line));
+            }
+        }
         lore.add(Component.empty());
         lore.add(Text.mm("<yellow>Clique para escolher"));
         if (card.maxStacks() > 1) {
             lore.add(Text.mm("<gray>Maximo: " + card.maxStacks() + " pilhas"));
         }
 
-        meta.lore(lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    private ItemStack buildDescriptionItem(Card card) {
-        ItemStack item = new ItemStack(Material.BOOK);
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-
-        meta.displayName(Text.mm("<gray>Descricao: <white>" + card.id().replace("_", " ")));
-
-        List<String> descLines = card.lore(run);
-        List<Component> lore = new ArrayList<>();
-        for (String line : descLines) {
-            lore.add(Text.mm(line));
-        }
-        if (lore.isEmpty()) {
-            lore.add(Text.mm("<dark_gray>Sem descricao adicional"));
-        }
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;

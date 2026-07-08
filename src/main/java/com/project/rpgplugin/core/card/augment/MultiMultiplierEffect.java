@@ -22,11 +22,14 @@ public record MultiMultiplierEffect(double damageDealt, double damageTaken) impl
     @Override
     public List<String> description() {
         List<String> lines = new ArrayList<>();
+        lines.add("<gray>Risco vs Recompensa:");
         if (damageDealt != 0) {
-            lines.add("<red>+" + (int) (damageDealt * 100) + "% dano causado");
+            String sign = damageDealt > 0 ? "+" : "";
+            lines.add("<green>" + sign + (int) (damageDealt * 100) + "% dano causado");
         }
         if (damageTaken != 0) {
-            lines.add("<dark_red>+" + (int) (damageTaken * 100) + "% dano recebido");
+            String sign = damageTaken > 0 ? "+" : "";
+            lines.add("<red>" + sign + (int) (damageTaken * 100) + "% dano recebido");
         }
         return lines;
     }

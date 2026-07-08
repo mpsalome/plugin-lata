@@ -50,7 +50,7 @@ public class SilkTouchSkill extends AbstractSkill {
                 return ctx.player().getInventory().getItemInMainHand().getType() == Material.AIR;
             }
             return ctx.usedItem() != null && ctx.usedItem().getType() == Material.SHEARS;
-        });
+        }, "Quebre blocos com <white>maos vazias</white> para Toque de Seda");
     }
 
     @Override

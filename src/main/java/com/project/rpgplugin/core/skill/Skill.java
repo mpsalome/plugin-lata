@@ -4,6 +4,7 @@ import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import org.bukkit.Material;
 
 import java.time.Duration;
+import java.util.List;
 
 public interface Skill {
     String id();
@@ -16,4 +17,5 @@ public interface Skill {
     void activate(SkillContext ctx);
     default String displayKey() { return "skill." + id() + ".name"; }
     default String descKey() { return "skill." + id() + ".desc"; }
+    default List<String> effectDescription() { return List.of(); }
 }

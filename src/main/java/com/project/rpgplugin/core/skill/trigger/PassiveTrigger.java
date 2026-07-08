@@ -3,6 +3,7 @@ package com.project.rpgplugin.core.skill.trigger;
 import com.project.rpgplugin.core.skill.Skill;
 import com.project.rpgplugin.core.skill.SkillContext;
 
+import java.util.List;
 import java.util.Set;
 
 public class PassiveTrigger implements SkillTrigger {
@@ -23,5 +24,10 @@ public class PassiveTrigger implements SkillTrigger {
     @Override
     public boolean matches(Skill skill, SkillContext ctx) {
         return true;
+    }
+
+    @Override
+    public List<String> activationDescription() {
+        return List.of("<gray>Passiva (sempre ativa)");
     }
 }
