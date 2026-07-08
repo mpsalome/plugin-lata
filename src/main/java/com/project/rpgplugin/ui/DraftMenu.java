@@ -98,13 +98,13 @@ public class DraftMenu extends Menu {
         }
 
         if (DraftWeighting.isSkipAllowed(plugin)) {
-            int heal = (int) DraftWeighting.getSkipHeal(plugin);
             ItemStack skipItem = new ItemStack(Material.BARRIER);
             ItemMeta meta = skipItem.getItemMeta();
             if (meta != null) {
                 meta.displayName(Text.mm("<red>Pular"));
                 meta.lore(List.of(
-                    Text.mm("<gray>Cura: <white>" + heal + " coracoes"),
+                    Text.mm("<green>+1 coracao permanente"),
+                    Text.mm("<green>+1 opcao no proximo draft"),
                     Text.mm("<gray>Nenhuma carta sera ganha")
                 ));
                 skipItem.setItemMeta(meta);

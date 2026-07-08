@@ -49,7 +49,10 @@ public final class StatService {
             }
         }
 
-        // 3. Apply as AttributeModifier
+        // 3. Apply skip health bonus (from draft skip)
+        healthBonus += run.skipHealthBonus();
+
+        // 4. Apply as AttributeModifier
         if (maxHealth != null && healthBonus != 0) {
             maxHealth.addModifier(new AttributeModifier(
                 ItemKeys.withKey(MODIFIER_PREFIX + "max_health"),

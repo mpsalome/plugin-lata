@@ -59,9 +59,11 @@ public class DraftService {
             .filter(this::cardPluginAvailable)
             .toList();
         Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);
-        List<Card> picks = new ArrayList<>(3);
+        int desired = 3 + (run.extraDraftSlots() > 0 ? 1 : 0);
+        if (run.extraDraftSlots() > 0) run.useExtraDraftSlot();
+        List<Card> picks = new ArrayList<>(desired);
 
-        while (picks.size() < 3) {
+        while (picks.size() < desired) {
             CardTier tier = weighting.pickTier(w);
             Card c = pickFromTierWeighted(pool, tier, picks, classWeights);
             if (c != null && !picks.contains(c)) {
@@ -111,14 +113,11 @@ public class DraftService {
     public void skipDraft(Player p, RunState run, DraftSession session) {
         activeSessions.remove(p.getUniqueId());
         session.skip();
-        int hearts = (int) DraftWeighting.getSkipHeal(runManager.plugin());
-        double heal = hearts * 2.0;
-        if (p.getHealth() + heal < p.getMaxHealth()) {
-            p.setHealth(p.getHealth() + heal);
-        } else {
-            p.setHealth(p.getMaxHealth());
-        }
-        p.sendActionBar(Text.mm("<gray>Draft pulado. Voce recuperou <red>\u2764 " + hearts + " <gray>de vida."));
+        run.addSkipHealthBonus(2.0);
+        run.addExtraDraftSlot();
+        statService.recompute(p, run);
+        p.setHealth(Math.min(p.getHealth() + 2.0, p.getMaxHealth()));
+        p.sendActionBar(Text.mm("<green>+1 coracao permanente <gray>| <green>+1 opcao no proximo draft"));
     }
 
     public boolean reroll(Player p, RunState run, DraftSession session) {
