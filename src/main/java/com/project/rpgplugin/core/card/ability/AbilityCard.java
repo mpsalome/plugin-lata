@@ -68,7 +68,6 @@ public class AbilityCard implements Card {
     @Override
     public List<String> lore(RunState run) {
         List<String> lines = new ArrayList<>();
-        lines.add("");
         lines.add("<" + skill.type().color() + "><bold>" + skill.type().key().toUpperCase());
         if (skill.passive()) {
             lines.add("<gray>Passiva");

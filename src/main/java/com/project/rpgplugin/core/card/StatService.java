@@ -35,6 +35,7 @@ public final class StatService {
         double armorBonus = 0;
 
         for (String cardId : run.ownedCards()) {
+            if (!run.isToggledOn(cardId)) continue;
             Card card = run.cardRegistry().byId(cardId).orElse(null);
             if (card instanceof AugmentCard ac && ac.effect() instanceof AttributeEffect attr) {
                 int stacks = run.cardCount(cardId);

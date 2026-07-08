@@ -21,4 +21,6 @@ public interface Card {
     default String descKey() { return "card." + id() + ".desc"; }
     default String requiredPlugin() { return null; }
     default List<String> lore(RunState run) { return List.of(); }
+    default void toggleOn(Player p, RunState run) {}
+    default void toggleOff(Player p, RunState run) {}
 }

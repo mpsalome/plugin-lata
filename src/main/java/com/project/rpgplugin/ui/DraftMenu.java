@@ -23,7 +23,7 @@ import java.util.List;
 
 public class DraftMenu extends Menu {
 
-    private static final int SIZE = 27;
+    private static final int SIZE = 54;
     private final Player player;
     private final DraftSession session;
     private final DraftService draftService;
@@ -51,8 +51,8 @@ public class DraftMenu extends Menu {
         setClickHandler(event -> {
             event.setCancelled(true);
             int slot = event.getRawSlot();
-            if (slot == 11 || slot == 14 || slot == 17) {
-                int index = (slot - 11) / 3;
+            if (slot == 20 || slot == 23 || slot == 26) {
+                int index = (slot - 20) / 3;
                 Card card = session.options().get(index);
                 playTierSound(player, card.tier());
                 draftService.applyChoice(player, run, session, index);
@@ -60,10 +60,10 @@ public class DraftMenu extends Menu {
                 if (run.hasPendingDrafts()) {
                     levelListener.openNextDraft(player, run);
                 }
-            } else if (slot == 22 && DraftWeighting.isRerollEnabled(plugin)) {
+            } else if (slot == 40 && DraftWeighting.isRerollEnabled(plugin)) {
                 draftService.reroll(player, run, session);
                 new DraftMenu(player, session, draftService, run, runManager, weighting, plugin, levelListener).open();
-            } else if (slot == 26 && DraftWeighting.isSkipAllowed(plugin)) {
+            } else if (slot == 44 && DraftWeighting.isSkipAllowed(plugin)) {
                 draftService.skipDraft(player, run, session);
                 player.closeInventory();
                 if (run.hasPendingDrafts()) {
@@ -79,7 +79,8 @@ public class DraftMenu extends Menu {
         List<Card> options = session.options();
         for (int i = 0; i < Math.min(3, options.size()); i++) {
             Card card = options.get(i);
-            setItem(11 + i * 3, buildCardItem(card, i));
+            setItem(20 + i * 3, buildCardItem(card, i));
+            setItem(29 + i * 3, buildDescriptionItem(card));
         }
 
         if (DraftWeighting.isRerollEnabled(plugin) && session.rerollsUsed() < DraftWeighting.getMaxRerollPerDraft(plugin)) {
@@ -94,7 +95,7 @@ public class DraftMenu extends Menu {
                 ));
                 rerollItem.setItemMeta(meta);
             }
-            setItem(22, rerollItem);
+            setItem(40, rerollItem);
         }
 
         if (DraftWeighting.isSkipAllowed(plugin)) {
@@ -108,7 +109,7 @@ public class DraftMenu extends Menu {
                 ));
                 skipItem.setItemMeta(meta);
             }
-            setItem(26, skipItem);
+            setItem(44, skipItem);
         }
 
         ItemStack border = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -168,15 +169,31 @@ public class DraftMenu extends Menu {
         }
 
         lore.add(Component.empty());
-        for (String line : card.lore(run)) {
-            lore.add(Text.mm(line));
-        }
-
         lore.add(Text.mm("<yellow>Clique para escolher"));
         if (card.maxStacks() > 1) {
             lore.add(Text.mm("<gray>Maximo: " + card.maxStacks() + " pilhas"));
         }
 
+        meta.lore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack buildDescriptionItem(Card card) {
+        ItemStack item = new ItemStack(Material.BOOK);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        meta.displayName(Text.mm("<gray>Descricao: <white>" + card.id().replace("_", " ")));
+
+        List<String> descLines = card.lore(run);
+        List<Component> lore = new ArrayList<>();
+        for (String line : descLines) {
+            lore.add(Text.mm(line));
+        }
+        if (lore.isEmpty()) {
+            lore.add(Text.mm("<dark_gray>Sem descricao adicional"));
+        }
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;

@@ -78,13 +78,19 @@ public class AugmentCard implements Card {
     public String requiredPlugin() { return requiredPlugin; }
 
     @Override
+    public void toggleOn(Player p, RunState run) {
+        if (effect != null) effect.apply(p, run, run.cardCount(id()));
+    }
+
+    @Override
+    public void toggleOff(Player p, RunState run) {
+        if (effect != null) effect.unapply(p, run, run.cardCount(id()));
+    }
+
+    @Override
     public List<String> lore(RunState run) {
-        List<String> lines = new ArrayList<>();
-        lines.add("");
-        if (effect != null) {
-            lines.addAll(effect.description());
-        }
-        return lines;
+        if (effect == null) return List.of();
+        return effect.description();
     }
 
     public static AugmentCard fromConfig(String id, ConfigurationSection section) {

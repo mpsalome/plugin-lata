@@ -60,7 +60,11 @@ public class CollectionMenu extends Menu {
                 if (count > 1) lore.add("<gray>" + count + " pilhas");
                 if (card != null) {
                     lore.add("<dark_gray>" + card.kind().name() + " [" + String.join(" ", card.tags().stream().map(t -> t.name()).toList()) + "]");
-                    lore.addAll(card.lore(run));
+                    List<String> desc = card.lore(run);
+                    if (!desc.isEmpty()) {
+                        lore.addAll(desc);
+                        lore.add("");
+                    }
                 }
                 if (toggled) {
                     lore.add("<yellow>Clique para desativar");
@@ -125,9 +129,9 @@ public class CollectionMenu extends Menu {
         Card card = cardRegistry.byId(cardId).orElse(null);
         if (card != null) {
             if (wasOn) {
-                card.onRemove(player, run);
+                card.toggleOff(player, run);
             } else {
-                card.onAcquire(player, run);
+                card.toggleOn(player, run);
             }
         }
         statService.recompute(player, run);
