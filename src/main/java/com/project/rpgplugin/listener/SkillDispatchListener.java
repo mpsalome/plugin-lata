@@ -60,7 +60,7 @@ public class SkillDispatchListener implements Listener {
             }
             RunState run = runManager.getRun(p);
             if (run != null) {
-                new CollectionMenu(p, run, cardRegistry);
+                new CollectionMenu(p, run, cardRegistry, runManager.statService());
             }
             return;
         }

@@ -333,7 +333,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             }
             RunState run = runManager.getRun(player);
             if (run != null) {
-                new CollectionMenu(player, run, this.cardRegistry);
+                new CollectionMenu(player, run, this.cardRegistry, this.statService);
             }
             return true;
         }

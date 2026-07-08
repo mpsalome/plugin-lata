@@ -4,6 +4,7 @@ import com.project.rpgplugin.core.run.RunState;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
 
 public interface Card {
@@ -19,4 +20,5 @@ public interface Card {
     default String nameKey() { return "card." + id() + ".name"; }
     default String descKey() { return "card." + id() + ".desc"; }
     default String requiredPlugin() { return null; }
+    default List<String> lore(RunState run) { return List.of(); }
 }

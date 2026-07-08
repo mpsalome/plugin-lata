@@ -168,6 +168,10 @@ public class DraftMenu extends Menu {
         }
 
         lore.add(Component.empty());
+        for (String line : card.lore(run)) {
+            lore.add(Text.mm(line));
+        }
+
         lore.add(Text.mm("<yellow>Clique para escolher"));
         if (card.maxStacks() > 1) {
             lore.add(Text.mm("<gray>Maximo: " + card.maxStacks() + " pilhas"));

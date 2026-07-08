@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,6 +76,16 @@ public class AugmentCard implements Card {
 
     @Override
     public String requiredPlugin() { return requiredPlugin; }
+
+    @Override
+    public List<String> lore(RunState run) {
+        List<String> lines = new ArrayList<>();
+        lines.add("");
+        if (effect != null) {
+            lines.addAll(effect.description());
+        }
+        return lines;
+    }
 
     public static AugmentCard fromConfig(String id, ConfigurationSection section) {
         CardTier tier = CardTier.valueOf(section.getString("tier", "BRONZE").toUpperCase());

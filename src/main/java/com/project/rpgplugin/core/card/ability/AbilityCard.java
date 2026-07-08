@@ -6,9 +6,12 @@ import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.Skill;
+import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class AbilityCard implements Card {
@@ -60,5 +63,34 @@ public class AbilityCard implements Card {
     public void onRemove(Player p, RunState run) {
         run.removeCard(id());
         run.ownedAbilities().remove(id());
+    }
+
+    @Override
+    public List<String> lore(RunState run) {
+        List<String> lines = new ArrayList<>();
+        lines.add("");
+        lines.add("<" + skill.type().color() + "><bold>" + skill.type().key().toUpperCase());
+        if (skill.passive()) {
+            lines.add("<gray>Passiva");
+        } else {
+            long cd = skill.cooldown().getSeconds();
+            if (cd > 0) {
+                lines.add("<gray>Cooldown: <white>" + cd + "s");
+            }
+            for (TriggerKind tk : skill.trigger().kinds()) {
+                String desc = switch (tk) {
+                    case INTERACT -> "Clique com o item";
+                    case CONSUME -> "Consumir";
+                    case BLOCK_BREAK -> "Quebrar bloco";
+                    case PASSIVE -> "Passiva";
+                    case DISTANCE -> "Distancia";
+                    case MOVE -> "Ao se mover";
+                    case DAMAGE -> "Ao causar dano";
+                    case FOOD_LEVEL_CHANGE -> "Nivel de fome";
+                };
+                lines.add("<gray>Ativacao: <white>" + desc);
+            }
+        }
+        return lines;
     }
 }

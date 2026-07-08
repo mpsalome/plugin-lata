@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
+
 public record PotionEffectAugment(String potionType, int amplifier) implements AugmentEffect {
     @Override
     public void apply(Player p, RunState run, int stacks) {
@@ -20,5 +22,22 @@ public record PotionEffectAugment(String potionType, int amplifier) implements A
         run.removePotionType(potionType);
         PotionEffectType type = PotionEffectType.getByName(potionType);
         if (type != null) p.removePotionEffect(type);
+    }
+
+    @Override
+    public List<String> description() {
+        String name = switch (potionType.toUpperCase()) {
+            case "NIGHT_VISION" -> "Visao Noturna";
+            case "REGENERATION" -> "Regeneracao";
+            case "ABSORPTION" -> "Absorcao";
+            case "SPEED" -> "Velocidade";
+            case "STRENGTH" -> "Forca";
+            case "JUMP" -> "Super Pulo";
+            case "INVISIBILITY" -> "Invisibilidade";
+            case "FIRE_RESISTANCE" -> "Resistencia ao Fogo";
+            case "WATER_BREATHING" -> "Respiracao Aquatica";
+            default -> potionType;
+        };
+        return List.of("<aqua>Efeito: " + name + " " + (amplifier + 1));
     }
 }

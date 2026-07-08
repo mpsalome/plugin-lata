@@ -2,6 +2,7 @@ package com.project.rpgplugin.ui;
 
 import com.project.rpgplugin.core.card.Card;
 import com.project.rpgplugin.core.card.CardRegistry;
+import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.ui.menu.MenuHolder;
@@ -23,13 +24,15 @@ public class CollectionMenu extends Menu {
     private final Player player;
     private final RunState run;
     private final CardRegistry cardRegistry;
+    private final StatService statService;
     private final Map<Integer, String> slotToCard = new HashMap<>();
 
-    public CollectionMenu(Player p, RunState run, CardRegistry cardRegistry) {
+    public CollectionMenu(Player p, RunState run, CardRegistry cardRegistry, StatService statService) {
         super(SIZE, "<gold><bold>Suas Cartas");
         this.player = p;
         this.run = run;
         this.cardRegistry = cardRegistry;
+        this.statService = statService;
 
         MenuHolder holder = new MenuHolder(this);
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -57,6 +60,7 @@ public class CollectionMenu extends Menu {
                 if (count > 1) lore.add("<gray>" + count + " pilhas");
                 if (card != null) {
                     lore.add("<dark_gray>" + card.kind().name() + " [" + String.join(" ", card.tags().stream().map(t -> t.name()).toList()) + "]");
+                    lore.addAll(card.lore(run));
                 }
                 if (toggled) {
                     lore.add("<yellow>Clique para desativar");
@@ -114,9 +118,19 @@ public class CollectionMenu extends Menu {
         event.setCancelled(true);
         int slot = event.getRawSlot();
         String cardId = slotToCard.get(slot);
-        if (cardId != null) {
-            run.toggle(cardId);
-            new CollectionMenu(player, run, cardRegistry);
+        if (cardId == null) return;
+
+        boolean wasOn = run.isToggledOn(cardId);
+        run.toggle(cardId);
+        Card card = cardRegistry.byId(cardId).orElse(null);
+        if (card != null) {
+            if (wasOn) {
+                card.onRemove(player, run);
+            } else {
+                card.onAcquire(player, run);
+            }
         }
+        statService.recompute(player, run);
+        new CollectionMenu(player, run, cardRegistry, statService);
     }
 }
