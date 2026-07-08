@@ -51,7 +51,7 @@ public class DraftMenu extends Menu {
         setClickHandler(event -> {
             event.setCancelled(true);
             int slot = event.getRawSlot();
-            if (slot == 20 || slot == 23 || slot == 26) {
+            if (slot == 20 || slot == 23 || slot == 26 || (slot == 29 && session.options().size() > 3)) {
                 int index = (slot - 20) / 3;
                 Card card = session.options().get(index);
                 playTierSound(player, card.tier());
@@ -71,15 +71,23 @@ public class DraftMenu extends Menu {
                 }
             }
         });
-
-        player.openInventory(getInventory());
     }
 
     private void build() {
+        fillBackground();
+
         List<Card> options = session.options();
-        for (int i = 0; i < Math.min(3, options.size()); i++) {
+        int cardCount = Math.min(3, options.size());
+        for (int i = 0; i < cardCount; i++) {
             Card card = options.get(i);
-            setItem(20 + i * 3, buildCardItem(card, i));
+            int slot = 20 + i * 3;
+            setItem(slot, buildCardItem(card, i));
+            // Decorative platform below each card
+            setItem(slot + 9, decorativePane(Material.GRAY_STAINED_GLASS_PANE, "<dark_gray>"));
+        }
+        // 4th card from extraDraftSlots
+        if (options.size() > 3) {
+            setItem(29, buildCardItem(options.get(3), 3));
         }
 
         if (DraftWeighting.isRerollEnabled(plugin) && session.rerollsUsed() < DraftWeighting.getMaxRerollPerDraft(plugin)) {
@@ -87,7 +95,7 @@ public class DraftMenu extends Menu {
             ItemStack rerollItem = new ItemStack(Material.ENDER_EYE);
             ItemMeta meta = rerollItem.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.mm("<light_purple>Reroll"));
+                meta.displayName(Text.mm("<light_purple><bold>Reroll"));
                 meta.lore(List.of(
                     Text.mm("<gray>Custo: <white>" + cost + " niveis"),
                     Text.mm("<gray>Usados: <white>" + session.rerollsUsed() + "/" + DraftWeighting.getMaxRerollPerDraft(plugin))
@@ -101,7 +109,7 @@ public class DraftMenu extends Menu {
             ItemStack skipItem = new ItemStack(Material.BARRIER);
             ItemMeta meta = skipItem.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.mm("<red>Pular"));
+                meta.displayName(Text.mm("<red><bold>Pular"));
                 meta.lore(List.of(
                     Text.mm("<green>+1 coracao permanente"),
                     Text.mm("<green>+1 opcao no proximo draft"),
@@ -111,18 +119,42 @@ public class DraftMenu extends Menu {
             }
             setItem(44, skipItem);
         }
+    }
 
-        ItemStack border = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta bMeta = border.getItemMeta();
-        if (bMeta != null) {
-            bMeta.displayName(Component.text(" "));
-            border.setItemMeta(bMeta);
-        }
+    private void fillBackground() {
+        ItemStack bg = decorativePane(Material.BLACK_STAINED_GLASS_PANE, null);
         for (int i = 0; i < SIZE; i++) {
-            if (getInventory().getItem(i) == null) {
-                setItem(i, border);
-            }
+            setItem(i, bg);
         }
+        // Outer border glow
+        ItemStack border = decorativePane(Material.BLACK_STAINED_GLASS_PANE, null);
+        for (int i = 0; i < 9; i++) {
+            setItem(i, border);
+            setItem(SIZE - 9 + i, border);
+        }
+        for (int i = 0; i < SIZE; i += 9) {
+            setItem(i, border);
+            setItem(i + 8, border);
+        }
+        // Corner accents
+        setItem(0, decorativePane(Material.PURPLE_STAINED_GLASS_PANE, null));
+        setItem(8, decorativePane(Material.PURPLE_STAINED_GLASS_PANE, null));
+        setItem(45, decorativePane(Material.PURPLE_STAINED_GLASS_PANE, null));
+        setItem(53, decorativePane(Material.PURPLE_STAINED_GLASS_PANE, null));
+    }
+
+    private ItemStack decorativePane(Material material, String name) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            if (name != null) {
+                meta.displayName(Text.mm(name));
+            } else {
+                meta.displayName(Component.empty());
+            }
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 
     public void open() {

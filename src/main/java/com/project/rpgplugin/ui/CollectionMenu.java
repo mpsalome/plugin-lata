@@ -28,20 +28,14 @@ public class CollectionMenu extends Menu {
     private final Map<Integer, String> slotToCard = new HashMap<>();
 
     public CollectionMenu(Player p, RunState run, CardRegistry cardRegistry, StatService statService) {
-        super(SIZE, "<gold><bold>Suas Cartas");
+        super(SIZE, "<dark_purple><bold>\u2728 Sua Colecao");
         this.player = p;
         this.run = run;
         this.cardRegistry = cardRegistry;
         this.statService = statService;
 
-        MenuHolder holder = new MenuHolder(this);
-        ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        var fillerMeta = filler.getItemMeta();
-        if (fillerMeta != null) {
-            fillerMeta.displayName(Text.mm(""));
-            filler.setItemMeta(fillerMeta);
-        }
-        fillBorder(filler);
+        new MenuHolder(this);
+        fillBackground();
 
         int slot = 10;
         for (String cardId : run.ownedCards()) {
@@ -87,6 +81,12 @@ public class CollectionMenu extends Menu {
             infoLore.add("<gray>Cartas: <white>" + run.ownedCards().size());
             infoLore.add("<gray>Milestones: <white>" + run.milestonesReached());
             infoLore.add("<gray>Distancia: <white>" + run.blocksWalked());
+            if (run.extraDraftSlots() > 0) {
+                infoLore.add("<green>Draft Extra: " + run.extraDraftSlots() + " disponivel(eis)");
+            }
+            if (run.skipHealthBonus() > 0) {
+                infoLore.add("<green>Vida Extra: +" + ((int) run.skipHealthBonus() / 2) + " coracoes");
+            }
             if (!run.multipliers().isEmpty()) {
                 infoLore.add("");
                 infoLore.add("<gold>Multiplicadores:");
@@ -115,6 +115,32 @@ public class CollectionMenu extends Menu {
         }
 
         p.openInventory(getInventory());
+    }
+
+    private void fillBackground() {
+        ItemStack bg = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        var bgMeta = bg.getItemMeta();
+        if (bgMeta != null) {
+            bgMeta.displayName(Component.text("\u00a7r"));
+            bg.setItemMeta(bgMeta);
+        }
+        for (int i = 0; i < SIZE; i++) {
+            setItem(i, bg);
+        }
+        ItemStack border = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
+        var bMeta = border.getItemMeta();
+        if (bMeta != null) {
+            bMeta.displayName(Component.text("\u00a7r"));
+            border.setItemMeta(bMeta);
+        }
+        for (int col = 0; col < 9; col++) {
+            setItem(col, border);
+            setItem(SIZE - 9 + col, border);
+        }
+        for (int row = 0; row < SIZE; row += 9) {
+            setItem(row, border);
+            setItem(row + 8, border);
+        }
     }
 
     @Override
