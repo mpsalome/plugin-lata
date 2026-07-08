@@ -55,7 +55,6 @@ public class SonarSkill extends AbstractSkill {
         }
         Player p = ctx.player();
         startCooldown(ctx);
-        ctx.services().plugin().getHudService().setCooldown(p, "Sonar", (int) cooldown().toSeconds());
         int range = cfg().getInt("range", 20);
         int duration = cfg().getInt("glow_duration", 10) * 20;
         List<LivingEntity> revealed = new ArrayList<>();

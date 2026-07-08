@@ -57,7 +57,6 @@ public class DashSkill extends AbstractSkill {
         p.setVelocity(dir.multiply(1.5).setY(0.4));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 1, true, false, false));
         startCooldown(ctx);
-        ctx.services().plugin().getHudService().setCooldown(p, "Dash", (int) cooldown().toSeconds());
         p.getWorld().spawnParticle(Particle.CLOUD, p.getLocation().add(0, 0.5, 0), 20, 0.3, 0.3, 0.3, 0.05);
         p.getWorld().spawnParticle(Particle.SWEEP_ATTACK, p.getLocation(), 5, 0.5, 0.5, 0.5, 0);
         p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 1.0f, 1.0f);

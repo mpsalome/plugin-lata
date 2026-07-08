@@ -54,6 +54,19 @@ public class HudService {
     }
 
     /**
+     * Registers a visual cooldown from the backend skill system.
+     * Called automatically by {@link com.project.rpgplugin.core.skill.AbstractSkill#startCooldown}.
+     * Uses millisecond precision for the duration.
+     */
+    public void registerCooldown(Player player, String skillId, String displayName, long durationMillis) {
+        if (durationMillis <= 0) return;
+        long expiry = System.currentTimeMillis() + durationMillis;
+        cooldownDisplays.computeIfAbsent(player.getUniqueId(), k -> new ConcurrentHashMap<>())
+            .put(displayName, expiry);
+        startPlayer(player);
+    }
+
+    /**
      * Convenience helper for item-based skills.
      * Uses the native Minecraft hotbar cooldown overlay instead of actionbar text.
      * Call this in the skill's activate() method when the skill is triggered by a
@@ -65,6 +78,16 @@ public class HudService {
      */
     public static void setItemCooldown(Player player, Material material, int durationTicks) {
         player.setCooldown(material, durationTicks);
+    }
+
+    /**
+     * Folia-aware 1-tick delayed item cooldown.
+     * When a skill cancels a PlayerInteractEvent/BlockPlaceEvent the client inventory
+     * sync can wipe the hotbar cooldown visual if setCooldown is called in the same tick.
+     * Scheduling it 1 tick later avoids this desync.
+     */
+    public static void setItemCooldownDelayed(Player player, Material material, int durationTicks, JavaPlugin plugin) {
+        player.getScheduler().runDelayed(plugin, st -> player.setCooldown(material, durationTicks), null, 1L);
     }
 
     public void startPlayer(Player player) {

@@ -4,8 +4,9 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.CompositeTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
+import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.time.Duration;
+import java.util.Set;
 
 public class ScaffoldSkill extends AbstractSkill {
 
@@ -40,18 +42,26 @@ public class ScaffoldSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ofSeconds(12); }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.DIRT); }
+    public SkillTrigger trigger() {
+        return new CompositeTrigger(Set.of(TriggerKind.INTERACT), ctx -> {
+            if (!(ctx.sourceEvent() instanceof org.bukkit.event.player.PlayerInteractEvent e)) return false;
+            if (!ctx.player().isSneaking()) return false;
+            if (e.getAction() != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+                && e.getAction() != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return false;
+            return ctx.usedItem() != null && ctx.usedItem().getType() == Material.DIRT;
+        }, "<gray>Agache e clique direito com terra (Catalisador)");
+    }
 
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "§cSalto do Andaime em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            ctx.player().playSound(ctx.player().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
             return;
         }
         Player p = ctx.player();
-        consume(ctx, 1);
         p.setVelocity(new Vector(0, 1.0, 0));
         startCooldown(ctx);
+        ctx.services().plugin().getHudService().setCooldown(p, "Andaime", (int) cooldown().toSeconds());
         Location bloc = p.getLocation().clone().subtract(0, 1, 0);
         if (bloc.getBlock().getType() == Material.AIR) {
             bloc.getBlock().setType(Material.HAY_BLOCK);
@@ -61,6 +71,6 @@ public class ScaffoldSkill extends AbstractSkill {
                 }
             }, 100L);
         }
-        feedback(ctx, "§aSalto do Andaime!", Sound.BLOCK_GRASS_PLACE);
+        p.playSound(p.getLocation(), Sound.BLOCK_GRASS_PLACE, 1.0f, 1.0f);
     }
 }

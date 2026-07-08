@@ -5,6 +5,7 @@ import com.project.rpgplugin.core.skill.SkillContext;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -75,6 +76,25 @@ public final class CompositeTriggerHelper {
                 return ctx.usedItem() != null && ctx.usedItem().getType() == heldItem;
             },
             "<gray>Agache e clique direito com " + heldItem.name().toLowerCase().replace('_', ' ')
+        );
+    }
+
+    /**
+     * Trigger for block-placement skills (Catalyst Pattern).
+     * Only activates when the player is sneaking while placing a block.
+     * Non-sneaking block placements pass through as vanilla building.
+     * <p>
+     * The corresponding {@code BlockPlaceEvent} is cancelled by the dispatch
+     * layer, so the block item is never consumed from the player's inventory.
+     */
+    public static SkillTrigger sneakBlockPlace() {
+        return new CompositeTrigger(
+            Set.of(TriggerKind.INTERACT),
+            ctx -> {
+                if (!(ctx.sourceEvent() instanceof BlockPlaceEvent)) return false;
+                return ctx.player().isSneaking();
+            },
+            "<gray>Agache e coloque um bloco no chão"
         );
     }
 

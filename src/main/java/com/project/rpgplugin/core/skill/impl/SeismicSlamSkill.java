@@ -7,6 +7,7 @@ import com.project.rpgplugin.core.skill.SkillType;
 import com.project.rpgplugin.core.skill.trigger.CompositeTrigger;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
+import com.project.rpgplugin.ui.HudService;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -68,7 +69,7 @@ public class SeismicSlamSkill extends AbstractSkill {
         Player p = ctx.player();
         startCooldown(ctx);
         if (ctx.usedItem() != null) {
-            p.setCooldown(ctx.usedItem().getType(), (int) cooldown().toSeconds() * 20);
+            HudService.setItemCooldownDelayed(p, ctx.usedItem().getType(), (int) cooldown().toSeconds() * 20, services.plugin());
         }
         Location origin = p.getLocation().add(0, 0.5, 0);
         Vector direction = p.getLocation().getDirection().normalize().setY(0);

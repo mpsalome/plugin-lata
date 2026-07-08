@@ -63,6 +63,9 @@ public class AuraSkillsIntegration implements Listener {
             Bukkit.getPluginManager().registerEvents(this, plugin);
             this.enabled = true;
             plugin.getLogger().info("AuraSkills integrado com sucesso! " + registeredSkillKeys.size() + " skills registradas.");
+            plugin.getLogger().warning("=== AVISO: Para o HUD do RogueLata funcionar corretamente, desative a action-bar do AuraSkills! ===");
+            plugin.getLogger().warning("Edite plugins/AuraSkills/config.yml e defina 'action-bar: false' na secao de habilidades.");
+            plugin.getLogger().warning("Caso contrario, a action-bar nativa do AuraSkills colidira com o RogueLata HUDService.");
         } catch (Exception e) {
             plugin.getLogger().warning("Falha ao integrar AuraSkills: " + e.getMessage());
         }

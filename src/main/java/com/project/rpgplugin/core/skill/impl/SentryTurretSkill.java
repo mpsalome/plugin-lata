@@ -4,7 +4,7 @@ import com.project.rpgplugin.core.skill.AbstractSkill;
 import com.project.rpgplugin.core.skill.SkillContext;
 import com.project.rpgplugin.core.skill.SkillTier;
 import com.project.rpgplugin.core.skill.SkillType;
-import com.project.rpgplugin.core.skill.trigger.InteractTrigger;
+import com.project.rpgplugin.core.skill.trigger.CompositeTriggerHelper;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import com.project.rpgplugin.util.SchedulerUtil;
 import org.bukkit.Location;
@@ -45,18 +45,18 @@ public class SentryTurretSkill extends AbstractSkill {
 
     @Override
     public SkillTrigger trigger() {
-        return InteractTrigger.of(Material.PUMPKIN);
+        return CompositeTriggerHelper.sneakRightClick(Material.PUMPKIN);
     }
 
     @Override
     public void activate(SkillContext ctx) {
         if (onCooldown(ctx)) {
-            feedback(ctx, "<red>Torreta em cooldown! " + cooldownRemaining(ctx) / 1000 + "s", Sound.BLOCK_NOTE_BLOCK_BASS);
+            ctx.player().playSound(ctx.player().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
             return;
         }
         Player p = ctx.player();
-        consume(ctx, 1);
         startCooldown(ctx);
+        ctx.services().plugin().getHudService().setCooldown(p, "Torreta", (int) cooldown().toSeconds());
         Location turretLoc = p.getLocation().add(0, 1, 0).add(p.getLocation().getDirection().normalize().multiply(2));
         turretLoc.getBlock().setType(Material.DISPENSER);
         turretLoc.getWorld().spawnParticle(Particle.PORTAL, turretLoc, 30, 0.5, 0.5, 0.5, 1);
@@ -91,6 +91,6 @@ public class SentryTurretSkill extends AbstractSkill {
                 arrow.setDamage(4.0);
             }
         }, 20L, 20L).getTaskId();
-        feedback(ctx, "<gold><bold>Torreta de Flechas invocada! 15s de duracao.</bold></gold>", Sound.ENTITY_ARROW_SHOOT);
+        p.playSound(p.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0f, 1.0f);
     }
 }

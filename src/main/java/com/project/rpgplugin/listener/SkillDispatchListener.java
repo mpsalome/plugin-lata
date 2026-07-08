@@ -75,6 +75,8 @@ public class SkillDispatchListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
+        // Vanilla construction mode: not sneaking → place block normally, skip all skill matching
+        if (!p.isSneaking()) return;
         dispatch(p, TriggerKind.INTERACT, e, p.getInventory().getItemInMainHand(), e.getBlockPlaced());
     }
 

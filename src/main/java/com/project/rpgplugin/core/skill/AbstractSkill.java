@@ -4,6 +4,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -72,8 +73,26 @@ public abstract class AbstractSkill implements Skill {
         return services.cooldownRemaining(ctx.player().getUniqueId(), id());
     }
 
+    protected String displayName() {
+        StringBuilder sb = new StringBuilder();
+        for (String part : id().split("_")) {
+            if (!sb.isEmpty()) sb.append(' ');
+            if (!part.isEmpty()) {
+                sb.append(Character.toUpperCase(part.charAt(0)));
+                if (part.length() > 1) sb.append(part.substring(1));
+            }
+        }
+        return sb.toString();
+    }
+
     protected void startCooldown(SkillContext ctx) {
-        services.startCooldown(ctx.player().getUniqueId(), id(), cooldown());
+        Duration dur = cooldown();
+        if (dur == null || dur.isZero() || dur.isNegative()) return;
+        long millis = dur.toMillis();
+        services.startCooldown(ctx.player().getUniqueId(), id(), dur);
+        services.plugin().getHudService().registerCooldown(
+            ctx.player(), id(), displayName(), millis
+        );
     }
 
     protected void consume(SkillContext ctx, int amount) {
