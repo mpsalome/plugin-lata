@@ -3,6 +3,8 @@ package com.project.rpgplugin.ui;
 import com.project.rpgplugin.core.progression.RecallProgression;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.core.skill.SkillRegistry;
+import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.util.SchedulerUtil;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
@@ -10,23 +12,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class HudService {
 
     private final JavaPlugin plugin;
     private final RunManager runManager;
     private final RecallProgression recallProgression;
+    private final SkillServices skillServices;
+    private final SkillRegistry skillRegistry;
     private BukkitTask task;
 
-    public HudService(JavaPlugin plugin, RunManager runManager, RecallProgression recallProgression) {
+    public HudService(JavaPlugin plugin, RunManager runManager, RecallProgression recallProgression,
+                      SkillServices skillServices, SkillRegistry skillRegistry) {
         this.plugin = plugin;
         this.runManager = runManager;
         this.recallProgression = recallProgression;
+        this.skillServices = skillServices;
+        this.skillRegistry = skillRegistry;
     }
 
     public void start() {
-        task = SchedulerUtil.runTimer(plugin, this::tick, 40L, 40L);
+        task = SchedulerUtil.runTimer(plugin, this::tick, 20L, 20L);
     }
 
     public void stop() {
@@ -45,6 +54,11 @@ public class HudService {
                 actionBar.append(" <yellow>").append(run.ownedCards().size()).append(" cartas <gray>|");
             }
 
+            String cooldowns = formatCooldowns(p.getUniqueId(), run);
+            if (!cooldowns.isEmpty()) {
+                actionBar.append(" ").append(cooldowns).append("<gray>|");
+            }
+
             if (recallProgression != null && run.hasCard("recall")) {
                 double req = recallProgression.required(run);
                 long prog = run.blocksSinceRecall();
@@ -59,5 +73,20 @@ public class HudService {
 
             p.sendActionBar(Text.mm(actionBar.toString()));
         }
+    }
+
+    private String formatCooldowns(UUID playerId, RunState run) {
+        List<String> entries = run.ownedAbilities().stream()
+            .filter(id -> skillServices.isOnCooldown(playerId, id))
+            .map(id -> {
+                long rem = skillServices.cooldownRemaining(playerId, id) / 1000;
+                String name = skillRegistry.byId(id)
+                    .map(s -> s.id().replace("_", " "))
+                    .orElse(id.replace("_", " "));
+                return "<white>" + name + " <red>" + rem + "s";
+            })
+            .toList();
+        if (entries.isEmpty()) return "";
+        return String.join(" <gray>", entries);
     }
 }

@@ -195,7 +195,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.augmentListener = new AugmentListener(runManager);
 
         // EPIC-8: HUD & Menu framework
-        this.hudService = new HudService(this, runManager, recallProgression);
+        this.hudService = new HudService(this, runManager, recallProgression, skillServices, skillRegistry);
         this.menuListener = new MenuListener();
 
         // EPIC-9: Persistence
