@@ -102,5 +102,14 @@ public final class DraftWeighting {
         return config.getBoolean("draft.allow_skip", true);
     }
 
+    public static double getSkipHeal(JavaPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "draft.yml");
+        if (!file.exists()) {
+            plugin.saveResource("draft.yml", false);
+        }
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        return config.getDouble("draft.skip_bonus.heal", 6);
+    }
+
     private record TierWeightEntry(int from, int to, double bronze, double silver, double gold) {}
 }

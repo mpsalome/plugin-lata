@@ -43,6 +43,6 @@ public class JumpBoostSkill extends AbstractSkill {
     @Override
     public void activate(SkillContext ctx) {
         Player p = ctx.player();
-        p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 1, true, false, false));
+        p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 100, 0, true, false, false));
     }
 }

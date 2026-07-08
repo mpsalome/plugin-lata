@@ -8,7 +8,7 @@ import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.run.RunManager;
-import net.kyori.adventure.text.Component;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -105,19 +105,20 @@ public class DraftService {
         statService.recompute(p, run);
 
         playTierSound(p, chosen.tier());
-        p.sendActionBar(Component.text("<green>✔ Draftado: " + chosen.id()));
+        p.sendActionBar(Text.mm("<green>✔ Draftado: " + chosen.id()));
     }
 
     public void skipDraft(Player p, RunState run, DraftSession session) {
         activeSessions.remove(p.getUniqueId());
         session.skip();
-        double heal = 6.0;
+        int hearts = (int) DraftWeighting.getSkipHeal(runManager.plugin());
+        double heal = hearts * 2.0;
         if (p.getHealth() + heal < p.getMaxHealth()) {
             p.setHealth(p.getHealth() + heal);
         } else {
             p.setHealth(p.getMaxHealth());
         }
-        p.sendActionBar(Component.text("<gray>Draft pulado. Você recuperou <red>❤ " + (int) heal + " <gray>de vida."));
+        p.sendActionBar(Text.mm("<gray>Draft pulado. Voce recuperou <red>\u2764 " + hearts + " <gray>de vida."));
     }
 
     public boolean reroll(Player p, RunState run, DraftSession session) {

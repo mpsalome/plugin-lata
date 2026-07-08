@@ -39,7 +39,7 @@ public class CoreOverdriveSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ZERO; }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.REDSTONE_BLOCK); }
+    public SkillTrigger trigger() { return InteractTrigger.of(Material.REDSTONE); }
 
     @Override
     public void activate(SkillContext ctx) {

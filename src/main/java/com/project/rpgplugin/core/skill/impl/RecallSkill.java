@@ -27,7 +27,7 @@ public class RecallSkill extends AbstractSkill {
     public SkillType type() { return SkillType.EXPLORER; }
 
     @Override
-    public Material icon() { return Material.DRAGON_BREATH; }
+    public Material icon() { return Material.ENDER_EYE; }
 
     @Override
     public boolean passive() { return false; }
@@ -38,7 +38,7 @@ public class RecallSkill extends AbstractSkill {
     }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.DRAGON_BREATH); }
+    public SkillTrigger trigger() { return InteractTrigger.of(Material.ENDER_EYE); }
 
     @Override
     public void activate(SkillContext ctx) {

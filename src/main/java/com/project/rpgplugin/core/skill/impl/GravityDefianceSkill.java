@@ -39,7 +39,7 @@ public class GravityDefianceSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ofSeconds(40); }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.SLIME_BLOCK); }
+    public SkillTrigger trigger() { return InteractTrigger.of(Material.SLIME_BALL); }
 
     @Override
     public void activate(SkillContext ctx) {

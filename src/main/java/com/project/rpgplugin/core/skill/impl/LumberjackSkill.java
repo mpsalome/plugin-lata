@@ -39,7 +39,7 @@ public class LumberjackSkill extends AbstractSkill {
     public Duration cooldown() { return Duration.ofSeconds(60); }
 
     @Override
-    public SkillTrigger trigger() { return InteractTrigger.of(Material.IRON_BLOCK, "AXE"); }
+    public SkillTrigger trigger() { return InteractTrigger.of(Material.IRON_INGOT, "AXE"); }
 
     @Override
     public void activate(SkillContext ctx) {
