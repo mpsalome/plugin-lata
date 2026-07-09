@@ -67,7 +67,7 @@ public class SonarSkill extends AbstractSkill {
         long interval = cfgInt("tick_interval", 20);
         int glowDuration = cfgInt("glow_duration", 60);
 
-        services.plugin().getHudService().setActiveEffect(p, "\uD83D\uDD0D Sonar", -1);
+        services.plugin().getHudService().setActiveEffect(p, "Sonar", -1);
 
         BukkitTask task = SchedulerUtil.runTimer(services.plugin(), () -> {
             if (!p.isOnline() || activeSessions.get(pid) == null) {
@@ -86,21 +86,21 @@ public class SonarSkill extends AbstractSkill {
 
         activeSessions.put(pid, new SonarSession(task));
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
-        p.sendActionBar(Text.mm("<aqua>\uD83D\uDD0D Sonar ativado! Agache + clique direito novamente para desligar.</aqua>"));
+        p.sendActionBar(Text.mm("<aqua>Sonar ativado! Agache + clique direito novamente para desligar.</aqua>"));
     }
 
     private void deactivate(Player p, SonarSession session) {
         UUID pid = p.getUniqueId();
         activeSessions.remove(pid);
         session.task.cancel();
-        services.plugin().getHudService().removeActiveEffect(p, "\uD83D\uDD0D Sonar");
+        services.plugin().getHudService().removeActiveEffect(p, "Sonar");
         for (Entity entity : p.getNearbyEntities(60, 60, 60)) {
             if (entity instanceof LivingEntity le && entity != p) {
                 le.setGlowing(false);
             }
         }
         p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.0f, 1.0f);
-        p.sendActionBar(Text.mm("<gray>\uD83D\uDD0D Sonar desativado.</gray>"));
+        p.sendActionBar(Text.mm("<gray>Sonar desativado.</gray>"));
     }
 
     public static boolean isActive(Player p) {

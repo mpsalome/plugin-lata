@@ -222,8 +222,8 @@ public class HudService {
             return;
         }
 
-        String title = String.join(" <dark_gray>|</dark_gray> ", parts);
-        hud.skillBar.setTitle(title.replaceAll("<[^>]+>", ""));
+        String title = String.join(" | ", parts);
+        hud.skillBar.setTitle(title.replaceAll("<[^>]+>", "").replaceAll("[^\\x20-\\x7E]", ""));
         hud.skillBar.setProgress(1.0);
 
         if (!hud.skillBar.isVisible()) {
