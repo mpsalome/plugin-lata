@@ -23,7 +23,7 @@ com.project.rpgplugin
 ├── config/                         # SkillsConfig, ShopConfig
 ├── core/
 │   ├── build/        SynergyService           # Sinergias por tags
-│   ├── card/          Card, CardRegistry...    # 90 cartas (37 ability + 53 augment)
+│   ├── card/          Card, CardRegistry...    # 91 cartas (38 ability + 53 augment)
 │   ├── difficulty/    DifficultyService        # Escala vanilla (profundidade + players)
 │   ├── draft/         DraftService, Weighting  # Motor do draft 1-de-3 (não-bloqueante)
 │   ├── mayhem/        MayhemService, 8+ mods   # Modificadores cumulativos (limpos na morte)
@@ -41,7 +41,7 @@ com.project.rpgplugin
 │   ├── CollectionMenu.java        # Coleção paginada (36 cards/página, filtros)
 │   ├── ShopMenu.java              # Loja (inclui Purificação do Mundo, slot 18)
 │   ├── DraftMenu.java             # Draft 1-de-3 (fechável, sessão preservada)
-│   └── HUD.java                   # Actionbar (mana+health) + BossBar (cooldowns/efeitos)
+│   └── HudService.java            # BossBar (HP/Mana/cooldowns) + Folia-safe scheduler
 ├── util/              ItemKeys, Text, ItemBuilder  # Utilitários
 └── integration/       MythicMobsBridge, ModelEngineBridge, AuraMobsIntegration
 ```
@@ -51,7 +51,7 @@ com.project.rpgplugin
 | Serviço | Função | Acesso |
 |---------|--------|--------|
 | `RunManager` | Iniciar/terminar runs, obter RunState | `RPGPlugin.getRunManager()` |
-| `CardRegistry` | 90 cartas registradas, consulta por tag/tier | `RPGPlugin.getCardRegistry()` |
+| `CardRegistry` | 91 cartas registradas, consulta por tag/tier | `RPGPlugin.getCardRegistry()` |
 | `DraftService` | Rolar draft, aplicar escolha, reroll, pular | `RPGPlugin.getDraftService()` |
 | `AuraSkillsIntegration` | Ponte com AuraSkills (se ativo) | `RPGPlugin.getAuraSkillsIntegration()` |
 | `PlayerDataStore` | Salvar/carregar runs do disco | `RPGPlugin.getDataStore()` |
@@ -103,7 +103,7 @@ Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `craft`, `draft`.
 - **BossSet drops**: todo boss tem um loot_set em `loot_sets.yml` — itens customizados com nome, encantamentos e lore. A quantidade de peças dropadas escala com o nível do boss.
 - **Milestone boss**: em `mayhem.yml`, `boss_chance: 0.5` define 50% de chance de invocar um boss aleatório a cada 10 níveis ao invés de mayhem
 - **SonarSkill**: ativado por sneak + clique direito; glow contínuo em entidades até desativar (clique novamente)
-- **HUD split**: actionbar = mana + vida; BossBar = cooldowns e efeitos ativos
+- **HUD via BossBar**: HP, Mana e cooldowns ativos exibidos na BossBar (não action bar) para evitar conflito com AuraSkills. ActionBar desativada.
 - **Purificação**: ShopMenu slot 18, item Purificação do Mundo, custo 30 níveis, remove todas as entidades e efeitos mayhem do mundo
 - **BossLootService**: gera peças de set temático + loot aleatório (pérolas, drops raros), quantidade escalada por nível do boss
 

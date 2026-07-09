@@ -15,6 +15,7 @@
 | AuraMobs | 1.x | Enhanced mob scaling |
 | MythicMobs | 5.x | Custom boss models & behaviors |
 | ModelEngine | 4.x | 3D model rendering for bosses |
+| PlaceholderAPI | 2.x | Placeholder expansion for external plugins |
 
 No plugin is required. RogueLata runs full-featured in standalone mode.
 When an optional plugin is absent, features depending on it are gracefully disabled.
@@ -24,7 +25,7 @@ When an optional plugin is absent, features depending on it are gracefully disab
 1. Install Paper 1.21.4+ and start once to generate folders
 2. Stop the server
 3. Place `RogueLata-<version>.jar` in `plugins/`
-4. (Optional) Install AuraSkills, AuraMobs, MythicMobs, ModelEngine
+4. (Optional) Install AuraSkills, AuraMobs, MythicMobs, ModelEngine, PlaceholderAPI
 5. Start the server
 6. Check console for `RogueLata loaded X cards, Y modifiers`
 7. Join the game — you automatically receive the RPG Book (`BREAD`)
@@ -46,7 +47,7 @@ When an optional plugin is absent, features depending on it are gracefully disab
 | Feature | Standalone | +AuraSkills | +AuraMobs | +MythicMobs |
 |---------|-----------|-------------|-----------|-------------|
 | Draft (1-de-3) | ✅ | ✅ | ✅ | ✅ |
-| 37 abilities | ✅ | ✅ (also as AuraSkills custom skills) | ✅ | ✅ |
+| 38 abilities | ✅ | ✅ (also as AuraSkills custom skills) | ✅ | ✅ |
 | 53 augments | ✅ | ✅ | ✅ | ✅ |
 | Mayhem modifiers | ✅ | ✅ | ✅ | ✅ |
 | Reset on death | ✅ | ✅ (also resets AuraSkills XP) | ✅ | ✅ |

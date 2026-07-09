@@ -13,7 +13,7 @@ public abstract class AbstractSkill implements Skill {
     private static final Map<String, List<String>> EFFECT_DESCRIPTIONS = Map.ofEntries(
         // Explorer
         Map.entry("dash", List.of("<white>Dash 6 blocos + Speed II 3s (Agache + Pulo no ar)")),
-        Map.entry("grapple", List.of("<white>Lanca o jogador para frente")),
+        Map.entry("grapple", List.of("<white>Lanca o jogador para frente (Bola de Slime)")),
         Map.entry("hydration", List.of("<white>Ao tocar agua/chuva: +1 comida, +0.5 saturacao, Speed I")),
         Map.entry("water_breathing", List.of("<white>Respiracao subaquatica + Golfinho (passivo na agua)")),
         Map.entry("jump_boost", List.of("<white>Salto Elevado II (passivo enquanto se move)")),
@@ -27,7 +27,7 @@ public abstract class AbstractSkill implements Skill {
         Map.entry("blade_dance", List.of("<white>Apos 3 mobility skills: proximo hit causa AOE + lifesteal 5%")),
         // Miner
         Map.entry("diet", List.of("<white>+4 comida, +2 saturacao")),
-        Map.entry("stone_smash", List.of("<white>Quebrar pedra da Haste (acumula ate III com momentum de 4s)")),
+        Map.entry("stone_smash", List.of("<white>Quebrar pedra acumula Haste (max III) por 4s")),
         Map.entry("torch_light", List.of("<white>Visao Noturna por 30s")),
         Map.entry("ore_sonar", List.of("<white>Revela minerios (Ferro/Ouro/Diamante) num raio de 8 blocos")),
         Map.entry("haste", List.of("<white>Ao quebrar minerios: Haste II + Speed I 10s (CD 20s)")),
@@ -41,10 +41,10 @@ public abstract class AbstractSkill implements Skill {
         Map.entry("unstable_core", List.of("<white>15% chance de explodir ao quebrar minerio: dano AOE + drop extra")),
         // Builder
         Map.entry("feast", List.of("<white>+2 comida, +0.8 saturacao")),
-        Map.entry("woodcutter", List.of("<white>Treecapitator: quebra todos os troncos conectados")),
+        Map.entry("woodcutter", List.of("<white>Treecapitator: derruba arvore inteira ao quebrar um tronco")),
         Map.entry("flora_shield", List.of("<white>Cura 4 coracoes")),
-        Map.entry("silk_touch", List.of("<white>Toque de Seda sem encantamento")),
-        Map.entry("scaffold", List.of("<white>Lanca para cima + coloca feno temporario")),
+        Map.entry("silk_touch", List.of("<white>Toque de Seda sem encantamento (maos vazias)")),
+        Map.entry("scaffold", List.of("<white>Lanca para cima + plataforma temporaria (Agache + terra)")),
         Map.entry("architect_focus", List.of("<green>Resistencia III 10s (colocar 8 blocos em <5s)")),
         Map.entry("unbreakable_block", List.of("<white>Agache + colocar bloco: barreira 3x3 de obsidiana 10s")),
         Map.entry("gravity_defiance", List.of("<white>Ao sofrer KB/dano de queda: anula e da voo temporario 4s")),

@@ -1,4 +1,4 @@
-# RogueLata — Technical Briefing v3.2.0
+# RogueLata — Technical Briefing v3.4.5
 
 > **Gerado em:** 09/07/2026
 > **Propósito:** Raio-X arquitetural completo para consultor externo gerar código compatível sem acesso ao repositório.
@@ -31,7 +31,7 @@ modelEngineBridge = new ModelEngineBridge();
 skillsConfig = new SkillsConfig(this);     // skills.yml
 skillServices = new SkillServices(this);  // cooldowns, reinforced blocks
 skillRegistry = new SkillRegistry();       // LinkedHashMap<String, Skill>
-SkillRegistration.registerAll(skillRegistry, skillServices); // 37 skills
+SkillRegistration.registerAll(skillRegistry, skillServices); // 38 skills
 
 // 5. Mayhem system (EPIC-4) — needed by EPIC-3
 modifierRegistry = new ModifierRegistry();
@@ -322,7 +322,7 @@ public interface Card {
 | ABILITY | `AbilityCard` | 1 | `!run.hasCard(id)` | `run.addCard(id)` + `run.ownedAbilities().add(id)` |
 | AUGMENT | `AugmentCard` | configurável | `run.cardCount(id) < maxStacks` | `run.addCard(id)` + `effect.apply(p, run, count)` |
 
-**AbilityCard** wrappeia uma `Skill` existente + `Set<CardTag>` mapeada no `AbilityCardRegistration` (37 skills mapeadas manualmente).
+**AbilityCard** wrappeia uma `Skill` existente + `Set<CardTag>` mapeada no `AbilityCardRegistration` (38 skills mapeadas manualmente).
 
 **AugmentCard** é carregada do `augments.yml` via `AugmentLoader.load()`. Contém `AugmentEffect` que pode ser:
 - `AttributeEffect` (MAX_HEALTH, ATTACK_DAMAGE, MOVEMENT_SPEED, ARMOR com ADD_NUMBER/ADD_SCALAR)
@@ -468,10 +468,12 @@ public void resetToBaseline(Player p)  // limpa todos modifiers RogueLata
 
 ### 5.2 `HudService` (`com.project.rpgplugin.ui.HudService`)
 
-- Actionbar contínua via `player.getScheduler().runAtFixedRate(plugin, st -> tick(player), ...)` a cada 4 ticks
-- `tick(player)`: actionbar compõe mana + health via MiniMessage → `player.sendActionBar(Text.mm(composed))`
-- Cooldowns ativos + efeitos ativos são exibidos via BossBar separada (não na actionbar)
+- BossBar contínua via `player.getScheduler().runAtFixedRate(plugin, st -> tick(player), ...)` a cada 4 ticks
+- `tick(player)`: BossBar compõe HP + Mana + status effects via MiniMessage → `player.getBossBar()`
+- ActionBar desativada (não usada) para evitar conflito com AuraSkills (que gerencia a própria action bar)
+- Cooldowns ativos + efeitos ativos são exibidos na mesma BossBar (HP/Mana + info + cooldowns)
 - Cooldown display: `Map<UUID, Map<String, Long>> cooldownDisplays` — chave = nome da skill, valor = timestamp de expiração
+- Quando AuraSkills está presente, a mana não é exibida na BossBar (já aparece na action bar nativa do AuraSkills)
 - Registro de cooldown manual: `setCooldown(Player, displayName, durationSeconds)` ou `registerCooldown(Player, skillId, displayName, durationMillis)`
 - Item cooldown nativo (hotbar): `static void setItemCooldown(Player, Material, int ticks)` e `static void setItemCooldownDelayed(Player, Material, int ticks, JavaPlugin)` (1 tick de delay para evitar desync)
 
