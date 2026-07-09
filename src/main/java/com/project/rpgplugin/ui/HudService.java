@@ -195,15 +195,13 @@ public class HudService {
         long now = System.currentTimeMillis();
         List<String> parts = new ArrayList<>();
 
-        // Active effects first
         if (effects != null) {
             for (Map.Entry<String, Long> entry : effects.entrySet()) {
                 if (entry.getValue() <= now) continue;
-                parts.add("<green>\u25CF " + entry.getKey() + "</green>");
+                parts.add("<green>" + entry.getKey() + "</green>");
             }
         }
 
-        // Then cooldowns
         if (cooldowns != null) {
             int idx = 0;
             for (Map.Entry<String, Long> entry : cooldowns.entrySet()) {
@@ -211,7 +209,7 @@ public class HudService {
                 if (remaining <= 0) continue;
                 double secs = remaining / 1000.0;
                 String color = (idx++ % 2 == 0) ? "yellow" : "gold";
-                parts.add("<" + color + ">\u25B8 " + entry.getKey() + ": "
+                parts.add("<" + color + ">" + entry.getKey() + ": "
                     + String.format("%.1f", secs) + "s</" + color + ">");
             }
         }
