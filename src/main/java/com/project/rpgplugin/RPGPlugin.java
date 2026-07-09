@@ -6,7 +6,6 @@ import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.integration.AuraMobsBridge;
-import com.project.rpgplugin.integration.BetterHudIntegration;
 import com.project.rpgplugin.integration.ModelEngineBridge;
 import com.project.rpgplugin.integration.MythicMobsBridge;
 import com.project.rpgplugin.integration.RogueLataPapiExpansion;
@@ -74,7 +73,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private AuraMobsBridge auraMobsBridge;
     private MythicMobsBridge mythicMobsBridge;
     private ModelEngineBridge modelEngineBridge;
-    private BetterHudIntegration betterHudIntegration;
     private RogueLataPapiExpansion papiExpansion;
 
     private SkillRegistry skillRegistry;
@@ -220,12 +218,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // EPIC-8: HUD & Menu framework
         this.hudService = new HudService(this, manaService, runManager);
 
-        // BetterHud integration
-        this.betterHudIntegration = new BetterHudIntegration();
-        if (betterHudIntegration.shouldDisableBossBar()) {
-            this.hudService.setBossBarEnabled(false);
-        }
-
         this.menuListener = new MenuListener();
 
         // EPIC-9: Persistence
@@ -286,13 +278,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         }
         if (modelEngineBridge.isEnabled()) {
             getLogger().info("RogueLata + ModelEngine detectado (modelos 3D).");
-        }
-        if (betterHudIntegration.isBetterHudEnabled()) {
-            if (betterHudIntegration.shouldDisableBossBar()) {
-                getLogger().info("RogueLata + BetterHud + PlaceholderAPI detectado (BossBar desativada, HUD delegada ao BetterHud).");
-            } else {
-                getLogger().info("RogueLata + BetterHud detectado (PlaceholderAPI ausente — BossBar nativa mantida).");
-            }
         }
 
         // Register PlaceholderAPI expansion

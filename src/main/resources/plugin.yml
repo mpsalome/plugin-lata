@@ -9,7 +9,6 @@ softdepend:
   - AuraMobs
   - MythicMobs
   - ModelEngine
-  - BetterHud
   - PlaceholderAPI
 commands:
   skills:
