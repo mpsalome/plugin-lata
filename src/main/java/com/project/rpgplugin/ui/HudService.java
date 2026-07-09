@@ -3,10 +3,8 @@ package com.project.rpgplugin.ui;
 import com.project.rpgplugin.core.PlayerState;
 import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
-import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.SchedulerUtil;
 import com.project.rpgplugin.util.StringUtil;
-import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -31,7 +29,8 @@ public class HudService extends BukkitRunnable {
     private final Map<UUID, Map<String, Long>> cooldownDisplays = new ConcurrentHashMap<>();
     private final Map<UUID, Map<String, Long>> activeEffects = new ConcurrentHashMap<>();
     private final Map<UUID, BossBar> playerBossBars = new ConcurrentHashMap<>();
-    private boolean bossBarEnabled = false;
+    private boolean bossBarEnabled = true;
+    private boolean hasAuraSkills;
 
     public HudService(Plugin plugin, Map<Player, PlayerState> playerStates) {
         this.plugin = plugin;
@@ -45,6 +44,7 @@ public class HudService extends BukkitRunnable {
         this.manaService = manaService;
         this.runManager = runManager;
         this.playerStates = new ConcurrentHashMap<>();
+        this.hasAuraSkills = Bukkit.getPluginManager().getPlugin("AuraSkills") != null;
         SchedulerUtil.runTimer(plugin, this, 20L, 4L);
     }
 
@@ -199,32 +199,8 @@ public class HudService extends BukkitRunnable {
     }
 
     private void composeActionbar(Player player, PlayerState state) {
-        StringBuilder actionBarText = new StringBuilder();
-
-        actionBarText.append("Mana ")
-                     .append(StringUtil.formatDouble(state.getCurrentMana()))
-                     .append("/")
-                     .append(StringUtil.formatDouble(state.getMaxMana()));
-
-        actionBarText.append(" | HP ")
-                     .append(StringUtil.formatDouble(player.getHealth()))
-                     .append("/")
-                     .append(StringUtil.formatDouble(player.getMaxHealth()));
-
-        if (!state.getActiveEffects().isEmpty()) {
-            actionBarText.append(" | ");
-            List<String> effectParts = new ArrayList<>();
-            state.getActiveEffects().forEach((effect, duration) -> {
-                if (duration > 0) {
-                    effectParts.add(effect.getName() + " " + StringUtil.formatDuration(duration));
-                }
-            });
-            if (!effectParts.isEmpty()) {
-                actionBarText.append(String.join(" | ", effectParts));
-            }
-        }
-
-        player.sendActionBar(Text.mm(actionBarText.toString()));
+        // action bar desativado para evitar conflito com AuraSkills
+        // mana/vida exibidos na BossBar via updateSkillBar
     }
 
     private void updateSkillBar(Player player, PlayerState state) {
@@ -236,9 +212,20 @@ public class HudService extends BukkitRunnable {
             return;
         }
 
-        String title = state.getSkillBarTitle();
+        List<String> segments = new ArrayList<>();
+        segments.add("HP " + StringUtil.formatDouble(player.getHealth()) + "/" + StringUtil.formatDouble(player.getMaxHealth()));
+        if (!hasAuraSkills) {
+            segments.add("Mana " + StringUtil.formatDouble(state.getCurrentMana()) + "/" + StringUtil.formatDouble(state.getMaxMana()));
+        }
 
-        if (title == null || title.trim().isEmpty()) {
+        String skillTitle = state.getSkillBarTitle();
+        if (skillTitle != null && !skillTitle.trim().isEmpty()) {
+            segments.add(skillTitle);
+        }
+
+        String title = String.join(" | ", segments);
+
+        if (title.trim().isEmpty()) {
             BossBar bar = playerBossBars.remove(player.getUniqueId());
             if (bar != null) {
                 bar.removeAll();
