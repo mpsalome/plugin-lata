@@ -12,6 +12,8 @@ public final class ItemKeys {
     private static NamespacedKey ELITE_ID;
     private static NamespacedKey IS_BOSS;
     private static NamespacedKey SKILL_ITEM;
+    private static NamespacedKey SHOP_ITEM;
+    private static NamespacedKey BOSS_BEACON;
 
     private ItemKeys() {}
 
@@ -21,6 +23,8 @@ public final class ItemKeys {
         ELITE_ID = new NamespacedKey(plugin, "elite_id");
         IS_BOSS = new NamespacedKey(plugin, "is_boss");
         SKILL_ITEM = new NamespacedKey(plugin, "skill_item");
+        SHOP_ITEM = new NamespacedKey(plugin, "shop_item");
+        BOSS_BEACON = new NamespacedKey(plugin, "boss_beacon");
     }
 
     public static NamespacedKey rpgBook() { return RPG_BOOK; }
@@ -31,10 +35,26 @@ public final class ItemKeys {
 
     public static NamespacedKey skillItem() { return SKILL_ITEM; }
 
+    public static NamespacedKey shopItem() { return SHOP_ITEM; }
+
+    public static NamespacedKey bossBeacon() { return BOSS_BEACON; }
+
     public static boolean isRpgBook(ItemStack is) {
         if (is == null || !is.hasItemMeta()) return false;
         return is.getItemMeta().getPersistentDataContainer()
                 .has(RPG_BOOK, PersistentDataType.BYTE);
+    }
+
+    public static boolean isShopItem(ItemStack is) {
+        if (is == null || !is.hasItemMeta()) return false;
+        return is.getItemMeta().getPersistentDataContainer()
+                .has(SHOP_ITEM, PersistentDataType.BYTE);
+    }
+
+    public static boolean isBossBeacon(ItemStack is) {
+        if (is == null || !is.hasItemMeta()) return false;
+        return is.getItemMeta().getPersistentDataContainer()
+                .has(BOSS_BEACON, PersistentDataType.BYTE);
     }
 
     public static NamespacedKey withKey(String key) {

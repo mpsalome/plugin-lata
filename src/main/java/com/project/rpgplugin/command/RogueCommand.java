@@ -1,8 +1,14 @@
 package com.project.rpgplugin.command;
 
 import com.project.rpgplugin.RPGPlugin;
+import com.project.rpgplugin.core.draft.DraftService;
+import com.project.rpgplugin.core.draft.DraftSession;
+import com.project.rpgplugin.core.draft.DraftWeighting;
 import com.project.rpgplugin.core.mob.MobSpawnService;
 import com.project.rpgplugin.core.run.RunManager;
+import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.ui.DraftMenu;
+import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.util.CombatTracker;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
@@ -48,6 +54,8 @@ public class RogueCommand implements CommandExecutor {
         switch (args[0].toLowerCase()) {
             case "tp" -> handleTeleport(player, args);
             case "boss" -> handleBossSpawn(player, args);
+            case "loja" -> handleShop(player);
+            case "draft" -> handleDraft(player);
             default -> sendHelp(player);
         }
 
@@ -119,7 +127,7 @@ public class RogueCommand implements CommandExecutor {
 
         String bossName = bossId.equals("frostmaw") ? "Frostmaw" : "Tirano Magmatico";
         Bukkit.broadcast(Text.mm(
-            "<gold><bold>⚠ " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
+            "<gold><bold>\u26A0 " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
         ));
         player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.5f);
 
@@ -132,10 +140,32 @@ public class RogueCommand implements CommandExecutor {
         }, null, 100L);
     }
 
+    private void handleShop(Player player) {
+        new ShopMenu(player, plugin).open();
+    }
+
+    private void handleDraft(Player player) {
+        if (!runManager.hasActiveRun(player)) {
+            runManager.startRun(player);
+        }
+        RunState run = runManager.getRun(player);
+        if (run == null) {
+            player.sendMessage(Text.mm("<red>Erro ao iniciar run."));
+            return;
+        }
+        if (!run.hasPendingDrafts()) {
+            player.sendMessage(Text.mm("<gray>Voce nao tem drafts pendentes. Upe de nivel ou compre uma Carta Avulsa na loja!</gray>"));
+            return;
+        }
+        plugin.getPlayerLevelListener().openNextDraft(player, run);
+    }
+
     private void sendHelp(Player player) {
         player.sendMessage(Text.mm("<gold>=== RogueLata Comandos ==="));
         player.sendMessage(Text.mm("<yellow>/rogue tp <jogador></yellow> <gray>- Teleporta ate um amigo (vida cheia = sem recarga)</gray>"));
         player.sendMessage(Text.mm("<yellow>/rogue boss spawn <frostmaw|tyrant></yellow> <gray>- Invoca um boss com 5s de delay</gray>"));
+        player.sendMessage(Text.mm("<yellow>/rogue loja</yellow> <gray>- Abre a Loja Pao em Lata</gray>"));
+        player.sendMessage(Text.mm("<yellow>/rogue draft</yellow> <gray>- Abre o proximo draft pendente</gray>"));
         player.sendMessage(Text.mm("<yellow>/run</yellow> <gray>- Mostra informacoes da sua run</gray>"));
         player.sendMessage(Text.mm("<yellow>/skills</yellow> <gray>- Abre o menu de habilidades</gray>"));
     }

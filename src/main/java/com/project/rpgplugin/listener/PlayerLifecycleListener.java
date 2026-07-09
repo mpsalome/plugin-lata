@@ -1,6 +1,7 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
+import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
@@ -58,12 +59,29 @@ public class PlayerLifecycleListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+        boolean isFirstJoin = !persistence.hasRun(p);
+
         RunState run = persistence.loadRun(p);
         if (run != null) {
             runManager.restoreRun(p, run);
         } else if (!runManager.hasActiveRun(p)) {
             runManager.startRun(p);
         }
+
+        // EPIC-11: Veteran migration — convert existing vanilla levels to pending drafts
+        if (isFirstJoin && p.getLevel() > 0) {
+            run = runManager.getRun(p);
+            if (run != null) {
+                int levels = p.getLevel();
+                run.addPendingDrafts(levels);
+                p.sendMessage(Text.mm(
+                    "<gradient:#ffd700:#ff8c00>\uD83E\uDD56 Bem-vindo ao RogueLata!</gradient> <gray>Seus <white>" + levels
+                    + " niveis</white> antigos foram convertidos em <yellow>" + levels
+                    + " Cartas de Build</yellow>! Digite <click:run_command:'/rogue draft'><b>/rogue draft</b></click> para abrir.</gray>"
+                ));
+            }
+        }
+
         if (plugin.getHudService() != null) {
             plugin.getHudService().startPlayer(p);
         }

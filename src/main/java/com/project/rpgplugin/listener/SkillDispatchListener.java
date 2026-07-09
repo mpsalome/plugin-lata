@@ -1,5 +1,6 @@
 package com.project.rpgplugin.listener;
 
+import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.mana.ManaService;
@@ -12,9 +13,11 @@ import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.core.skill.impl.BladeDanceSkill;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.ui.CollectionMenu;
+import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -39,13 +42,15 @@ public class SkillDispatchListener implements Listener {
     private final SkillServices services;
     private final RunManager runManager;
     private final CardRegistry cardRegistry;
+    private final RPGPlugin plugin;
     private ManaService manaService;
 
-    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, CardRegistry cardRegistry) {
+    public SkillDispatchListener(SkillRegistry registry, SkillServices services, RunManager runManager, CardRegistry cardRegistry, RPGPlugin plugin) {
         this.registry = registry;
         this.services = services;
         this.runManager = runManager;
         this.cardRegistry = cardRegistry;
+        this.plugin = plugin;
     }
 
     public void setManaService(ManaService manaService) {
@@ -66,6 +71,18 @@ public class SkillDispatchListener implements Listener {
             if (run != null) {
                 new CollectionMenu(p, run, cardRegistry, runManager.statService());
             }
+            return;
+        }
+
+        if (ItemKeys.isShopItem(item)) {
+            e.setCancelled(true);
+            new ShopMenu(p, plugin).open();
+            return;
+        }
+
+        if (ItemKeys.isBossBeacon(item)) {
+            e.setCancelled(true);
+            handleBossBeacon(p);
             return;
         }
 
@@ -169,6 +186,43 @@ public class SkillDispatchListener implements Listener {
                 return;
             }
         }
+    }
+
+    private void handleBossBeacon(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item != null && item.getAmount() > 0) {
+            item.setAmount(item.getAmount() - 1);
+        } else {
+            item = player.getInventory().getItemInOffHand();
+            if (item != null && item.getAmount() > 0) {
+                item.setAmount(item.getAmount() - 1);
+            }
+        }
+
+        // Biome-aware boss selection
+        String bossId;
+        var biome = player.getLocation().getBlock().getBiome();
+        String biomeName = biome.name().toLowerCase();
+        if (biomeName.contains("nether") || biomeName.contains("desert") || biomeName.contains("badlands")
+                || biomeName.contains("savanna") || biomeName.contains("jungle")) {
+            bossId = "magma_tyrant";
+        } else {
+            bossId = "frostmaw";
+        }
+
+        String bossName = bossId.equals("frostmaw") ? "Frostmaw" : "Tirano Magmatico";
+        org.bukkit.Bukkit.broadcast(Text.mm(
+            "<gold><bold>\u26A0 " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
+        ));
+        player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.5f);
+
+        player.getScheduler().runDelayed(plugin, st -> {
+            if (!player.isOnline()) return;
+            plugin.getMobSpawnService().spawnBoss(bossId, player.getLocation().add(5, 0, 5));
+            org.bukkit.Bukkit.broadcast(Text.mm(
+                "<red><bold>" + bossName + " surgiu!</bold></red>"
+            ));
+        }, null, 100L);
     }
 
     private void trackBladeDanceMobility(Player player, String skillId) {

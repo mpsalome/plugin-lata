@@ -121,11 +121,16 @@ public class DraftService {
     }
 
     public boolean reroll(Player p, RunState run, DraftSession session) {
-        int cost = DraftWeighting.getRerollCostLevels(runManager.plugin());
-        if (p.getLevel() < cost) return false;
         if (session.rerollsUsed() >= DraftWeighting.getMaxRerollPerDraft(runManager.plugin())) return false;
 
-        p.setLevel(p.getLevel() - cost);
+        if (run.hasFreeRerolls()) {
+            run.consumeFreeReroll();
+        } else {
+            int cost = DraftWeighting.getRerollCostLevels(runManager.plugin());
+            if (p.getLevel() < cost) return false;
+            p.setLevel(p.getLevel() - cost);
+        }
+
         session.useReroll();
 
         Map<CardTag, Double> classWeights = auraSkills.getClassWeights(p);

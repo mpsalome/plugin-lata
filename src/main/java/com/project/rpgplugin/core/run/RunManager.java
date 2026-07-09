@@ -8,7 +8,9 @@ import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.util.ItemKeys;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,14 +51,18 @@ public class RunManager {
 
     private void giveBook(Player p) {
         boolean hasBook = false;
+        boolean hasShop = false;
         for (var item : p.getInventory().getContents()) {
-            if (item != null && ItemKeys.isRpgBook(item)) {
-                hasBook = true;
-                break;
+            if (item != null) {
+                if (ItemKeys.isRpgBook(item)) hasBook = true;
+                if (ItemKeys.isShopItem(item)) hasShop = true;
             }
         }
         if (!hasBook) {
             p.getInventory().addItem(plugin.createRpgBook());
+        }
+        if (!hasShop) {
+            p.getInventory().addItem(plugin.createShopItem());
         }
     }
 

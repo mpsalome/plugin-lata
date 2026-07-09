@@ -38,6 +38,8 @@ public class RunPersistenceService {
     private final NamespacedKey xpMultKey;
     private final NamespacedKey cooldownMultKey;
 
+    private final NamespacedKey freeRerollsKey;
+
     // String list keys (comma-separated)
     private final NamespacedKey cardsKey;
     private final NamespacedKey cardCountsKey;
@@ -62,6 +64,7 @@ public class RunPersistenceService {
         this.extraSlotsKey = new NamespacedKey(plugin, PREFIX + "extra_slots");
         this.skipHealthKey = new NamespacedKey(plugin, PREFIX + "skip_health");
         this.extraDraftKey = new NamespacedKey(plugin, PREFIX + "extra_draft");
+        this.freeRerollsKey = new NamespacedKey(plugin, PREFIX + "free_rerolls");
         this.outcomeKey = new NamespacedKey(plugin, PREFIX + "outcome");
         this.xpMultKey = new NamespacedKey(plugin, PREFIX + "xp_mult");
         this.cooldownMultKey = new NamespacedKey(plugin, PREFIX + "cooldown_mult");
@@ -92,6 +95,7 @@ public class RunPersistenceService {
         pdc.set(extraSlotsKey, PersistentDataType.INTEGER, run.extraSkillSlots());
         pdc.set(skipHealthKey, PersistentDataType.DOUBLE, run.skipHealthBonus());
         pdc.set(extraDraftKey, PersistentDataType.INTEGER, run.extraDraftSlots());
+        pdc.set(freeRerollsKey, PersistentDataType.INTEGER, run.freeRerolls());
         pdc.set(outcomeKey, PersistentDataType.STRING, run.outcome().name());
         pdc.set(xpMultKey, PersistentDataType.INTEGER, run.xpMultTotal());
         pdc.set(cooldownMultKey, PersistentDataType.DOUBLE, run.cooldownMultTotal());
@@ -121,6 +125,7 @@ public class RunPersistenceService {
         run.setExtraSkillSlots(pdc.getOrDefault(extraSlotsKey, PersistentDataType.INTEGER, 0));
         run.setSkipHealthBonus(pdc.getOrDefault(skipHealthKey, PersistentDataType.DOUBLE, 0.0));
         run.setExtraDraftSlots(pdc.getOrDefault(extraDraftKey, PersistentDataType.INTEGER, 0));
+        run.setFreeRerolls(pdc.getOrDefault(freeRerollsKey, PersistentDataType.INTEGER, 0));
 
         String outcomeStr = pdc.getOrDefault(outcomeKey, PersistentDataType.STRING, "ONGOING");
         try {
@@ -206,6 +211,7 @@ public class RunPersistenceService {
         pdc.remove(extraSlotsKey);
         pdc.remove(skipHealthKey);
         pdc.remove(extraDraftKey);
+        pdc.remove(freeRerollsKey);
         pdc.remove(outcomeKey);
         pdc.remove(xpMultKey);
         pdc.remove(cooldownMultKey);

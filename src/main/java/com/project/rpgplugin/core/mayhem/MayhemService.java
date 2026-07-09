@@ -2,6 +2,7 @@ package com.project.rpgplugin.core.mayhem;
 
 import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -117,6 +118,38 @@ public class MayhemService {
             Bukkit.broadcast(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(msg));
             world.playSound(deadPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 0.8f);
         }
+    }
+
+    public void reduceMayhemByOne(Player player, RunState run) {
+        if (run.activeModifiers().isEmpty()) return;
+
+        String lastModId = run.activeModifiers().stream()
+            .reduce((first, second) -> second)
+            .orElse(null);
+        if (lastModId == null) return;
+
+        registry.byId(lastModId).ifPresent(m -> {
+            MayhemContext ctx = new MayhemContext(plugin, run, player.getWorld());
+            m.onDeactivate(ctx);
+        });
+
+        run.activeModifiers().remove(lastModId);
+        run.setMilestonesReached(Math.max(0, run.milestonesReached() - 1));
+
+        if (scopeIsServer()) {
+            globalModifiers.remove(lastModId);
+            Set<String> updatedShared = Set.copyOf(globalModifiers);
+            for (RunState otherRun : plugin.getRunManager().getAllRuns()) {
+                otherRun.setSharedModifiers(updatedShared);
+            }
+        }
+
+        int newLevel = run.activeModifiers().size();
+        Bukkit.broadcast(Text.mm(
+            "<gradient:#ffd700:#00ff87>🕊 O Caos foi dissipado pela Loja Pao em Lata!</gradient> <gray>Mayhem na regiao de <white>"
+            + player.getName() + "</white> caiu para</gray> <yellow>Lv " + newLevel + "</yellow>"
+        ));
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 0.8f);
     }
 
     public void reapplyOnJoin(Player p, RunState run) {

@@ -39,6 +39,7 @@ public class RunState {
     private int extraSkillSlots;
     private double skipHealthBonus;
     private int extraDraftSlots;
+    private int freeRerolls;
     private final Set<String> toggledOff = new HashSet<>();
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
@@ -165,6 +166,12 @@ public class RunState {
     public void useExtraDraftSlot() { if (extraDraftSlots > 0) extraDraftSlots--; }
     public void setExtraDraftSlots(int v) { this.extraDraftSlots = Math.max(0, v); }
 
+    public int freeRerolls() { return freeRerolls; }
+    public void setFreeRerolls(int count) { this.freeRerolls = Math.max(0, count); }
+    public void addFreeReroll() { this.freeRerolls++; }
+    public void consumeFreeReroll() { if (freeRerolls > 0) freeRerolls--; }
+    public boolean hasFreeRerolls() { return freeRerolls > 0; }
+
     public Set<String> toggledOff() { return toggledOff; }
     public boolean isToggledOn(String skillId) { return !toggledOff.contains(skillId); }
     public void toggle(String skillId) {
@@ -195,6 +202,7 @@ public class RunState {
         extraSkillSlots = 0;
         skipHealthBonus = 0;
         extraDraftSlots = 0;
+        freeRerolls = 0;
         toggledOff.clear();
     }
 }

@@ -3,6 +3,7 @@ package com.project.rpgplugin;
 import com.project.rpgplugin.command.RecallCommand;
 import com.project.rpgplugin.command.RogueCommand;
 import com.project.rpgplugin.command.RunCommand;
+import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.integration.AuraMobsBridge;
@@ -229,7 +230,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // Prepare SkillDispatchListener with RunManager
         RunManager rm = this.runManager;
-        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, cardRegistry);
+        this.skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, rm, cardRegistry, this);
         this.skillDispatchListener.setManaService(manaService);
 
         // Pass ManaService to AuraSkillsIntegration for skill descriptions
@@ -326,6 +327,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
     public DraftService getDraftService() {
         return draftService;
+    }
+
+    public PlayerLevelListener getPlayerLevelListener() {
+        return playerLevelListener;
     }
 
     public MayhemService getMayhemService() {
@@ -456,6 +461,21 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             book.setItemMeta(meta);
         }
         return book;
+    }
+
+    public ItemStack createShopItem() {
+        ItemStack item = new ItemStack(Material.HAY_BLOCK, 1);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(Text.mm("<gradient:#ffd700:#ff8c00>\uD83E\uDD56 Pao em Lata</gradient>"));
+            meta.lore(List.of(
+                    Text.mm("<gray>Clique com o direito para abrir a Loja Pao em Lata!"),
+                    Text.mm("<yellow>Compre upgrades com seus niveis de XP!</yellow>")
+            ));
+            meta.getPersistentDataContainer().set(ItemKeys.shopItem(), org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 
     public ResetService getResetService() { return resetService; }
