@@ -2,7 +2,6 @@ package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunManager;
-import com.project.rpgplugin.core.run.RunOutcome;
 import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.Text;
@@ -42,7 +41,7 @@ public class PlayerLifecycleListener implements Listener {
             return;
         }
 
-        runManager.endRun(p, RunOutcome.DIED);
+        plugin.getResetService().resetBuild(p, run);
     }
 
     @EventHandler

@@ -2,16 +2,21 @@ package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunManager;
-import com.project.rpgplugin.core.run.RunOutcome;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.util.CombatTracker;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 public class CombatListener implements Listener {
@@ -30,6 +35,10 @@ public class CombatListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player victim) {
+            CombatTracker.recordDamage(victim.getUniqueId());
+        }
+
         if (!(e.getDamager() instanceof Player damager)) return;
         if (!(e.getEntity() instanceof LivingEntity target)) return;
 
@@ -61,7 +70,7 @@ public class CombatListener implements Listener {
         e.setDamage(damage);
 
         double thornsReflect = run.getMultiplier("thorns_reflect");
-        if (thornsReflect > 0 && e.getCause() == org.bukkit.event.entity.EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (thornsReflect > 0 && e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             target.damage(damage * thornsReflect);
         }
 
@@ -91,25 +100,43 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent e) {
         if (!(e.getEntity() instanceof LivingEntity target)) return;
-        if (e.getEntity().getKiller() instanceof Player killer) {
-            RunState run = runManager.getRun(killer);
-            if (run == null) return;
+        if (!(e.getEntity().getKiller() instanceof Player killer)) return;
 
-            double lifestealPct = run.getMultiplier("lifesteal");
-            if (lifestealPct > 0) {
-                double heal = e.getEntity().getMaxHealth() * lifestealPct;
-                killer.setHealth(Math.min(killer.getMaxHealth(), killer.getHealth() + heal));
-            }
+        RunState run = runManager.getRun(killer);
+        if (run == null) return;
 
-            boolean isBoss = target.getPersistentDataContainer().has(ItemKeys.isBoss(), PersistentDataType.BYTE);
-            if (isBoss) {
-                run.setMilestonesReached(run.milestonesReached() + 1);
-                if (plugin != null && plugin.getMayhemService() != null) {
-                    plugin.getMayhemService().rollAndApply(run, target.getWorld());
-                }
-                runManager.endRun(killer, RunOutcome.VICTORY);
-                killer.sendMessage(Text.mm("<gold><bold>Boss derrotado! Vitória!"));
-            }
+        double lifestealPct = run.getMultiplier("lifesteal");
+        if (lifestealPct > 0) {
+            double heal = target.getMaxHealth() * lifestealPct;
+            killer.setHealth(Math.min(killer.getMaxHealth(), killer.getHealth() + heal));
         }
+
+        boolean isBoss = target.getPersistentDataContainer().has(ItemKeys.isBoss(), PersistentDataType.BYTE);
+        if (!isBoss) return;
+
+        Location bossLoc = target.getLocation();
+
+        int xpAmount = 15000;
+        String bossName = target.getName();
+
+        for (Player nearby : bossLoc.getNearbyPlayers(64)) {
+            nearby.giveExp(xpAmount);
+            nearby.sendMessage(Text.mm(
+                "<gold><bold>⚔ " + bossName + " derrotado por " + killer.getName() + "!</bold></gold>"
+            ));
+            nearby.sendMessage(Text.mm(
+                "<yellow>✨ +" + xpAmount + " XP pela vitoria!</yellow>"
+            ));
+        }
+
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.DIAMOND, 8));
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.NETHERITE_SCRAP, 2));
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.EXPERIENCE_BOTTLE, 48));
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.GOLDEN_APPLE, 4));
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.ENDER_PEARL, 6));
+
+        Bukkit.broadcast(Text.mm(
+            "<gold><bold>🏆 " + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
+        ));
     }
 }

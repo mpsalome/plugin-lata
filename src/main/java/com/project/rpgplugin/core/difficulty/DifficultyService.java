@@ -31,10 +31,10 @@ public class DifficultyService {
     }
 
     private double nearbyPlayerFactor(Location loc) {
-        Collection<Player> nearby = loc.getNearbyPlayers(48);
+        Collection<Player> nearby = loc.getNearbyPlayers(64);
         if (nearby.isEmpty()) return 0.0;
         double avgLevel = nearby.stream().mapToInt(Player::getLevel).average().orElse(0);
-        return avgLevel * 0.02;
+        return avgLevel * 0.035;
     }
 
     public void applyMobScaling(LivingEntity mob, Location loc) {
