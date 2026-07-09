@@ -220,7 +220,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         // EPIC-8: HUD & Menu framework
         this.hudService = new HudService(this, manaService, runManager);
 
-        // BetterHud integration — disable RogueLata's BossBar if BetterHud is present
+        // BetterHud integration
         this.betterHudIntegration = new BetterHudIntegration();
         if (betterHudIntegration.shouldDisableBossBar()) {
             this.hudService.setBossBarEnabled(false);
@@ -287,8 +287,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         if (modelEngineBridge.isEnabled()) {
             getLogger().info("RogueLata + ModelEngine detectado (modelos 3D).");
         }
-        if (betterHudIntegration.isEnabled()) {
-            getLogger().info("RogueLata + BetterHud detectado (BossBar desativada, HUD delegada ao BetterHud).");
+        if (betterHudIntegration.isBetterHudEnabled()) {
+            if (betterHudIntegration.shouldDisableBossBar()) {
+                getLogger().info("RogueLata + BetterHud + PlaceholderAPI detectado (BossBar desativada, HUD delegada ao BetterHud).");
+            } else {
+                getLogger().info("RogueLata + BetterHud detectado (PlaceholderAPI ausente — BossBar nativa mantida).");
+            }
         }
 
         // Register PlaceholderAPI expansion
