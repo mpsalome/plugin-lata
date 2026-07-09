@@ -17,14 +17,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BladeDanceSkill extends AbstractSkill {
 
-    private static final Map<UUID, Integer> MOBILITY_COUNT = new HashMap<>();
+    private static final Map<UUID, Integer> MOBILITY_COUNT = new ConcurrentHashMap<>();
 
     public BladeDanceSkill(com.project.rpgplugin.core.skill.SkillServices services) {
         super(services);
@@ -87,5 +87,9 @@ public class BladeDanceSkill extends AbstractSkill {
 
     public static void recordMobility(UUID playerId) {
         MOBILITY_COUNT.merge(playerId, 1, Integer::sum);
+    }
+
+    public static void clearAll() {
+        MOBILITY_COUNT.clear();
     }
 }

@@ -133,6 +133,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private SynergyService synergyService;
 
     // EPIC-6: Mana system
+    private ManaProvider manaProvider;
     private ManaService manaService;
 
     @Override
@@ -162,15 +163,14 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         this.mayhemService = new MayhemService(this, modifierRegistry, milestoneService, mayhemConfig);
 
         // EPIC-6: Mana system — init provider BEFORE ResetService and RunManager
-        ManaProvider manaProvider;
         try {
             Class.forName("dev.aurelium.auraskills.api.AuraSkillsApi");
-            manaProvider = new com.project.rpgplugin.core.mana.AuraSkillsManaProvider(this);
+            this.manaProvider = new com.project.rpgplugin.core.mana.AuraSkillsManaProvider(this);
             if (!manaProvider.isAvailable()) {
-                manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
+                this.manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
             }
         } catch (ClassNotFoundException e) {
-            manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
+            this.manaProvider = new com.project.rpgplugin.core.mana.StandaloneDummyManaProvider(this);
         }
         this.manaService = new com.project.rpgplugin.core.mana.ManaService(this, manaProvider);
 
@@ -314,6 +314,35 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         if (passiveTask != null) passiveTask.stop();
         if (hudService != null) hudService.stopAll();
         if (dataStore != null) dataStore.flushAll();
+        if (manaProvider instanceof com.project.rpgplugin.core.mana.StandaloneDummyManaProvider dummy) {
+            dummy.stop();
+        }
+        if (skillServices != null) {
+            skillServices.clearAllCooldowns();
+            skillServices.reinforcedBlocks().clear();
+            skillServices.clearMoltenTouchAll();
+        }
+        if (mayhemService != null) {
+            mayhemService.clearAll();
+        }
+        if (mobSpawnService != null) {
+            mobSpawnService.getEliteFactory().cancelAll();
+        }
+        if (skillRegistry != null) {
+            skillRegistry.all().stream()
+                .filter(s -> s instanceof com.project.rpgplugin.core.skill.impl.SonarSkill
+                    || s instanceof com.project.rpgplugin.core.skill.impl.ArchitectFocusSkill
+                    || s instanceof com.project.rpgplugin.core.skill.impl.BladeDanceSkill)
+                .forEach(s -> {
+                    if (s instanceof com.project.rpgplugin.core.skill.impl.SonarSkill sonar) {
+                        for (Player p : getServer().getOnlinePlayers()) {
+                            sonar.cleanup(p);
+                        }
+                    }
+                });
+        }
+        com.project.rpgplugin.core.skill.impl.ArchitectFocusSkill.clearAll();
+        com.project.rpgplugin.core.skill.impl.BladeDanceSkill.clearAll();
         if (auraSkillsIntegration != null) {
             for (Player p : getServer().getOnlinePlayers()) {
                 auraSkillsIntegration.removeSkillSlotAttachment(p);
@@ -321,6 +350,12 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         }
         if (papiExpansion != null) {
             papiExpansion.unregister();
+        }
+        if (runManager != null) {
+            runManager.clearAll();
+        }
+        if (cooldownService != null) {
+            cooldownService.clearAll();
         }
         getLogger().info("RogueLata Plugin desativado.");
     }

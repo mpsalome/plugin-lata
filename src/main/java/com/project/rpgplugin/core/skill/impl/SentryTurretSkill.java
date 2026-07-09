@@ -61,35 +61,38 @@ public class SentryTurretSkill extends AbstractSkill {
         turretLoc.getWorld().spawnParticle(Particle.PORTAL, turretLoc, 30, 0.5, 0.5, 0.5, 1);
         turretLoc.getWorld().playSound(turretLoc, Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
         int[] ticks = {0};
-        int[] taskId = { -1 };
-        taskId[0] = SchedulerUtil.runTimer(services.plugin(), () -> {
-            ticks[0]++;
-            if (ticks[0] >= 300) {
-                turretLoc.getBlock().setType(Material.AIR);
-                return;
-            }
-            turretLoc.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, turretLoc.clone().add(0.5, 0.5, 0.5), 2, 0.3, 0.3, 0.3, 0);
-            Collection<LivingEntity> nearby = turretLoc.getNearbyLivingEntities(10, 5, 10);
-            LivingEntity target = null;
-            double closest = Double.MAX_VALUE;
-            for (LivingEntity le : nearby) {
-                if (le == p || le instanceof Player) continue;
-                double dist = le.getLocation().distanceSquared(turretLoc);
-                if (dist < closest) {
-                    closest = dist;
-                    target = le;
+        SchedulerUtil.runTimer(services.plugin(), new java.util.function.Consumer<>() {
+            @Override
+            public void accept(org.bukkit.scheduler.BukkitTask task) {
+                ticks[0]++;
+                if (ticks[0] >= 300) {
+                    turretLoc.getBlock().setType(Material.AIR);
+                    task.cancel();
+                    return;
+                }
+                turretLoc.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, turretLoc.clone().add(0.5, 0.5, 0.5), 2, 0.3, 0.3, 0.3, 0);
+                Collection<LivingEntity> nearby = turretLoc.getNearbyLivingEntities(10, 5, 10);
+                LivingEntity target = null;
+                double closest = Double.MAX_VALUE;
+                for (LivingEntity le : nearby) {
+                    if (le == p || le instanceof Player) continue;
+                    double dist = le.getLocation().distanceSquared(turretLoc);
+                    if (dist < closest) {
+                        closest = dist;
+                        target = le;
+                    }
+                }
+                if (target != null) {
+                    Arrow arrow = turretLoc.getWorld().spawnArrow(
+                        turretLoc.clone().add(0.5, 0.5, 0.5),
+                        target.getLocation().toVector().subtract(turretLoc.clone().add(0.5, 0.5, 0.5).toVector()).normalize(),
+                        1.5f, 0
+                    );
+                    arrow.setShooter(p);
+                    arrow.setDamage(4.0);
                 }
             }
-            if (target != null) {
-                Arrow arrow = turretLoc.getWorld().spawnArrow(
-                    turretLoc.clone().add(0.5, 0.5, 0.5),
-                    target.getLocation().toVector().subtract(turretLoc.clone().add(0.5, 0.5, 0.5).toVector()).normalize(),
-                    1.5f, 0
-                );
-                arrow.setShooter(p);
-                arrow.setDamage(4.0);
-            }
-        }, 20L, 20L).getTaskId();
+        }, 20L, 20L);
         p.playSound(p.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0f, 1.0f);
     }
 }

@@ -8,18 +8,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SkillServices {
 
     private final RPGPlugin plugin;
-    private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
-    private final Set<Location> reinforcedBlocks = new HashSet<>();
-    private final Map<UUID, Long> moltenTouchActiveUntil = new HashMap<>();
+    private final Map<UUID, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
+    private final Set<Location> reinforcedBlocks = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Long> moltenTouchActiveUntil = new ConcurrentHashMap<>();
 
     public SkillServices(RPGPlugin plugin) {
         this.plugin = plugin;
@@ -46,7 +45,7 @@ public class SkillServices {
     }
 
     public void startCooldown(UUID playerId, String skillId, Duration duration) {
-        cooldowns.computeIfAbsent(playerId, k -> new HashMap<>())
+        cooldowns.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>())
             .put(skillId, System.currentTimeMillis() + duration.toMillis());
     }
 
@@ -56,6 +55,10 @@ public class SkillServices {
 
     public void clearAllCooldowns() {
         cooldowns.clear();
+    }
+
+    public void clearMoltenTouchAll() {
+        moltenTouchActiveUntil.clear();
     }
 
     // -- Molten Touch state --

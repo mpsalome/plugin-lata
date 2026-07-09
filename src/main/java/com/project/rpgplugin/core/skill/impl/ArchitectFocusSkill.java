@@ -17,16 +17,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ArchitectFocusSkill extends AbstractSkill {
 
-    private static final Map<UUID, LinkedList<Long>> PLACE_TIMES = new HashMap<>();
-    private static final Map<UUID, Long> COOLDOWN_UNTIL = new HashMap<>();
+    private static final Map<UUID, LinkedList<Long>> PLACE_TIMES = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> COOLDOWN_UNTIL = new ConcurrentHashMap<>();
 
     public ArchitectFocusSkill(com.project.rpgplugin.core.skill.SkillServices services) {
         super(services);
@@ -80,5 +80,10 @@ public class ArchitectFocusSkill extends AbstractSkill {
         SchedulerUtil.runLater(services.plugin(), () -> {
             COOLDOWN_UNTIL.remove(uid);
         }, 200L);
+    }
+
+    public static void clearAll() {
+        PLACE_TIMES.clear();
+        COOLDOWN_UNTIL.clear();
     }
 }

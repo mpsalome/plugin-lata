@@ -82,6 +82,7 @@ public class PlayerLevelListener implements Listener {
         EliteFactory.BossDef scaled = def.scaleByLevel(level);
 
         Location loc = p.getLocation().clone().add(Math.random() * 30 - 15, 0, Math.random() * 30 - 15);
+        if (loc.getWorld() == null) return;
         loc.setY(loc.getWorld().getHighestBlockYAt(loc) + 1);
 
         plugin.getMobSpawnService().getEliteFactory().spawnBoss(loc, scaled, level);

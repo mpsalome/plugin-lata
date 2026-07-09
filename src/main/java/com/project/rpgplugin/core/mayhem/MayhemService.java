@@ -9,11 +9,10 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MayhemService {
 
@@ -21,8 +20,8 @@ public class MayhemService {
     private final ModifierRegistry registry;
     private final MilestoneService milestoneService;
     private final MayhemConfig config;
-    private final Map<UUID, Set<String>> playerModifiers = new HashMap<>();
-    private final Set<String> globalModifiers = new HashSet<>();
+    private final Map<UUID, Set<String>> playerModifiers = new ConcurrentHashMap<>();
+    private final Set<String> globalModifiers = ConcurrentHashMap.newKeySet();
 
     public MayhemService(RPGPlugin plugin, ModifierRegistry registry, MilestoneService milestoneService, MayhemConfig config) {
         this.plugin = plugin;
@@ -186,5 +185,10 @@ public class MayhemService {
 
     private boolean scopeIsServer() {
         return "server".equals(config.scope());
+    }
+
+    public void clearAll() {
+        globalModifiers.clear();
+        playerModifiers.clear();
     }
 }

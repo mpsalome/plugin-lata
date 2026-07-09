@@ -25,6 +25,7 @@ public final class CompositeTriggerHelper {
             Set.of(TriggerKind.MOVE),
             ctx -> {
                 if (!(ctx.sourceEvent() instanceof PlayerMoveEvent e)) return false;
+                if (e.getTo() == null) return false;
                 Player p = ctx.player();
                 return p.isSneaking()
                     && !p.isOnGround()

@@ -14,7 +14,7 @@ public class CooldownService {
 
     public void start(UUID playerId, String skillId, Duration duration) {
         long expiry = System.currentTimeMillis() + duration.toMillis();
-        cooldowns.computeIfAbsent(playerId, k -> new HashMap<>()).put(skillId, expiry);
+        cooldowns.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>()).put(skillId, expiry);
     }
 
     public boolean isOnCooldown(UUID playerId, String skillId) {
@@ -51,7 +51,11 @@ public class CooldownService {
         long now = System.currentTimeMillis();
         cooldowns.forEach((uuid, map) -> {
             map.entrySet().removeIf(e -> e.getValue() <= now);
-            if (map.isEmpty()) cooldowns.remove(uuid);
         });
+        cooldowns.values().removeIf(Map::isEmpty);
+    }
+
+    public void clearAll() {
+        cooldowns.clear();
     }
 }

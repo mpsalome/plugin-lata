@@ -14,11 +14,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RunManager {
 
@@ -27,7 +27,7 @@ public class RunManager {
     private final StatService statService;
     private final ResetService resetService;
     private final MayhemService mayhemService;
-    private final Map<UUID, RunState> activeRuns = new HashMap<>();
+    private final Map<UUID, RunState> activeRuns = new ConcurrentHashMap<>();
     private final Random random = new Random();
     private boolean resetting = false;
 
@@ -124,4 +124,8 @@ public class RunManager {
     public CardRegistry cardRegistry() { return cardRegistry; }
     public StatService statService() { return statService; }
     public Collection<RunState> getAllRuns() { return activeRuns.values(); }
+
+    public void clearAll() {
+        activeRuns.clear();
+    }
 }

@@ -4,6 +4,7 @@ import com.project.rpgplugin.core.PlayerState;
 import com.project.rpgplugin.core.mana.ManaService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.util.SchedulerUtil;
 import com.project.rpgplugin.util.StringUtil;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
@@ -44,6 +45,7 @@ public class HudService extends BukkitRunnable {
         this.manaService = manaService;
         this.runManager = runManager;
         this.playerStates = new ConcurrentHashMap<>();
+        SchedulerUtil.runTimer(plugin, this, 20L, 4L);
     }
 
     public void registerCooldown(Player player, String skillId, String displayName, long durationMillis) {
@@ -119,10 +121,13 @@ public class HudService extends BukkitRunnable {
     }
 
     public void stopAll() {
+        cancel();
         List.copyOf(playerStates.keySet()).forEach(this::stopPlayer);
         playerStates.clear();
         cooldownDisplays.clear();
         activeEffects.clear();
+        playerBossBars.values().forEach(BossBar::removeAll);
+        playerBossBars.clear();
     }
 
     @Override

@@ -4,30 +4,28 @@ import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.augment.OnKillEffect;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RunState {
 
     private final UUID playerId;
     private final CardRegistry cardRegistry;
-    private final Set<String> ownedCards = new HashSet<>();
-    private final Map<String, Integer> cardCounts = new HashMap<>();
-    private final Set<String> ownedAbilities = new HashSet<>();
-    private final Map<String, Double> multipliers = new HashMap<>();
-    private final List<OnKillEffect> onKillEffects = new ArrayList<>();
+    private final Set<String> ownedCards = ConcurrentHashMap.newKeySet();
+    private final Map<String, Integer> cardCounts = new ConcurrentHashMap<>();
+    private final Set<String> ownedAbilities = ConcurrentHashMap.newKeySet();
+    private final Map<String, Double> multipliers = new ConcurrentHashMap<>();
+    private final List<OnKillEffect> onKillEffects = new CopyOnWriteArrayList<>();
     private int level;
     private int pendingDrafts;
     private int milestonesReached;
-    private final Set<String> activeModifiers = new LinkedHashSet<>();
-    private Set<String> sharedModifiers = Set.of();
-    private final Set<String> activePotionTypes = new TreeSet<>();
+    private final Set<String> activeModifiers = ConcurrentHashMap.newKeySet();
+    private volatile Set<String> sharedModifiers = Set.of();
+    private final Set<String> activePotionTypes = ConcurrentHashMap.newKeySet();
     private int xpMultTotal;
     private double cooldownMultTotal;
     private RunOutcome outcome = RunOutcome.ONGOING;
@@ -40,7 +38,7 @@ public class RunState {
     private double skipHealthBonus;
     private int extraDraftSlots;
     private int freeRerolls;
-    private final Set<String> toggledOff = new HashSet<>();
+    private final Set<String> toggledOff = ConcurrentHashMap.newKeySet();
 
     public RunState(UUID playerId, CardRegistry cardRegistry) {
         this.playerId = playerId;

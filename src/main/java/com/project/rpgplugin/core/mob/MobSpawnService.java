@@ -15,16 +15,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MobSpawnService {
 
     private final JavaPlugin plugin;
     private final EliteFactory eliteFactory;
     private final RunManager runManager;
-    private final Map<String, EliteFactory.BossDef> bossDefs = new HashMap<>();
-    private final Map<String, EliteFactory.MobDef> mobDefs = new HashMap<>();
+    private final Map<String, EliteFactory.BossDef> bossDefs = new ConcurrentHashMap<>();
+    private final Map<String, EliteFactory.MobDef> mobDefs = new ConcurrentHashMap<>();
 
     public MobSpawnService(JavaPlugin plugin, RunManager runManager, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
@@ -51,7 +51,14 @@ public class MobSpawnService {
         for (String key : sec.getKeys(false)) {
             ConfigurationSection b = sec.getConfigurationSection(key);
             if (b == null) continue;
-            EntityType type = EntityType.valueOf(b.getString("base_type", "ZOMBIE").toUpperCase());
+            String baseTypeStr = b.getString("base_type", "ZOMBIE").toUpperCase();
+            EntityType type;
+            try {
+                type = EntityType.valueOf(baseTypeStr);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("MobSpawnService: EntityType invalido '" + baseTypeStr + "' no boss '" + key + "'. Usando ZOMBIE.");
+                type = EntityType.ZOMBIE;
+            }
             String name = b.getString("display_name", key);
             double hp = b.getDouble("health", 100);
             double dmg = b.getDouble("damage", 10);
@@ -76,7 +83,14 @@ public class MobSpawnService {
         for (String key : sec.getKeys(false)) {
             ConfigurationSection m = sec.getConfigurationSection(key);
             if (m == null) continue;
-            EntityType type = EntityType.valueOf(m.getString("base_type", "ZOMBIE").toUpperCase());
+            String baseTypeStr = m.getString("base_type", "ZOMBIE").toUpperCase();
+            EntityType type;
+            try {
+                type = EntityType.valueOf(baseTypeStr);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("MobSpawnService: EntityType invalido '" + baseTypeStr + "' no mob '" + key + "'. Usando ZOMBIE.");
+                type = EntityType.ZOMBIE;
+            }
             String name = m.getString("display_name", key);
             double hp = m.getDouble("health", 40);
             double dmg = m.getDouble("damage", 6);
@@ -120,7 +134,7 @@ public class MobSpawnService {
 
     private Map<String, ItemStack> parseEquipment(ConfigurationSection sec) {
         if (sec == null) return null;
-        Map<String, ItemStack> eq = new HashMap<>();
+        Map<String, ItemStack> eq = new java.util.HashMap<>();
         for (String slot : sec.getKeys(false)) {
             String matName = sec.getString(slot, "AIR").toUpperCase();
             Material mat = Material.getMaterial(matName);

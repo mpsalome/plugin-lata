@@ -5,7 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,7 @@ public class StandaloneDummyManaProvider implements ManaProvider {
     private final JavaPlugin plugin;
     private final Map<UUID, Double> manaMap = new ConcurrentHashMap<>();
     private final Map<UUID, Double> bonusMaxMana = new ConcurrentHashMap<>();
+    private BukkitTask regenTask;
 
     public StandaloneDummyManaProvider(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -25,8 +27,12 @@ public class StandaloneDummyManaProvider implements ManaProvider {
         plugin.getLogger().info("ManaProvider: StandaloneDummy ativo — mana em memoria com regeneracao de " + REGEN_PER_SECOND + "/s.");
     }
 
+    public void stop() {
+        if (regenTask != null) regenTask.cancel();
+    }
+
     private void startRegenTask() {
-        SchedulerUtil.runTimer(plugin, () -> {
+        regenTask = SchedulerUtil.runTimer(plugin, () -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 UUID uid = p.getUniqueId();
                 double current = manaMap.getOrDefault(uid, getMaxMana(p));

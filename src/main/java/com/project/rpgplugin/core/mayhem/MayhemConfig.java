@@ -54,14 +54,24 @@ public class MayhemConfig {
         Map<Integer, List<ModifierSeverity>> result = new LinkedHashMap<>();
         for (var entry : config.getMapList("mayhem.severity_by_index")) {
             if (entry.containsKey("index") && entry.containsKey("allow")) {
-                int index = (int) entry.get("index");
+                Object rawIndex = entry.get("index");
+                int index;
+                if (rawIndex instanceof Number n) {
+                    index = n.intValue();
+                } else {
+                    continue;
+                }
                 @SuppressWarnings("unchecked")
                 List<String> allow = (List<String>) entry.get("allow");
                 List<ModifierSeverity> sevs = allow.stream()
                     .map(String::toUpperCase)
-                    .map(ModifierSeverity::valueOf)
+                    .map(s -> {
+                        try { return ModifierSeverity.valueOf(s); }
+                        catch (IllegalArgumentException e) { return null; }
+                    })
+                    .filter(java.util.Objects::nonNull)
                     .toList();
-                result.put(index, sevs);
+                if (!sevs.isEmpty()) result.put(index, sevs);
             }
         }
         return result;

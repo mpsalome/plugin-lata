@@ -4,6 +4,7 @@ import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
+import com.project.rpgplugin.core.skill.impl.SonarSkill;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -95,6 +96,7 @@ public class PlayerLifecycleListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
+        SonarSkill.cleanup(p);
         if (runManager.hasActiveRun(p)) {
             RunState run = runManager.getRun(p);
             if (run != null) {

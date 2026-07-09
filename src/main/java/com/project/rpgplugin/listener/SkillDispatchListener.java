@@ -36,6 +36,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.Cancellable;
+import org.bukkit.command.CommandExecutor;
 
 import java.util.List;
 
@@ -122,6 +123,7 @@ public class SkillDispatchListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
+        if (e.getTo() == null) return;
         Player p = e.getPlayer();
         if (e.getFrom().getBlockX() == e.getTo().getBlockX()
                 && e.getFrom().getBlockY() == e.getTo().getBlockY()
@@ -230,8 +232,12 @@ public class SkillDispatchListener implements Listener {
 
         player.getScheduler().runDelayed(plugin, st -> {
             if (!player.isOnline()) return;
-            LataCommand lataCmd = (LataCommand) plugin.getCommand("lata").getExecutor();
-            lataCmd.spawnBossAtSafeLocation(player, bossId, bossName, playerLevel);
+            org.bukkit.command.Command lata = plugin.getCommand("lata");
+            if (lata == null) return;
+            if (!(lata instanceof org.bukkit.command.PluginCommand lataCmd)) return;
+            CommandExecutor exec = lataCmd.getExecutor();
+            if (!(exec instanceof LataCommand lc)) return;
+            lc.spawnBossAtSafeLocation(player, bossId, bossName, playerLevel);
         }, null, 100L);
     }
 

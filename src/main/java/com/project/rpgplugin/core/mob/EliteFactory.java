@@ -22,6 +22,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,14 @@ public class EliteFactory implements Listener {
     private final MythicMobsBridge mythicMobs;
     private final ModelEngineBridge modelEngine;
     private final Map<UUID, BossBar> trackedBossBars = new ConcurrentHashMap<>();
+    private final List<org.bukkit.scheduler.BukkitTask> bossBarTasks = new ArrayList<>();
+
+    public void cancelAll() {
+        bossBarTasks.forEach(t -> { if (t != null) t.cancel(); });
+        bossBarTasks.clear();
+        trackedBossBars.values().forEach(BossBar::removeAll);
+        trackedBossBars.clear();
+    }
 
     public EliteFactory(JavaPlugin plugin, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
@@ -113,7 +123,7 @@ public class EliteFactory implements Listener {
         UUID bossId = boss.getUniqueId();
         trackedBossBars.put(bossId, bar);
 
-        new BukkitRunnable() {
+        org.bukkit.scheduler.BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!boss.isValid() || boss.isDead()) {
@@ -122,6 +132,7 @@ public class EliteFactory implements Listener {
                         trackedBossBars.remove(bossId);
                     });
                     cancel();
+                    bossBarTasks.remove(this);
                     return;
                 }
                 double pct = boss.getHealth() / boss.getMaxHealth();
@@ -143,6 +154,7 @@ public class EliteFactory implements Listener {
                 }
             }
         }.runTaskTimer(plugin, 0L, 10L);
+        bossBarTasks.add(task);
     }
 
     public LivingEntity spawnElite(Location loc, MobDef def) {
