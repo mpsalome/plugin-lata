@@ -1,6 +1,7 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
+import com.project.rpgplugin.core.mob.BossLootService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.CombatTracker;
@@ -19,17 +20,22 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.List;
+
 public class CombatListener implements Listener {
 
     private final RunManager runManager;
     private final RPGPlugin plugin;
+    private final BossLootService lootService;
 
     public CombatListener(RunManager runManager) {
         this.runManager = runManager;
         if (runManager.plugin() instanceof RPGPlugin rpg) {
             this.plugin = rpg;
+            this.lootService = new BossLootService();
         } else {
             this.plugin = null;
+            this.lootService = null;
         }
     }
 
@@ -114,29 +120,38 @@ public class CombatListener implements Listener {
         boolean isBoss = target.getPersistentDataContainer().has(ItemKeys.isBoss(), PersistentDataType.BYTE);
         if (!isBoss) return;
 
+        // Clear natural drops — we handle our own loot
+        e.getDrops().clear();
+
         Location bossLoc = target.getLocation();
 
-        int xpAmount = 15000;
+        // XP reward for nearby players
+        int xpAmount = (int) (target.getMaxHealth() * 40);
         String bossName = target.getName();
 
         for (Player nearby : bossLoc.getNearbyPlayers(64)) {
             nearby.giveExp(xpAmount);
             nearby.sendMessage(Text.mm(
-                "<gold><bold>⚔ " + bossName + " derrotado por " + killer.getName() + "!</bold></gold>"
+                "<gold><bold>\u2694 " + bossName + " derrotado por " + killer.getName() + "!</bold></gold>"
             ));
             nearby.sendMessage(Text.mm(
-                "<yellow>✨ +" + xpAmount + " XP pela vitoria!</yellow>"
+                "<yellow>\u2728 +" + xpAmount + " XP pela vitoria!</yellow>"
             ));
         }
 
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.DIAMOND, 8));
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.NETHERITE_SCRAP, 2));
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.EXPERIENCE_BOTTLE, 48));
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.GOLDEN_APPLE, 4));
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.ENDER_PEARL, 6));
+        // Gerar loot baseado na vida maxima do boss
+        if (lootService != null) {
+            List<ItemStack> loot = lootService.generateLoot(target.getMaxHealth());
+            for (ItemStack item : loot) {
+                bossLoc.getWorld().dropItemNaturally(bossLoc, item);
+            }
+        }
+
+        // Base loot sempre cai
+        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.DIAMOND, 4 + (int)(Math.random() * 5)));
 
         Bukkit.broadcast(Text.mm(
-            "<gold><bold>🏆 " + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
+            "<gold><bold>\uD83C\uDFC6 " + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
         ));
     }
 }
