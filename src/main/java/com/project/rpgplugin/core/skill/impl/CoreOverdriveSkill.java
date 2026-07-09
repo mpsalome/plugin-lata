@@ -60,7 +60,7 @@ public class CoreOverdriveSkill extends AbstractSkill {
         }
         Player p = ctx.player();
         consume(ctx, 1);
-        int dur = cfg().getInt("duration", 15) * 20;
+        int dur = cfgInt("duration", 15) * 20;
         p.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, dur, 2, true, false, false));
         p.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, dur, 1, true, false, false));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, dur, 1, true, false, false));

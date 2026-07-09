@@ -111,6 +111,33 @@ public abstract class AbstractSkill implements Skill {
         return services.skillConfig(id());
     }
 
+    protected int cfgInt(String path, int def) {
+        ConfigurationSection s = cfg();
+        if (s == null) {
+            services.plugin().getLogger().warning("Skill '" + id() + "': config section is null, using default for '" + path + "' = " + def);
+            return def;
+        }
+        return s.getInt(path, def);
+    }
+
+    protected double cfgDouble(String path, double def) {
+        ConfigurationSection s = cfg();
+        if (s == null) {
+            services.plugin().getLogger().warning("Skill '" + id() + "': config section is null, using default for '" + path + "' = " + def);
+            return def;
+        }
+        return s.getDouble(path, def);
+    }
+
+    protected String cfgString(String path, String def) {
+        ConfigurationSection s = cfg();
+        if (s == null) {
+            services.plugin().getLogger().warning("Skill '" + id() + "': config section is null, using default for '" + path + "' = '" + def + "'");
+            return def;
+        }
+        return s.getString(path, def);
+    }
+
     public SkillServices services() {
         return services;
     }

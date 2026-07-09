@@ -72,8 +72,8 @@ public class EntanglingRootsSkill extends AbstractSkill {
         if (targetBlock == null) return;
         Location center = targetBlock.getLocation().add(0.5, 0, 0.5);
         startCooldown(ctx);
-        int radius = cfg().getInt("radius", 4);
-        int duration = cfg().getInt("duration", 3) * 20;
+        int radius = cfgInt("radius", 4);
+        int duration = cfgInt("duration", 3) * 20;
         center.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, center.add(0, 0.5, 0), 40, radius, 0.2, radius, 1);
         center.getWorld().playSound(center, Sound.BLOCK_GRASS_BREAK, 1.0f, 0.5f);
         for (Entity e : center.getWorld().getNearbyEntities(center, radius, 2, radius)) {

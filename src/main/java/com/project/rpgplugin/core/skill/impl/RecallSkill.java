@@ -34,7 +34,7 @@ public class RecallSkill extends AbstractSkill {
 
     @Override
     public Duration cooldown() {
-        return Duration.ofSeconds(cfg() != null ? cfg().getInt("cooldown", 60) : 60);
+        return Duration.ofSeconds(cfgInt("cooldown", 60));
     }
 
     @Override

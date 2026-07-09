@@ -66,9 +66,9 @@ public class BladeDanceSkill extends AbstractSkill {
         Player p = ctx.player();
         MOBILITY_COUNT.put(p.getUniqueId(), 0);
         Location origin = e.getEntity().getLocation();
-        double radius = cfg().getInt("radius", 4);
-        double damage = cfg().getInt("damage", 6);
-        double lifesteal = cfg().getDouble("lifesteal", 0.05);
+        double radius = cfgInt("radius", 4);
+        double damage = cfgInt("damage", 6);
+        double lifesteal = cfgDouble("lifesteal", 0.05);
         origin.getWorld().spawnParticle(Particle.SWEEP_ATTACK, origin, 20, radius, 1, radius, 0);
         origin.getWorld().playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f);
         int hitCount = 0;

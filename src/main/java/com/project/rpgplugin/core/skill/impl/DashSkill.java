@@ -38,7 +38,7 @@ public class DashSkill extends AbstractSkill {
 
     @Override
     public Duration cooldown() {
-        return Duration.ofSeconds(cfg().getInt("cooldown", 8));
+        return Duration.ofSeconds(cfgInt("cooldown", 8));
     }
 
     @Override

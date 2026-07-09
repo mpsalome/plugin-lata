@@ -1,7 +1,6 @@
 package com.project.rpgplugin.ui;
 
 import com.project.rpgplugin.RPGPlugin;
-import com.project.rpgplugin.core.draft.DraftSession;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.util.ItemKeys;
@@ -14,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
+import java.util.Map;
 
 public class ShopMenu extends Menu {
 
@@ -52,6 +52,31 @@ public class ShopMenu extends Menu {
     private void build() {
         fillBackground();
 
+        // Row 0: gradient header
+        ItemStack corner = decorativePane(Material.GOLD_NUGGET, "<gold>Pao em Lata");
+        setItem(0, corner);
+        for (int i = 1; i < 8; i++) {
+            setItem(i, decorativePane(
+                i < 4 ? Material.ORANGE_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE,
+                null
+            ));
+        }
+        setItem(8, corner.clone());
+
+        // Row 1: shop items at 10, 12, 14, 16 with colored backgrounds
+        Material[] bgColors = {
+            Material.ORANGE_STAINED_GLASS_PANE,   // reroll
+            Material.LIME_STAINED_GLASS_PANE,      // draft
+            Material.CYAN_STAINED_GLASS_PANE,      // absolution
+            Material.RED_STAINED_GLASS_PANE        // beacon
+        };
+        int[] itemSlots = {10, 12, 14, 16};
+        for (int i = 0; i < 4; i++) {
+            int bgSlot = itemSlots[i] - 1;
+            setItem(bgSlot, decorativePane(bgColors[i], null));
+            setItem(bgSlot + 1, decorativePane(bgColors[i], null));
+        }
+
         setItem(10, buildShopItem(Material.ENDER_EYE,
                 "<light_purple><bold>\uD83C\uDFB2 Reroll de Sorte",
                 List.of(
@@ -79,6 +104,19 @@ public class ShopMenu extends Menu {
                         "<gray>Custo: <yellow>15 niveis</yellow></gray>",
                         "<gray>Invoca um boss apos 5 segundos</gray>"
                 )));
+
+        // Row 2: footer
+        ItemStack footer = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        var footerMeta = footer.getItemMeta();
+        if (footerMeta != null) {
+            footerMeta.displayName(Text.mm("<dark_gray>Clique em um item para comprar"));
+            footer.setItemMeta(footerMeta);
+        }
+        for (int i = 18; i < 27; i++) {
+            if (i != 18 && i != 26) {
+                setItem(i, footer);
+            }
+        }
     }
 
     private void buyReroll(RunState run) {
@@ -111,8 +149,13 @@ public class ShopMenu extends Menu {
         successSound();
 
         ItemStack beacon = createBeaconItem();
-        player.getInventory().addItem(beacon);
-        player.sendActionBar(Text.mm("<red>\uD83D\uDC51 Sinalizador do Chefe adicionado ao inventario!"));
+        Map<Integer, ItemStack> leftover = player.getInventory().addItem(beacon);
+        if (!leftover.isEmpty()) {
+            player.getWorld().dropItem(player.getLocation(), beacon);
+            player.sendActionBar(Text.mm("<red>Inventario cheio! Sinalizador caiu no chao."));
+        } else {
+            player.sendActionBar(Text.mm("<red>\uD83D\uDC51 Sinalizador do Chefe adicionado ao inventario!"));
+        }
     }
 
     private boolean checkLevels(int cost) {

@@ -55,8 +55,8 @@ public class SonarSkill extends AbstractSkill {
         }
         Player p = ctx.player();
         startCooldown(ctx);
-        int range = cfg().getInt("range", 20);
-        int duration = cfg().getInt("glow_duration", 10) * 20;
+        int range = cfgInt("range", 20);
+        int duration = cfgInt("glow_duration", 10) * 20;
         List<LivingEntity> revealed = new ArrayList<>();
         for (Entity entity : p.getNearbyEntities(range, range, range)) {
             if (entity instanceof LivingEntity le && entity != p) {
