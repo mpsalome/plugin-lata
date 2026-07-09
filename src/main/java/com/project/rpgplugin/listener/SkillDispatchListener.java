@@ -14,6 +14,7 @@ import com.project.rpgplugin.core.skill.SkillServices;
 import com.project.rpgplugin.core.skill.impl.BladeDanceSkill;
 import com.project.rpgplugin.core.skill.trigger.TriggerKind;
 import com.project.rpgplugin.ui.CollectionMenu;
+import com.project.rpgplugin.ui.HubMenu;
 import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
@@ -65,13 +66,7 @@ public class SkillDispatchListener implements Listener {
 
         if (ItemKeys.isRpgBook(item)) {
             e.setCancelled(true);
-            if (!runManager.hasActiveRun(p)) {
-                runManager.startRun(p);
-            }
-            RunState run = runManager.getRun(p);
-            if (run != null) {
-                new CollectionMenu(p, run, cardRegistry, runManager.statService());
-            }
+            new HubMenu(p, plugin, runManager, cardRegistry, runManager.statService());
             return;
         }
 
@@ -190,28 +185,34 @@ public class SkillDispatchListener implements Listener {
     }
 
     private void handleBossBeacon(Player player) {
-        ItemStack item = player.getInventory().getItemInMainHand();
+        // Consume beacon from whichever hand held it
+        ItemStack main = player.getInventory().getItemInMainHand();
+        boolean isBeacon = ItemKeys.isBossBeacon(main);
+        ItemStack item = isBeacon ? main : player.getInventory().getItemInOffHand();
         if (item != null && item.getAmount() > 0) {
             item.setAmount(item.getAmount() - 1);
-        } else {
-            item = player.getInventory().getItemInOffHand();
-            if (item != null && item.getAmount() > 0) {
-                item.setAmount(item.getAmount() - 1);
-            }
         }
 
         // Biome-aware boss selection
         String bossId;
+        String bossName;
         var biome = player.getLocation().getBlock().getBiome();
         String biomeName = biome.name().toLowerCase();
         if (biomeName.contains("nether") || biomeName.contains("desert") || biomeName.contains("badlands")
-                || biomeName.contains("savanna") || biomeName.contains("jungle")) {
+                || biomeName.contains("savanna")) {
             bossId = "magma_tyrant";
+            bossName = "Tirano Magmatico, Coracao do Inferno";
+        } else if (biomeName.contains("jungle") || biomeName.contains("swamp") || biomeName.contains("mangrove")) {
+            bossId = "storm_wyvern";
+            bossName = "Furia Tempestuosa, Asa do Ceu";
+        } else if (biomeName.contains("deep_dark") || biomeName.contains("crimson") || biomeName.contains("warped")) {
+            bossId = "void_lich";
+            bossName = "Lich do Vazio, A Noite Eterna";
         } else {
             bossId = "frostmaw";
+            bossName = "Frostmaw, Senhor do Gelo";
         }
 
-        String bossName = bossId.equals("frostmaw") ? "Frostmaw" : "Tirano Magmatico";
         org.bukkit.Bukkit.broadcast(Text.mm(
             "<gold><bold>\u26A0 " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
         ));
@@ -219,7 +220,6 @@ public class SkillDispatchListener implements Listener {
 
         player.getScheduler().runDelayed(plugin, st -> {
             if (!player.isOnline()) return;
-            // Reuse LataCommand safe spawn logic
             LataCommand lataCmd = (LataCommand) plugin.getCommand("lata").getExecutor();
             lataCmd.spawnBossAtSafeLocation(player, bossId, bossName);
         }, null, 100L);

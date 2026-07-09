@@ -1,9 +1,9 @@
-# Bosses configuracao - bosses da run
+# Bosses configuracao — bosses da run
 # Formatos de entidade: ZOMBIE, SKELETON, WITHER, RAVAGER, etc.
 bosses:
   frostmaw:
     base_type: ZOMBIE
-    display_name: "<bold><aqua>Frostmaw"
+    display_name: "<bold><aqua>Frostmaw <gray>| <white>Senhor do Gelo"
     health: 200
     damage: 12
     speed: 0.25
@@ -16,10 +16,36 @@ bosses:
       mainhand: DIAMOND_SWORD
   magma_tyrant:
     base_type: MAGMA_CUBE
-    display_name: "<bold><red>Tirano Magmático"
+    display_name: "<bold><red>Tirano Magmatico <gray>| <white>Coracao do Inferno"
     health: 300
     damage: 15
     speed: 0.3
     scale: 4.0
     knockback_resist: 0.8
     victory: true
+  storm_wyvern:
+    base_type: RAVAGER
+    display_name: "<bold><yellow>Furia Tempestuosa <gray>| <white>Asa do Ceu"
+    health: 350
+    damage: 18
+    speed: 0.35
+    scale: 2.8
+    knockback_resist: 0.9
+    victory: true
+    equipment:
+      mainhand: TRIDENT
+  void_lich:
+    base_type: WITHER_SKELETON
+    display_name: "<bold><dark_purple>Lich do Vazio <gray>| <white>A Noite Eterna"
+    health: 250
+    damage: 20
+    speed: 0.2
+    scale: 2.0
+    knockback_resist: 1.0
+    victory: true
+    equipment:
+      helmet: NETHERITE_HELMET
+      chestplate: NETHERITE_CHESTPLATE
+      leggings: NETHERITE_LEGGINGS
+      boots: NETHERITE_BOOTS
+      mainhand: TRIDENT

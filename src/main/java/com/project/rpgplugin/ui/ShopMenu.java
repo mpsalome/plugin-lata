@@ -45,6 +45,8 @@ public class ShopMenu extends Menu {
                 case 12 -> buyDraftToken(run);
                 case 14 -> buyAbsolution(run);
                 case 16 -> buyBeacon(run);
+                case 18, 26 -> new HubMenu(player, plugin, plugin.getRunManager(),
+                    plugin.getCardRegistry(), plugin.getRunManager().statService());
             }
         });
     }
@@ -106,17 +108,24 @@ public class ShopMenu extends Menu {
                 )));
 
         // Row 2: footer
+        ItemStack backBtn = new ItemStack(Material.GOLD_NUGGET);
+        var backMeta = backBtn.getItemMeta();
+        if (backMeta != null) {
+            backMeta.displayName(Text.mm("<gold>\uD83C\uDF7C Menu Principal"));
+            backBtn.setItemMeta(backMeta);
+        }
+        setItem(18, backBtn);
+
         ItemStack footer = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         var footerMeta = footer.getItemMeta();
         if (footerMeta != null) {
             footerMeta.displayName(Text.mm("<dark_gray>Clique em um item para comprar"));
             footer.setItemMeta(footerMeta);
         }
-        for (int i = 18; i < 27; i++) {
-            if (i != 18 && i != 26) {
-                setItem(i, footer);
-            }
+        for (int i = 19; i < 26; i++) {
+            setItem(i, footer);
         }
+        setItem(26, backBtn.clone());
     }
 
     private void buyReroll(RunState run) {

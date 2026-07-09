@@ -1,9 +1,11 @@
 package com.project.rpgplugin.ui;
 
+import com.project.rpgplugin.RPGPlugin;
 import com.project.rpgplugin.core.card.Card;
 import com.project.rpgplugin.core.card.CardKind;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.CardTag;
+import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.ui.menu.Menu;
@@ -33,7 +35,9 @@ public class CollectionMenu extends Menu {
     private static final int SLOT_NEXT = 50;
     private static final int SLOT_COUNT = 53;
     private static final int SLOT_MAYHEM = 45;
+    private static final int SLOT_HUB = 46;
 
+    private final RPGPlugin plugin;
     private final Player player;
     private final RunState run;
     private final CardRegistry cardRegistry;
@@ -45,12 +49,17 @@ public class CollectionMenu extends Menu {
     private final int page;
 
     public CollectionMenu(Player p, RunState run, CardRegistry cardRegistry, StatService statService) {
-        this(p, run, cardRegistry, statService, null, null, 0);
+        this(null, p, run, cardRegistry, statService, null, null, 0);
     }
 
-    private CollectionMenu(Player p, RunState run, CardRegistry cardRegistry, StatService statService,
+    public CollectionMenu(RPGPlugin plugin, Player p, RunState run, CardRegistry cardRegistry, StatService statService) {
+        this(plugin, p, run, cardRegistry, statService, null, null, 0);
+    }
+
+    private CollectionMenu(RPGPlugin plugin, Player p, RunState run, CardRegistry cardRegistry, StatService statService,
                            CardTag activeTag, CardKind activeKind, int page) {
         super(SIZE, "<dark_purple><bold>\u2728 Sua Colecao");
+        this.plugin = plugin;
         this.player = p;
         this.run = run;
         this.cardRegistry = cardRegistry;
@@ -221,14 +230,21 @@ public class CollectionMenu extends Menu {
             setItem(SLOT_MAYHEM, empty);
         }
 
-        // Spacer
+        // Hub button
+        ItemStack hubBtn = new ItemStack(Material.GOLD_NUGGET);
+        var hubMeta = hubBtn.getItemMeta();
+        if (hubMeta != null) {
+            hubMeta.displayName(Text.mm("<gold>\uD83C\uDF7C Menu Principal"));
+            hubBtn.setItemMeta(hubMeta);
+        }
+        setItem(SLOT_HUB, hubBtn);
+
         ItemStack spacer = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         var spacerMeta = spacer.getItemMeta();
         if (spacerMeta != null) {
             spacerMeta.displayName(Component.text("\u00a7r"));
             spacer.setItemMeta(spacerMeta);
         }
-        setItem(46, spacer);
         setItem(47, spacer);
         setItem(51, spacer);
         setItem(52, spacer);
@@ -368,7 +384,13 @@ public class CollectionMenu extends Menu {
             case 5 -> { newTag = null; newKind = CardKind.AUGMENT; }
         }
         if (slot >= 0 && slot <= 5) {
-            new CollectionMenu(player, run, cardRegistry, statService, newTag, newKind, 0);
+            new CollectionMenu(plugin, player, run, cardRegistry, statService, newTag, newKind, 0);
+            return;
+        }
+
+        // Hub / back
+        if (slot == SLOT_HUB && plugin != null) {
+            new HubMenu(player, plugin, plugin.getRunManager(), cardRegistry, statService);
             return;
         }
 
@@ -377,7 +399,7 @@ public class CollectionMenu extends Menu {
             int totalCards = countFiltered();
             int totalPages = Math.max(1, (int) Math.ceil((double) totalCards / CARDS_PER_PAGE));
             if (page > 0) {
-                new CollectionMenu(player, run, cardRegistry, statService, activeTag, activeKind, page - 1);
+                new CollectionMenu(plugin, player, run, cardRegistry, statService, activeTag, activeKind, page - 1);
             }
             return;
         }
@@ -385,7 +407,7 @@ public class CollectionMenu extends Menu {
             int totalCards = countFiltered();
             int totalPages = Math.max(1, (int) Math.ceil((double) totalCards / CARDS_PER_PAGE));
             if (page < totalPages - 1) {
-                new CollectionMenu(player, run, cardRegistry, statService, activeTag, activeKind, page + 1);
+                new CollectionMenu(plugin, player, run, cardRegistry, statService, activeTag, activeKind, page + 1);
             }
             return;
         }
@@ -405,6 +427,6 @@ public class CollectionMenu extends Menu {
             }
         }
         statService.recompute(player, run);
-        new CollectionMenu(player, run, cardRegistry, statService, activeTag, activeKind, page);
+        new CollectionMenu(plugin, player, run, cardRegistry, statService, activeTag, activeKind, page);
     }
 }
