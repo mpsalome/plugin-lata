@@ -5,6 +5,7 @@ import com.project.rpgplugin.command.LataCommand;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.mana.ManaService;
+import com.project.rpgplugin.core.mob.EliteFactory;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.core.skill.Skill;
@@ -199,14 +200,12 @@ public class SkillDispatchListener implements Listener {
         if (run != null) level = run.level();
         final int playerLevel = level;
 
-        String[] bossIds = {"frostmaw", "magma_tyrant", "storm_wyvern", "void_lich"};
+        String[] bossIds = {"frostmaw", "magma_tyrant", "storm_wyvern", "void_lich",
+            "sir_creeper_alot", "slime_shady", "the_beheader",
+            "ancient_guardian", "piglin_warlord", "phantom_king"};
         String bossId = bossIds[(int) (Math.random() * bossIds.length)];
-        String bossName = switch (bossId) {
-            case "magma_tyrant" -> "Tirano Magmatico, Coracao do Inferno";
-            case "storm_wyvern" -> "Furia Tempestuosa, Asa do Ceu";
-            case "void_lich" -> "Lich do Vazio, A Noite Eterna";
-            default -> "Frostmaw, Senhor do Gelo";
-        };
+        EliteFactory.BossDef bossDef = plugin.getMobSpawnService().getBossDef(bossId);
+        String bossName = bossDef != null ? bossDef.displayName().replaceAll("<[^>]+>", "").trim() : bossId;
 
         String levelStr = "<yellow>Nivel " + playerLevel + "</yellow>";
         String hint = switch (bossId) {

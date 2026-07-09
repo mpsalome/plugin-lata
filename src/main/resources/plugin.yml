@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.project.rpgplugin.RPGPlugin
 api-version: '1.21'
 author: Developer
-description: Plugin roguelike com draft 1-de-3, modificadores Mayhem cumulativos, dificuldade escalada, recall por distancia e suporte a AuraSkills/AuraMobs. Paper 1.21.4+.
+description: Plugin action RPG com draft de cartas, modificadores Mayhem, bosses tematicos, dificuldade escalada e consequencia por morte. Paper 1.21.4+.
 softdepend:
   - AuraSkills
   - AuraMobs

@@ -437,17 +437,17 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             }
 
             sender.sendMessage(Component.text("=========== RogueLata HELP ===========").color(NamedTextColor.GOLD));
-            sender.sendMessage(Component.text("/skills ").color(NamedTextColor.YELLOW).append(Component.text("- Abre o menu de habilidades (3 tiers).").color(NamedTextColor.WHITE)));
-            sender.sendMessage(Component.text("/rpg ").color(NamedTextColor.YELLOW).append(Component.text("- Recebe o Livro de RPG se necessario.").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/skills ").color(NamedTextColor.YELLOW).append(Component.text("- Abre o menu de habilidades.").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/rpg ").color(NamedTextColor.YELLOW).append(Component.text("- Recebe o item Pao em Lata.").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg reload ").color(NamedTextColor.YELLOW).append(Component.text("- Recarrega config (Admin).").color(NamedTextColor.WHITE)));
-            sender.sendMessage(Component.text("/rpg reset ").color(NamedTextColor.YELLOW).append(Component.text("- Reseta todos os dados RPG (Admin).").color(NamedTextColor.WHITE)));
-            sender.sendMessage(Component.text("/rpg debug ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra estado interno da run (Admin).").color(NamedTextColor.WHITE)));
-            sender.sendMessage(Component.text("/run ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra informacoes da run atual.").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/rpg reset ").color(NamedTextColor.YELLOW).append(Component.text("- Reseta todos os dados (Admin).").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/rpg debug ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra dados internos (Admin).").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/run ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra informacoes do personagem.").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.empty());
-            sender.sendMessage(Component.text("=== MODO ROGUE-LIKE ATIVO ===").color(NamedTextColor.RED));
-            sender.sendMessage(Component.text("Ao morrer, voce perde TODAS as habilidades e XP!").color(NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("Escolha sabiamente suas cartas no draft!").color(NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("=================================").color(NamedTextColor.GOLD));
+            sender.sendMessage(Component.text("=== MUNDO DIFICIL ===").color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("O mundo e perigoso. Morrer tem consequencias!").color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("Evolua seus poderes atraves do draft de cartas.").color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("=====================").color(NamedTextColor.GOLD));
             return true;
         }
 
@@ -458,7 +458,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         ItemStack book = new ItemStack(Material.BREAD, 1);
         ItemMeta meta = book.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.mm("<gold><bold>Lata de Pão"));
+            meta.displayName(Text.mm("<gold><bold>Pão em Lata"));
             meta.lore(List.of(
                     Text.mm("<gray>Use para abrir o Menu de Habilidades!"),
                     Text.mm("<yellow>Clique com o direito para abrir.")

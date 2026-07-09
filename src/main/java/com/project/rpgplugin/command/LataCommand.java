@@ -110,34 +110,34 @@ public class LataCommand implements CommandExecutor {
 
     private void handleBossSpawn(Player player, String[] args, String label) {
         if (args.length < 2) {
-            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich>"));
+            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich|sir_creeper_alot|slime_shady|the_beheader|ancient_guardian|piglin_warlord|phantom_king>"));
             return;
         }
 
         if (!args[1].equalsIgnoreCase("spawn")) {
-            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich>"));
+            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <id>"));
             return;
         }
 
         if (args.length < 3) {
-            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich>"));
+            player.sendMessage(Text.mm("<red>Uso: /" + label + " boss spawn <id>"));
             return;
         }
 
         String bossId = args[2].toLowerCase();
-        if (!bossId.equals("frostmaw") && !bossId.equals("magma_tyrant")
-                && !bossId.equals("storm_wyvern") && !bossId.equals("void_lich")) {
-            player.sendMessage(Text.mm("<red>Boss desconhecido. Opcoes: frostmaw, magma_tyrant, storm_wyvern, void_lich"));
+        String[] allBosses = {"frostmaw", "magma_tyrant", "storm_wyvern", "void_lich",
+            "sir_creeper_alot", "slime_shady", "the_beheader",
+            "ancient_guardian", "piglin_warlord", "phantom_king"};
+        boolean found = false;
+        for (String id : allBosses) {
+            if (id.equals(bossId)) { found = true; break; }
+        }
+        if (!found) {
+            player.sendMessage(Text.mm("<red>Boss desconhecido. IDs: frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king"));
             return;
         }
 
-        String bossName = switch (bossId) {
-            case "frostmaw" -> "Frostmaw, Senhor do Gelo";
-            case "magma_tyrant" -> "Tirano Magmatico, Coracao do Inferno";
-            case "storm_wyvern" -> "Furia Tempestuosa, Asa do Ceu";
-            case "void_lich" -> "Lich do Vazio, A Noite Eterna";
-            default -> bossId;
-        };
+        String bossName = bossDisplayName(bossId);
         int level = 1;
         if (runManager.hasActiveRun(player)) {
             RunState r = runManager.getRun(player);
@@ -216,14 +216,8 @@ public class LataCommand implements CommandExecutor {
 
     private String bossDisplayName(String bossId) {
         EliteFactory.BossDef def = mobSpawnService.getBossDef(bossId);
-        if (def != null) return def.displayName();
-        return switch (bossId) {
-            case "frostmaw" -> "<bold><aqua>Frostmaw <gray>| <white>Senhor do Gelo";
-            case "magma_tyrant" -> "<bold><red>Tirano Magmatico <gray>| <white>Coracao do Inferno";
-            case "storm_wyvern" -> "<bold><yellow>Furia Tempestuosa <gray>| <white>Asa do Ceu";
-            case "void_lich" -> "<bold><dark_purple>Lich do Vazio <gray>| <white>A Noite Eterna";
-            default -> bossId;
-        };
+        if (def != null) return def.displayName().replaceAll("<[^>]+>", "").trim();
+        return bossId;
     }
 
     public void spawnBossAtSafeLocation(Player player, String bossId, String bossName, int playerLevel) {
@@ -338,7 +332,7 @@ public class LataCommand implements CommandExecutor {
     private void sendHelp(Player player, String label) {
         player.sendMessage(Text.mm("<gold>=== RogueLata Comandos ==="));
         player.sendMessage(Text.mm("<yellow>/" + label + " tp <jogador></yellow> <gray>- Teleporta ate um amigo (vida cheia = sem recarga)</gray>"));
-        player.sendMessage(Text.mm("<yellow>/" + label + " boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich></yellow> <gray>- Invoca um boss com 5s de delay</gray>"));
+        player.sendMessage(Text.mm("<yellow>/" + label + " boss spawn <id></yellow> <gray>- Invoca um boss (ids: frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king)</gray>"));
         player.sendMessage(Text.mm("<yellow>/" + label + " loja</yellow> <gray>- Abre a Loja Pao em Lata</gray>"));
         player.sendMessage(Text.mm("<yellow>/" + label + " book</yellow> <gray>- Recebe uma Lata de Pao (caso tenha perdido)</gray>"));
         player.sendMessage(Text.mm("<yellow>/" + label + " draft</yellow> <gray>- Abre o proximo draft pendente</gray>"));

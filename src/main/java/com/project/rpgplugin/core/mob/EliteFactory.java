@@ -45,6 +45,8 @@ public class EliteFactory {
                 mm.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
                 mm.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
                 mm.getPersistentDataContainer().set(ItemKeys.withKey("boss_level"), PersistentDataType.INTEGER, bossLevel);
+                mm.customName(Text.mm(def.displayName()));
+                mm.setCustomNameVisible(true);
                 modelEngine.applyModel(mm, def.id());
                 trackBossBar(mm, def);
                 return mm;

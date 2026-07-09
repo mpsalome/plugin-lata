@@ -127,7 +127,11 @@ public class CombatListener implements Listener {
 
         // XP reward for nearby players
         int xpAmount = (int) (target.getMaxHealth() * 40);
-        String bossName = target.getName();
+        String bossName = target.getCustomName();
+        if (bossName == null) {
+            String eliteId = target.getPersistentDataContainer().get(ItemKeys.eliteId(), PersistentDataType.STRING);
+            bossName = eliteId != null ? eliteId : target.getName();
+        }
 
         for (Player nearby : bossLoc.getNearbyPlayers(64)) {
             nearby.giveExp(xpAmount);

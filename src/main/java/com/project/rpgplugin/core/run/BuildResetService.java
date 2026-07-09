@@ -107,9 +107,9 @@ public class BuildResetService {
             p.setRemainingAir(p.getMaximumAir());
         }, null);
 
-        String msg = "<red>☠ <bold>A BUILD FOI DESTRUÍDA!</bold></red>"
-            + " <gray><white>" + p.getName() + "</white> morreu no <yellow>Nível "
-            + previousLevel + "</yellow> e perdeu todos os seus poderes...</gray>";
+        String msg = "<red>☠ <bold>MORTE!</bold></red>"
+            + " <gray><white>" + p.getName() + "</white> caiu no <yellow>Nível "
+            + previousLevel + "</yellow> e perdeu seus poderes...</gray>";
         Bukkit.broadcast(MiniMessage.miniMessage().deserialize(msg));
         p.getWorld().playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 0.5f);
     }

@@ -163,8 +163,8 @@ public class RunResetService {
         ensureRpgBook(p);
 
         // 16. Feedback
-        p.sendMessage(com.project.rpgplugin.util.Text.mm("<red><bold>RUN ENCERRADA"));
-        p.sendMessage(com.project.rpgplugin.util.Text.mm("<gray>Todos os poderes foram perdidos. Uma nova run comeca!"));
+        p.sendMessage(com.project.rpgplugin.util.Text.mm("<red><bold>JORNADA ENCERRADA"));
+        p.sendMessage(com.project.rpgplugin.util.Text.mm("<gray>Todos os poderes foram perdidos. Uma nova jornada comeca!"));
     }
 
     public void softReset(Player p, RunState run) {

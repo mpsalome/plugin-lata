@@ -27,7 +27,7 @@ public class RecallCommand implements CommandExecutor {
         }
 
         if (!runManager.hasActiveRun(p)) {
-            p.sendMessage(Text.mm("<red>Voce nao tem uma run ativa! Use /run para comecar."));
+            p.sendMessage(Text.mm("<red>Voce nao tem uma jornada ativa! Use /run para comecar."));
             return true;
         }
 

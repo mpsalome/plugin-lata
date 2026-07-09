@@ -7,6 +7,7 @@ import com.project.rpgplugin.core.card.CardTier;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.util.ItemKeys;
+import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,23 +47,19 @@ public class RunManager {
         giveBook(p);
 
         statService.recompute(p, run);
-        p.sendMessage(Component.text("Nova Run Iniciada!").color(net.kyori.adventure.text.format.NamedTextColor.GREEN).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+        p.sendMessage(Text.mm("<green><bold>Progresso iniciado!</bold></green>"));
     }
 
     private void giveBook(Player p) {
         boolean hasBook = false;
-        boolean hasShop = false;
         for (var item : p.getInventory().getContents()) {
-            if (item != null) {
-                if (ItemKeys.isRpgBook(item)) hasBook = true;
-                if (ItemKeys.isShopItem(item)) hasShop = true;
+            if (item != null && ItemKeys.isRpgBook(item)) {
+                hasBook = true;
+                break;
             }
         }
         if (!hasBook) {
             p.getInventory().addItem(plugin.createRpgBook());
-        }
-        if (!hasShop) {
-            p.getInventory().addItem(plugin.createShopItem());
         }
     }
 
@@ -79,7 +76,7 @@ public class RunManager {
         run.setOutcome(outcome);
 
         if (outcome == RunOutcome.VICTORY) {
-            p.sendMessage(Component.text("VITORIA!").color(net.kyori.adventure.text.format.NamedTextColor.GOLD).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+            p.sendMessage(Text.mm("<gold><bold>VITORIA!</bold></gold>"));
         }
 
         resetService.fullReset(p, run);
@@ -116,7 +113,7 @@ public class RunManager {
         activeRuns.put(p.getUniqueId(), run);
         statService.recompute(p, run);
         mayhemService.reapplyOnJoin(p, run);
-        p.sendMessage(Component.text("Run restaurada!").color(net.kyori.adventure.text.format.NamedTextColor.GREEN).decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true));
+        p.sendMessage(Text.mm("<green><bold>Progresso restaurado!</bold></green>"));
     }
 
     public void removeRun(Player p) {

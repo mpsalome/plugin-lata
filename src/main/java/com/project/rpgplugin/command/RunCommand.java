@@ -28,14 +28,14 @@ public class RunCommand implements CommandExecutor {
         }
 
         if (!runManager.hasActiveRun(p)) {
-            p.sendMessage(Component.text("<red>Você não tem uma run ativa."));
+            p.sendMessage(Text.mm("<red>Você nao tem uma jornada ativa."));
             return true;
         }
 
         RunState run = runManager.getRun(p);
         if (run == null) return true;
 
-        p.sendMessage(Text.mm("<gold><bold>=== Run Info ==="));
+        p.sendMessage(Text.mm("<gold><bold>=== Informacoes do Personagem ==="));
         p.sendMessage(Text.mm("<gray>Nível: <white>" + run.level()));
         p.sendMessage(Text.mm("<gray>Status: <white>" + run.outcome().name()));
         p.sendMessage(Text.mm("<gray>Cartas: <white>" + run.ownedCards().size()));
@@ -44,7 +44,7 @@ public class RunCommand implements CommandExecutor {
         long elapsed = System.currentTimeMillis() - run.startedAt();
         long minutes = TimeUnit.MILLISECONDS.toMinutes(elapsed);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsed) % 60;
-        p.sendMessage(Text.mm("<gray>Tempo de run: <white>" + minutes + "m " + seconds + "s"));
+        p.sendMessage(Text.mm("<gray>Tempo decorrido: <white>" + minutes + "m " + seconds + "s"));
 
         p.sendMessage(Text.mm("<gray>Milestones: <white>" + run.milestonesReached()));
         if (!run.activeModifiers().isEmpty()) {
