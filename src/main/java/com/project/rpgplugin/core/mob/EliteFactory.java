@@ -158,7 +158,18 @@ public class EliteFactory {
         String id, EntityType baseType, String displayName,
         double health, double damage, double speed, double scale, double knockbackResist,
         boolean victory, Map<String, ItemStack> equipment
-    ) {}
+    ) {
+        public BossDef scaleByLevel(int level) {
+            double hpMult = 1 + Math.max(0, (level - 1) * 0.15);
+            double dmgMult = 1 + Math.max(0, (level - 1) * 0.1);
+            double hpRand = 0.85 + Math.random() * 0.3;
+            double dmgRand = 0.9 + Math.random() * 0.2;
+            return new BossDef(id, baseType, displayName,
+                Math.round(health * hpMult * hpRand),
+                Math.round(damage * dmgMult * dmgRand * 10.0) / 10.0,
+                speed, scale, knockbackResist, victory, equipment);
+        }
+    }
 
     public record MobDef(
         String id, EntityType baseType, String displayName,

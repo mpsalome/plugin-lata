@@ -187,31 +187,26 @@ public class SkillDispatchListener implements Listener {
     private void handleBossBeacon(Player player) {
         // Consume beacon from whichever hand held it
         ItemStack main = player.getInventory().getItemInMainHand();
-        boolean isBeacon = ItemKeys.isBossBeacon(main);
+        boolean isBeacon = main != null && ItemKeys.isBossBeacon(main);
         ItemStack item = isBeacon ? main : player.getInventory().getItemInOffHand();
         if (item != null && item.getAmount() > 0) {
             item.setAmount(item.getAmount() - 1);
         }
 
-        // Biome-aware boss selection
-        String bossId;
-        String bossName;
-        var biome = player.getLocation().getBlock().getBiome();
-        String biomeName = biome.name().toLowerCase();
-        if (biomeName.contains("nether") || biomeName.contains("desert") || biomeName.contains("badlands")
-                || biomeName.contains("savanna")) {
-            bossId = "magma_tyrant";
-            bossName = "Tirano Magmatico, Coracao do Inferno";
-        } else if (biomeName.contains("jungle") || biomeName.contains("swamp") || biomeName.contains("mangrove")) {
-            bossId = "storm_wyvern";
-            bossName = "Furia Tempestuosa, Asa do Ceu";
-        } else if (biomeName.contains("deep_dark") || biomeName.contains("crimson") || biomeName.contains("warped")) {
-            bossId = "void_lich";
-            bossName = "Lich do Vazio, A Noite Eterna";
-        } else {
-            bossId = "frostmaw";
-            bossName = "Frostmaw, Senhor do Gelo";
-        }
+        // Boss aleatorio + stats escaladas pelo nivel do invocador
+        int level = 1;
+        RunState run = runManager.getRun(player);
+        if (run != null) level = run.level();
+        final int playerLevel = level;
+
+        String[] bossIds = {"frostmaw", "magma_tyrant", "storm_wyvern", "void_lich"};
+        String bossId = bossIds[(int) (Math.random() * bossIds.length)];
+        String bossName = switch (bossId) {
+            case "magma_tyrant" -> "Tirano Magmatico, Coracao do Inferno";
+            case "storm_wyvern" -> "Furia Tempestuosa, Asa do Ceu";
+            case "void_lich" -> "Lich do Vazio, A Noite Eterna";
+            default -> "Frostmaw, Senhor do Gelo";
+        };
 
         org.bukkit.Bukkit.broadcast(Text.mm(
             "<gold><bold>\u26A0 " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
@@ -221,7 +216,7 @@ public class SkillDispatchListener implements Listener {
         player.getScheduler().runDelayed(plugin, st -> {
             if (!player.isOnline()) return;
             LataCommand lataCmd = (LataCommand) plugin.getCommand("lata").getExecutor();
-            lataCmd.spawnBossAtSafeLocation(player, bossId, bossName);
+            lataCmd.spawnBossAtSafeLocation(player, bossId, bossName, playerLevel);
         }, null, 100L);
     }
 

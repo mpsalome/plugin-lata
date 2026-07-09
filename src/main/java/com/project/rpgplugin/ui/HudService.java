@@ -5,7 +5,10 @@ import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.util.Text;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,8 +27,11 @@ public class HudService {
     private final RunManager runManager;
     private final Map<UUID, PlayerHud> sessions = new ConcurrentHashMap<>();
 
-    // Visual cooldown display registry: player UUID -> skill display name -> expiry timestamp
+    // Cooldown display: player UUID -> skill display name -> expiry timestamp
     private final Map<UUID, Map<String, Long>> cooldownDisplays = new ConcurrentHashMap<>();
+
+    // Active effects: player UUID -> effect display name (e.g. "Sonar")
+    private final Map<UUID, Map<String, Long>> activeEffects = new ConcurrentHashMap<>();
 
     public HudService(JavaPlugin plugin, ManaService manaService, RunManager runManager) {
         this.plugin = plugin;
@@ -33,18 +39,6 @@ public class HudService {
         this.runManager = runManager;
     }
 
-    /**
-     * Registers a visual cooldown for display on the HUD actionbar.
-     * The actionbar will show "⏳ SkillName: X.Xs" until the cooldown expires.
-     * <p>
-     * For item-based skills (e.g. pickaxe, fishing rod), prefer using
-     * {@link Player#setCooldown(Material, int)} for the native hotbar
-     * cooldown overlay instead. See {@link #setItemCooldown(Player, Material, int)}.
-     *
-     * @param player          the player
-     * @param displayName     human-readable skill name (e.g. "Dash", "Sonar")
-     * @param durationSeconds cooldown duration in seconds
-     */
     public void setCooldown(Player player, String displayName, int durationSeconds) {
         if (durationSeconds <= 0) return;
         long expiry = System.currentTimeMillis() + durationSeconds * 1000L;
@@ -53,11 +47,6 @@ public class HudService {
         startPlayer(player);
     }
 
-    /**
-     * Registers a visual cooldown from the backend skill system.
-     * Called automatically by {@link com.project.rpgplugin.core.skill.AbstractSkill#startCooldown}.
-     * Uses millisecond precision for the duration.
-     */
     public void registerCooldown(Player player, String skillId, String displayName, long durationMillis) {
         if (durationMillis <= 0) return;
         long expiry = System.currentTimeMillis() + durationMillis;
@@ -66,33 +55,37 @@ public class HudService {
         startPlayer(player);
     }
 
-    /**
-     * Convenience helper for item-based skills.
-     * Uses the native Minecraft hotbar cooldown overlay instead of actionbar text.
-     * Call this in the skill's activate() method when the skill is triggered by a
-     * physical item (e.g. pickaxe for SeismicSlam, fishing rod for HarpoonPull).
-     *
-     * @param player        the player
-     * @param material      the item material to put on cooldown
-     * @param durationTicks cooldown duration in ticks (20 ticks = 1 second)
-     */
-    public static void setItemCooldown(Player player, Material material, int durationTicks) {
+    public static void setItemCooldown(Player player, org.bukkit.Material material, int durationTicks) {
         player.setCooldown(material, durationTicks);
     }
 
-    /**
-     * Folia-aware 1-tick delayed item cooldown.
-     * When a skill cancels a PlayerInteractEvent/BlockPlaceEvent the client inventory
-     * sync can wipe the hotbar cooldown visual if setCooldown is called in the same tick.
-     * Scheduling it 1 tick later avoids this desync.
-     */
-    public static void setItemCooldownDelayed(Player player, Material material, int durationTicks, JavaPlugin plugin) {
+    public static void setItemCooldownDelayed(Player player, org.bukkit.Material material, int durationTicks, JavaPlugin plugin) {
         player.getScheduler().runDelayed(plugin, st -> player.setCooldown(material, durationTicks), null, 1L);
+    }
+
+    /**
+     * Registra um efeito ativo (como Sonar). O efeito aparece na BossBar
+     * de status ate ser removido via removeActiveEffect() ou expire.
+     */
+    public void setActiveEffect(Player player, String displayName, long durationMillis) {
+        long expiry = durationMillis <= 0 ? Long.MAX_VALUE : System.currentTimeMillis() + durationMillis;
+        activeEffects.computeIfAbsent(player.getUniqueId(), k -> new ConcurrentHashMap<>())
+            .put(displayName, expiry);
+        startPlayer(player);
+    }
+
+    public void removeActiveEffect(Player player, String displayName) {
+        Map<String, Long> effects = activeEffects.get(player.getUniqueId());
+        if (effects != null) {
+            effects.remove(displayName);
+        }
     }
 
     public void startPlayer(Player player) {
         sessions.computeIfAbsent(player.getUniqueId(), k -> {
             var hud = new PlayerHud();
+            hud.skillBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+            hud.skillBar.setVisible(false);
             hud.task = player.getScheduler().runAtFixedRate(plugin, st -> tick(player), () -> {}, 1L, TICK_INTERVAL);
             return hud;
         });
@@ -100,10 +93,15 @@ public class HudService {
 
     public void stopPlayer(Player player) {
         PlayerHud hud = sessions.remove(player.getUniqueId());
-        if (hud != null && hud.task != null) {
-            hud.task.cancel();
+        if (hud != null) {
+            if (hud.task != null) hud.task.cancel();
+            if (hud.skillBar != null) {
+                hud.skillBar.removeAll();
+                hud.skillBar.setVisible(false);
+            }
         }
         cooldownDisplays.remove(player.getUniqueId());
+        activeEffects.remove(player.getUniqueId());
     }
 
     public void startAll() {
@@ -117,6 +115,7 @@ public class HudService {
         });
         sessions.clear();
         cooldownDisplays.clear();
+        activeEffects.clear();
     }
 
     private void tick(Player player) {
@@ -129,36 +128,38 @@ public class HudService {
 
         boolean hasRun = runManager.getRun(player) != null;
         Map<String, Long> playerCooldowns = cooldownDisplays.get(player.getUniqueId());
+        Map<String, Long> playerEffects = activeEffects.get(player.getUniqueId());
 
         cleanup(playerCooldowns);
+        cleanup(playerEffects);
 
-        boolean hasCooldowns = playerCooldowns != null && !playerCooldowns.isEmpty();
-        if (!hasRun && !hasCooldowns) {
-            if (!hud.lastSent.isEmpty()) {
+        // --- Actionbar: mana + health only ---
+        String actionbar = composeActionbar(player, hasRun);
+        if (!actionbar.equals(hud.lastActionbar)) {
+            if (actionbar.isEmpty()) {
                 player.sendActionBar(Component.empty());
-                hud.lastSent = "";
+            } else {
+                player.sendActionBar(Text.mm(actionbar));
             }
-            stopPlayer(player);
-            return;
+            hud.lastActionbar = actionbar;
         }
 
-        String composed = compose(player, hasRun, playerCooldowns);
-        if (!composed.equals(hud.lastSent)) {
-            player.sendActionBar(Text.mm(composed));
-            hud.lastSent = composed;
-        }
+        // --- BossBar: cooldowns + active effects ---
+        updateSkillBar(player, hud, playerCooldowns, playerEffects);
     }
 
-    private void cleanup(Map<String, Long> cooldowns) {
-        if (cooldowns == null || cooldowns.isEmpty()) return;
+    private void cleanup(Map<String, Long> map) {
+        if (map == null || map.isEmpty()) return;
         long now = System.currentTimeMillis();
-        cooldowns.values().removeIf(v -> v <= now);
+        map.values().removeIf(v -> v <= now);
     }
 
-    private String compose(Player player, boolean hasRun, Map<String, Long> playerCooldowns) {
+    private String composeActionbar(Player player, boolean hasRun) {
+        if (!hasRun) return "";
+
         StringBuilder sb = new StringBuilder();
 
-        boolean showMana = hasRun && manaService != null && manaService.isEnabled();
+        boolean showMana = manaService != null && manaService.isEnabled();
         if (showMana) {
             double mana = manaService.getMana(player);
             double maxMana = manaService.getMaxMana(player, runManager.getRun(player));
@@ -169,12 +170,26 @@ public class HudService {
         sb.append("<green>\u2764 ").append((int) player.getHealth())
             .append("/").append((int) player.getMaxHealth()).append("</green>");
 
-        if (playerCooldowns != null && !playerCooldowns.isEmpty()) {
-            long now = System.currentTimeMillis();
-            List<String> parts = new ArrayList<>();
-            int idx = 0;
+        return sb.toString();
+    }
 
-            for (Map.Entry<String, Long> entry : playerCooldowns.entrySet()) {
+    private void updateSkillBar(Player player, PlayerHud hud,
+                                Map<String, Long> cooldowns, Map<String, Long> effects) {
+        long now = System.currentTimeMillis();
+        List<String> parts = new ArrayList<>();
+
+        // Active effects first
+        if (effects != null) {
+            for (Map.Entry<String, Long> entry : effects.entrySet()) {
+                if (entry.getValue() <= now) continue;
+                parts.add("<green>\u25C9 " + entry.getKey() + "</green>");
+            }
+        }
+
+        // Then cooldowns
+        if (cooldowns != null) {
+            int idx = 0;
+            for (Map.Entry<String, Long> entry : cooldowns.entrySet()) {
                 long remaining = entry.getValue() - now;
                 if (remaining <= 0) continue;
                 double secs = remaining / 1000.0;
@@ -182,18 +197,29 @@ public class HudService {
                 parts.add("<" + color + ">\u231b " + entry.getKey() + ": "
                     + String.format("%.1f", secs) + "s</" + color + ">");
             }
-
-            if (!parts.isEmpty()) {
-                sb.append(" <dark_gray>|</dark_gray> ");
-                sb.append(String.join(" <dark_gray>|</dark_gray> ", parts));
-            }
         }
 
-        return sb.toString();
+        if (parts.isEmpty()) {
+            if (hud.skillBar.isVisible()) {
+                hud.skillBar.removeAll();
+                hud.skillBar.setVisible(false);
+            }
+            return;
+        }
+
+        String title = String.join(" <dark_gray>|</dark_gray> ", parts);
+        hud.skillBar.setTitle(title.replaceAll("<[^>]+>", ""));
+        hud.skillBar.setProgress(1.0);
+
+        if (!hud.skillBar.isVisible()) {
+            hud.skillBar.addPlayer(player);
+            hud.skillBar.setVisible(true);
+        }
     }
 
     private static class PlayerHud {
         ScheduledTask task;
-        String lastSent = "";
+        BossBar skillBar;
+        String lastActionbar = "";
     }
 }

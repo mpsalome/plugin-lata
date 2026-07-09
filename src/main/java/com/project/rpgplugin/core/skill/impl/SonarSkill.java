@@ -7,18 +7,23 @@ import com.project.rpgplugin.core.skill.SkillType;
 import com.project.rpgplugin.core.skill.trigger.CompositeTriggerHelper;
 import com.project.rpgplugin.core.skill.trigger.SkillTrigger;
 import com.project.rpgplugin.util.SchedulerUtil;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SonarSkill extends AbstractSkill {
+
+    private static final Map<UUID, SonarSession> activeSessions = new ConcurrentHashMap<>();
 
     public SonarSkill(com.project.rpgplugin.core.skill.SkillServices services) {
         super(services);
@@ -40,7 +45,7 @@ public class SonarSkill extends AbstractSkill {
     public boolean passive() { return false; }
 
     @Override
-    public Duration cooldown() { return Duration.ofSeconds(25); }
+    public Duration cooldown() { return Duration.ZERO; }
 
     @Override
     public SkillTrigger trigger() {
@@ -49,27 +54,65 @@ public class SonarSkill extends AbstractSkill {
 
     @Override
     public void activate(SkillContext ctx) {
-        if (onCooldown(ctx)) {
-            ctx.player().playSound(ctx.player().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
+        Player p = ctx.player();
+        UUID pid = p.getUniqueId();
+        SonarSession existing = activeSessions.get(pid);
+
+        if (existing != null) {
+            deactivate(p, existing);
             return;
         }
-        Player p = ctx.player();
-        startCooldown(ctx);
-        int range = cfgInt("range", 20);
-        int duration = cfgInt("glow_duration", 10) * 20;
-        List<LivingEntity> revealed = new ArrayList<>();
-        for (Entity entity : p.getNearbyEntities(range, range, range)) {
-            if (entity instanceof LivingEntity le && entity != p) {
-                le.setGlowing(true);
-                revealed.add(le);
-                le.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, le.getLocation().add(0, 1, 0), 15, 0.3, 0.5, 0.3, 0);
+
+        int range = cfgInt("range", 30);
+        long interval = cfgInt("tick_interval", 20);
+        int glowDuration = cfgInt("glow_duration", 60);
+
+        services.plugin().getHudService().setActiveEffect(p, "\uD83D\uDD0D Sonar", -1);
+
+        BukkitTask task = SchedulerUtil.runTimer(services.plugin(), () -> {
+            if (!p.isOnline() || activeSessions.get(pid) == null) {
+                return;
             }
-        }
-        SchedulerUtil.runLater(services.plugin(), () -> {
-            for (LivingEntity le : revealed) {
+            for (Entity entity : p.getNearbyEntities(range, range, range)) {
+                if (entity instanceof LivingEntity le && entity != p) {
+                    le.setGlowing(true);
+                    le.getWorld().spawnParticle(Particle.GLOW_SQUID_INK, le.getLocation().add(0, 1, 0), 6, 0.3, 0.5, 0.3, 0);
+                    SchedulerUtil.runLater(services.plugin(), () -> {
+                        if (le.isValid()) le.setGlowing(false);
+                    }, glowDuration);
+                }
+            }
+        }, 0L, interval);
+
+        activeSessions.put(pid, new SonarSession(task));
+        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
+        p.sendActionBar(Text.mm("<aqua>\uD83D\uDD0D Sonar ativado! Agache + clique direito novamente para desligar.</aqua>"));
+    }
+
+    private void deactivate(Player p, SonarSession session) {
+        UUID pid = p.getUniqueId();
+        activeSessions.remove(pid);
+        session.task.cancel();
+        services.plugin().getHudService().removeActiveEffect(p, "\uD83D\uDD0D Sonar");
+        for (Entity entity : p.getNearbyEntities(60, 60, 60)) {
+            if (entity instanceof LivingEntity le && entity != p) {
                 le.setGlowing(false);
             }
-        }, duration);
-        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
+        }
+        p.playSound(p.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.0f, 1.0f);
+        p.sendActionBar(Text.mm("<gray>\uD83D\uDD0D Sonar desativado.</gray>"));
     }
+
+    public static boolean isActive(Player p) {
+        return activeSessions.containsKey(p.getUniqueId());
+    }
+
+    public static void cleanup(Player p) {
+        SonarSession session = activeSessions.remove(p.getUniqueId());
+        if (session != null) {
+            session.task.cancel();
+        }
+    }
+
+    private record SonarSession(BukkitTask task) {}
 }

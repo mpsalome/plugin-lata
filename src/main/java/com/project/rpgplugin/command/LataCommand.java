@@ -145,7 +145,12 @@ public class LataCommand implements CommandExecutor {
 
         player.getScheduler().runDelayed(plugin, st -> {
             if (!player.isOnline()) return;
-            spawnBossAtSafeLocation(player, bossId, bossName);
+            int level = 1;
+            if (runManager.hasActiveRun(player)) {
+                RunState r = runManager.getRun(player);
+                if (r != null) level = r.level();
+            }
+            spawnBossAtSafeLocation(player, bossId, bossName, level);
         }, null, 100L);
     }
 
@@ -204,7 +209,7 @@ public class LataCommand implements CommandExecutor {
         };
     }
 
-    public void spawnBossAtSafeLocation(Player player, String bossId, String bossName) {
+    public void spawnBossAtSafeLocation(Player player, String bossId, String bossName, int playerLevel) {
         Location playerLoc = player.getLocation();
         var world = playerLoc.getWorld();
 
@@ -217,7 +222,7 @@ public class LataCommand implements CommandExecutor {
             LivingEntity boss = null;
             EliteFactory.BossDef def = mobSpawnService.getBossDef(bossId);
             if (def != null) {
-                boss = mobSpawnService.getEliteFactory().spawnBoss(finalLoc, def);
+                boss = mobSpawnService.getEliteFactory().spawnBoss(finalLoc, def.scaleByLevel(playerLevel));
             }
 
             // Fallback: if boss is null or def was missing, spawn the Titan em Lata
