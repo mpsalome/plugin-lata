@@ -35,7 +35,7 @@ When an optional plugin is absent, features depending on it are gracefully disab
 | Command | Description |
 |---------|-------------|
 | `/lata tp <player>` | Teleport to a player |
-| `/lata boss spawn <boss>` | Spawn a boss (frostmaw, magma_tyrant, storm_wyvern, void_lich) |
+| `/lata boss spawn <boss>` | Spawn a boss (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma) |
 | `/lata loja` | Open the ShopMenu |
 | `/lata draft` | Open pending draft (non-blocking) |
 | `/lata book` | Receive the RPG Book (drops to ground if inventory full) |
@@ -46,14 +46,14 @@ When an optional plugin is absent, features depending on it are gracefully disab
 | Feature | Standalone | +AuraSkills | +AuraMobs | +MythicMobs |
 |---------|-----------|-------------|-----------|-------------|
 | Draft (1-de-3) | ✅ | ✅ | ✅ | ✅ |
-| 35 abilities | ✅ | ✅ (also as AuraSkills custom skills) | ✅ | ✅ |
+| 37 abilities | ✅ | ✅ (also as AuraSkills custom skills) | ✅ | ✅ |
 | 53 augments | ✅ | ✅ | ✅ | ✅ |
 | Mayhem modifiers | ✅ | ✅ | ✅ | ✅ |
 | Reset on death | ✅ | ✅ (also resets AuraSkills XP) | ✅ | ✅ |
 | Recall | ✅ | ✅ | ✅ | ✅ |
 | Vanilla elites/bosses | ✅ | ✅ | ✅ | ✅ |
 | Difficulty scaling | ✅ (depth + players) | ✅ | ✅ (enhanced) | ✅ |
-| 4 bosses (frostmaw, magma_tyrant, storm_wyvern, void_lich) | ✅ | ✅ | ✅ | ✅ |
+| 10 bosses with themed loot (BossSet) | ✅ | ✅ | ✅ | ✅ |
 | HubMenu (right-click BREAD) | ✅ | ✅ | ✅ | ✅ |
 | ShopMenu (5 items) | ✅ | ✅ | ✅ | ✅ |
 | Non-blocking draft | ✅ | ✅ | ✅ | ✅ |
@@ -73,7 +73,7 @@ Generated on first run under `plugins/RogueLata/`:
 - `augments.yml` — Augment card definitions
 - `gates.yml` — AuraSkills level gates
 - `mayhem.yml` — Mayhem thresholds & config
-- `bosses.yml` — Boss definitions (frostmaw, magma_tyrant, storm_wyvern, void_lich)
+- `bosses.yml` — Boss definitions (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma)
 - `mobs.yml` — Elite mob definitions
 - `mana_abilities.yml` — Mana costs per ability
 - `runs/<uuid>.yml` — Per-player run persistence

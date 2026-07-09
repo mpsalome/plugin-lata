@@ -1,13 +1,39 @@
 # Handoff — RogueLata Plugin
 
-## Estado Atual (2026-07-08)
+## Estado Atual (2026-07-09)
 
-- **Versão:** `3.1.0` (pom.xml)
-- **Build:** `mvn clean package` — 161 source files
+- **Versão:** `3.2.0` (pom.xml)
+- **Build:** `mvn clean package` — 163 source files
 - **CI:** `.github/workflows/ci.yml` roda `mvn clean package` + `mvn test` em push/PR
 - **Release:** `.github/workflows/release.yml` triggered on tag `v*`
 
 ## O que foi feito
+
+### v3.2.0 — New Features
+
+#### Bosses
+- 10 bosses (4 originais + 6 novos: Sir Creeper-A-Lot, Slime Shady, O Decapitador, Guardião Ancestral, Senhor da Guerra Piglin, Rei Fantasma)
+- BossSet system: cada boss dropa equipamento temático (nome custom, encantamentos, lore)
+- Boss drops escalam por nível (mais peças em níveis altos)
+- Boss level exibido no summon + dica do possível loot
+- BossLootService: loot baseado no tier do boss (COMMON→EPIC por HP), XP recompensa escala com HP do boss
+- Milestone boss: 50% de chance de spawnar boss aleatório em vez de mayhem a cada milestone
+
+#### Gameplay
+- SonarSkill é toggle (sneak right-click on/off), glowing reveal contínuo
+- Boss stats escalam com nível do invocador (+15% HP, +10% damage por nível, ±20% random)
+- Purificação do Mundo: novo item na Loja (slot 18, 30 níveis), remove TODOS os efeitos Mayhem do mundo
+
+#### UI/HUD
+- HUD separada: actionbar só mana+health, BossBar para cooldowns + efeitos ativos
+
+#### Skills
+- Defensive cfg reads (cfgInt/cfgDouble/cfgString) no AbstractSkill
+
+#### Fluxo de Jogo
+- Draft não-bloqueante: sem auto-open, player usa `/lata draft`
+- Respawn vanilla (sem setRespawnLocation)
+- Mayhem limpa na morte
 
 ### v3.1.0 — New Features
 
@@ -110,10 +136,10 @@
 - `core/run/` — `RunState`, `RunManager`, `ResetService`
 - `core/draft/` — `DraftService`, `DraftSession`, `DraftWeighting`
 - `core/mob/` — `EliteFactory`, `MobSpawnService`
-- `core/mayhem/` — 8 modifiers, `MilestoneService`
+- `core/mayhem/` — 8 modifiers, `MilestoneService`, `MayhemService` (inclui clear)
 - `core/build/` — `SynergyService` (inclui ascendant cards)
 - `core/mana/` — `ManaService`
-- `core/boss/` — Boss definitions, spawn logic (frostmaw, magma_tyrant, storm_wyvern, void_lich)
+- `core/boss/` — Boss definitions, spawn logic, BossSet, BossLootService
 
 ### Tasks
 - `task/PassiveTask.java` — periodic potion effect maintenance + synergy application
@@ -131,7 +157,7 @@
 - `ui/CollectionMenu.java` — 54 slots, pagination 36/page, category filters, "Menu Principal" at 49
 - `ui/ShopMenu.java` — 27 slots, 5 items at 10/12/14/16/18
 - `ui/HubMenu.java` — 27 slots, items at 11/13/15, "Fechar" at 22
-- `ui/HudService.java` — action bar
+- `ui/HudService.java` — action bar (mana+health) + BossBar (cooldowns+effects)
 - `ui/menu/Menu.java`, `MenuHolder.java`, `MenuListener.java`
 
 ### Data
@@ -144,6 +170,7 @@
 
 ### Config
 - `config/BossConfig.java` — bosses.yml loader
+- `config/BossLootConfig.java` — boss loot tables
 - `config/ShopConfig.java` — shop item definitions
 
 ## O que NÃO foi feito (propositalmente não incluído no escopo)

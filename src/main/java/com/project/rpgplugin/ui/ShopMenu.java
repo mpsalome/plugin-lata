@@ -1,6 +1,7 @@
 package com.project.rpgplugin.ui;
 
 import com.project.rpgplugin.RPGPlugin;
+import com.project.rpgplugin.core.mayhem.MayhemService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.util.ItemKeys;
@@ -45,7 +46,8 @@ public class ShopMenu extends Menu {
                 case 12 -> buyDraftToken(run);
                 case 14 -> buyAbsolution(run);
                 case 16 -> buyBeacon(run);
-                case 18, 26 -> new HubMenu(player, plugin, plugin.getRunManager(),
+                case 18 -> buyMayhemCleanse(run);
+                case 20, 26 -> new HubMenu(player, plugin, plugin.getRunManager(),
                     plugin.getCardRegistry(), plugin.getRunManager().statService());
             }
         });
@@ -70,10 +72,11 @@ public class ShopMenu extends Menu {
             Material.ORANGE_STAINED_GLASS_PANE,   // reroll
             Material.LIME_STAINED_GLASS_PANE,      // draft
             Material.CYAN_STAINED_GLASS_PANE,      // absolution
-            Material.RED_STAINED_GLASS_PANE        // beacon
+            Material.RED_STAINED_GLASS_PANE,       // beacon
+            Material.PURPLE_STAINED_GLASS_PANE     // cleanse
         };
-        int[] itemSlots = {10, 12, 14, 16};
-        for (int i = 0; i < 4; i++) {
+        int[] itemSlots = {10, 12, 14, 16, 18};
+        for (int i = 0; i < 5; i++) {
             int bgSlot = itemSlots[i] - 1;
             setItem(bgSlot, decorativePane(bgColors[i], null));
             setItem(bgSlot + 1, decorativePane(bgColors[i], null));
@@ -107,6 +110,14 @@ public class ShopMenu extends Menu {
                         "<gray>Invoca um boss apos 5 segundos</gray>"
                 )));
 
+        setItem(18, buildShopItem(Material.HEART_OF_THE_SEA,
+                "<dark_purple><bold>\uD83D\uDD25 Purificacao do Mundo",
+                List.of(
+                        "<gray>Custo: <yellow>30 niveis</yellow></gray>",
+                        "<gray>Remove <red>TODOS</red> os efeitos mayhem do mundo.</gray>",
+                        "<dark_gray>A calma retorna... ate o proximo caos.</dark_gray>"
+                )));
+
         // Row 2: footer
         ItemStack backBtn = new ItemStack(Material.GOLD_NUGGET);
         var backMeta = backBtn.getItemMeta();
@@ -114,7 +125,7 @@ public class ShopMenu extends Menu {
             backMeta.displayName(Text.mm("<gold>\uD83C\uDF7C Menu Principal"));
             backBtn.setItemMeta(backMeta);
         }
-        setItem(18, backBtn);
+        setItem(20, backBtn);
 
         ItemStack footer = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         var footerMeta = footer.getItemMeta();
@@ -122,7 +133,7 @@ public class ShopMenu extends Menu {
             footerMeta.displayName(Text.mm("<dark_gray>Clique em um item para comprar"));
             footer.setItemMeta(footerMeta);
         }
-        for (int i = 19; i < 26; i++) {
+        for (int i = 21; i < 26; i++) {
             setItem(i, footer);
         }
         setItem(26, backBtn.clone());
@@ -150,6 +161,14 @@ public class ShopMenu extends Menu {
         player.setLevel(player.getLevel() - 10);
         plugin.getMayhemService().reduceMayhemByOne(player, run);
         successSound();
+    }
+
+    private void buyMayhemCleanse(RunState run) {
+        if (!checkLevels(30)) return;
+        player.setLevel(player.getLevel() - 30);
+        plugin.getMayhemService().clear(player, run);
+        successSound();
+        player.sendActionBar(Text.mm("<dark_purple>\uD83D\uDD25 O caos foi purificado do mundo!</dark_purple>"));
     }
 
     private void buyBeacon(RunState run) {
@@ -219,7 +238,7 @@ public class ShopMenu extends Menu {
 
         ItemStack bg = decorativePane(Material.BLACK_STAINED_GLASS_PANE, null);
         for (int i = 9; i < SIZE - 9; i++) {
-            if (i != 10 && i != 12 && i != 14 && i != 16) {
+            if (i != 10 && i != 12 && i != 14 && i != 16 && i != 18) {
                 setItem(i, bg);
             }
         }

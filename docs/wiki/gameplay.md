@@ -25,7 +25,7 @@ Ao morrer, você **perde absolutamente todo o poder**:
 |--------|---------|-------------|
 | **Draft de cartas** | A alma roguelike | A cada X níveis, acumula um draft pendente; abra manualmente com `/lata draft` ou pelo HubMenu |
 | **AuraSkills** *(se instalado)* | Recompensa por dedicação | Minerar sobe Mining, andar sobe Agility... libera cartas (gates) e influencia o draft |
-| **Mayhem** | O caos | A cada marco, o mundo ganha uma regra maluca; **limpo na morte** |
+| **Mayhem** | O caos | A cada marco, o mundo ganha uma regra maluca; **limpo na morte** ou pela Purificação |
 
 ## 4. O Draft
 
@@ -105,6 +105,12 @@ A cada **marco** (níveis 10, 20, 30...), o mundo ganha uma **regra maluca perma
 
 Ao morrer, **todo Mayhem é limpo** — timers cancelados e entidades mayhem removidas.
 
+**Purificação:** compre o item "Purificação do Mundo" na Loja por 30 níveis para remover TODO o mayhem do mundo instantaneamente.
+
+### Milestone Boss (novo na 3.2.0)
+
+A cada 10 níveis, há 50% de chance de invocar um **boss aleatório** ao invés de aplicar mayhem. O boss escala com o nível do invocador.
+
 ## 9. Recall
 
 A carta **Recall do Dragão** (ouro, Explorador) te leva de volta ao spawn — mas só depois de **andar uma certa distância**, e o requisito **cresce a cada uso** (ex: 2000 → 3000 → 4500 blocos).
@@ -117,13 +123,14 @@ Carta ouro que te **revive uma vez** na run. Morreu com ela? Você volta com 1 d
 
 Acessível via `/lata loja` ou botão "Loja Pao em Lata" no HubMenu. Compre upgrades com seus níveis de XP:
 
-| Item | Custo | Efeito |
-|------|-------|--------|
-| Reroll de Sorte | 2 níveis | Ganha 1 reroll gratuito no próximo draft |
-| Carta Avulsa | 5 níveis | Adiciona 1 draft pendente e abre o menu |
-| Absolvição do Caos | 10 níveis | Reduz o Mayhem da região em 1 nível |
-| Sinalizador do Chefe | 15 níveis | Item consumível — clique direito para invocar um boss no bioma atual |
-| Beque | 30 níveis | Na morte, preserva itens do inventário |
+| Slot | Item | Custo | Efeito |
+|------|------|-------|--------|
+| 11 | Reroll de Sorte | 2 níveis | 1 reroll gratuito no próximo draft |
+| 12 | Carta Avulsa | 5 níveis | +1 draft pendente |
+| 13 | Absolvição do Caos | 10 níveis | Reduz o Mayhem em 1 nível |
+| 14 | Sinalizador do Chefe | 15 níveis | Item consumível — clique direito para invocar um boss no bioma atual |
+| 15 | Beque | 30 níveis | Na morte, preserva itens do inventário |
+| 18 | Purificação do Mundo | 30 níveis | Remove TODO o mayhem do mundo |
 
 ## 12. HubMenu
 
@@ -135,24 +142,42 @@ Acessado clicando com o **botão direito na Lata de Pão** (RPG Book, item BREAD
 
 ## 13. Bosses
 
-4 bosses disponíveis, invocados via `/lata boss spawn <id>` ou pelo item **Sinalizador do Chefe** (comprado na loja, clicável no chão):
+**10 bosses** disponíveis (4 originais + 6 novos), invocados via `/lata boss spawn <id>`, pelo item **Sinalizador do Chefe**, ou como **Milestone Boss** (50% de chance a cada 10 níveis).
 
-| ID | Tipo | Vida | Display (MiniMessage) |
-|----|------|------|-----------------------|
-| `frostmaw` | POLAR_BEAR | 300 HP | Frostmaw, Senhor do Gelo |
-| `magma_tyrant` | MAGMA_CUBE | 200 HP | Tirano Magmático, Coração do Inferno |
-| `storm_wyvern` | RAVAGER | 350 HP | Fúria Tempestuosa, Asa do Céu |
-| `void_lich` | WITHER_SKELETON | 250 HP | Lich do Vazio, A Noite Eterna |
+**Novos bosses da v3.2.0:** Sir Creeper-A-Lot (CREEPER), Slime Shady (SLIME), O Decapitador (WITHER_SKELETON), Guardião Ancestral (IRON_GOLEM), Senhor da Guerra Piglin (PIGLIN_BRUTE), Rei Fantasma (SKELETON).
 
+| ID | Tipo | Display (MiniMessage) |
+|----|------|-----------------------|
+| `frostmaw` | POLAR_BEAR | Frostmaw, Senhor do Gelo |
+| `magma_tyrant` | MAGMA_CUBE | Tirano Magmático, Coração do Inferno |
+| `storm_wyvern` | RAVAGER | Fúria Tempestuosa, Asa do Céu |
+| `void_lich` | WITHER_SKELETON | Lich do Vazio, A Noite Eterna |
+| `sir_creeper` | CREEPER | Sir Creeper-A-Lot |
+| `slime_shady` | SLIME | Slime Shady |
+| `o_decapitador` | WITHER_SKELETON | O Decapitador |
+| `guardiao_ancestral` | IRON_GOLEM | Guardião Ancestral |
+| `senhor_da_guerra_piglin` | PIGLIN_BRUTE | Senhor da Guerra Piglin |
+| `rei_fantasma` | SKELETON | Rei Fantasma |
+
+- Ao invocar, o **nível do boss** é exibido + uma dica do loot (sneak peek)
 - Bosses usam **MiniMessage** para nomes com formatação (BossBar usa texto plano sem tags)
 - Invocação tem delay de 5 segundos com broadcast de aviso
 - Configuráveis via `bosses.yml`
+- **Loot:** cada boss dropa peças do seu **set temático** (armadura/arma customizada com nome, encantamentos e lore) + loot aleatório. A quantidade de peças aumenta com o nível do boss.
+- **Escala:** vida do boss = base * (1 + 0.15 × nível_invocador), dano = base * (1 + 0.10 × nível_invocador), com ±20% de variação RNG.
+- **Equipamento:** o BossLootService gera as peças do set + loot aleatório escalado pelo nível do boss.
 
-## 14. Vitória
+## 14. HUD e BossBar
+
+- **Actionbar:** exibe apenas mana e vida atual
+- **BossBar:** exibe status dos cooldowns, habilidades ativas e efeitos ativos
+- **SonarSkill:** agache + clique direito para ativar um **glow contínuo** em entidades próximas; clique novamente para desativar
+
+## 15. Vitória
 
 **Derrote o boss final** para vencer a run. A vitória encerra a run com glória — e uma nova começa.
 
-## 15. Dicas de build
+## 16. Dicas de build
 
 - Foque uma atividade (minerar/andar) para o draft favorecer cartas daquela classe (com AuraSkills)
 - Cartas Bronze empilháveis (vida, velocidade, %XP) somam muito ao longo da run
@@ -160,3 +185,5 @@ Acessado clicando com o **botão direito na Lata de Pão** (RPG Book, item BREAD
 - Cartas de risco compensam quando você já tem sustain para bancar
 - Pegue Recall do Dragão cedo — quanto mais você anda, mais útil ele fica
 - Use a Loja para comprar drafts extras e rerolls quando estiver com níveis sobrando
+- Compre **Purificação do Mundo** se o mayhem estiver acumulando demais
+- Fique atento ao **Milestone Boss** ao subir de nível — prepare-se para um combate

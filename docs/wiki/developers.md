@@ -17,31 +17,33 @@ com.project.rpgplugin
 ├── RPGPlugin.java                  # Bootstrap + DI manual
 ├── AuraSkillsIntegration.java      # Ponte AuraSkills (custom skills, gates, draft bias)
 ├── command/
-│   ├── LataCommand.java            # /lata e subcomandos (tp, boss, loja, draft, book)
+│   ├── LataCommand.java            # /lata e subcomandos (tp, boss, loja, craft, book)
 │   ├── RunCommand.java             # /run
 │   └── RecallCommand.java          # /recall
-├── config/                         # SkillsConfig
+├── config/                         # SkillsConfig, ShopConfig
 ├── core/
-│   ├── build/       SynergyService           # Sinergias por tags
-│   ├── card/        Card, CardRegistry...    # 90 cartas (37 ability + 53 augment)
-│   ├── difficulty/  DifficultyService        # Escala vanilla (profundidade + players)
-│   ├── draft/       DraftService, Weighting  # Motor do draft 1-de-3 (não-bloqueante)
-│   ├── mayhem/      MayhemService, 8+ mods   # Modificadores cumulativos (limpos na morte)
-│   ├── mob/         EliteFactory, MobSpawnService  # Bosses/elites via bosses.yml/mobs.yml
-│   ├── progression/ GateRegistry, Recall     # Gates, recall, distância
-│   ├── run/         RunState, RunManager     # Ciclo da run, persistência, migração veteran
-│   └── skill/       Skill, 38 impls          # Sistema de skills data-driven (cfgInt/cfgDouble/cfgString)
-├── data/            YamlDataStore, RunPersistenceService  # Persistência runs/{uuid}.yml
-├── listener/        CombatListener, PlayerLifecycleListener, SkillDispatchListener
-├── task/            DistanceTask             # Tasks periódicas
+│   ├── build/        SynergyService           # Sinergias por tags
+│   ├── card/          Card, CardRegistry...    # 90 cartas (37 ability + 53 augment)
+│   ├── difficulty/    DifficultyService        # Escala vanilla (profundidade + players)
+│   ├── draft/         DraftService, Weighting  # Motor do draft 1-de-3 (não-bloqueante)
+│   ├── mayhem/        MayhemService, 8+ mods   # Modificadores cumulativos (limpos na morte)
+│   ├── mob/           EliteFactory, MobSpawnService  # Bosses/elites via bosses.yml/mobs.yml
+│   ├── boss/          BossLootService, BossSet       # Geração de loot temático por boss (v3.2.0)
+│   ├── milestone/     MilestoneService          # Milestone boss (50% chance a cada 10 níveis)
+│   ├── progression/   GateRegistry, Recall     # Gates, recall, distância
+│   ├── run/           RunState, RunManager     # Ciclo da run, persistência, migração veteran
+│   └── skill/         Skill, 38 impls          # Sistema de skills data-driven (cfgInt/cfgDouble/cfgString)
+├── data/              YamlDataStore, RunPersistenceService  # Persistência runs/{uuid}.yml
+├── listener/          CombatListener, PlayerLifecycleListener, SkillDispatchListener
+├── task/              DistanceTask             # Tasks periódicas
 ├── ui/
 │   ├── HubMenu.java               # Menu principal (Coleção, Loja, Draft)
 │   ├── CollectionMenu.java        # Coleção paginada (36 cards/página, filtros)
-│   ├── ShopMenu.java              # Loja (Reroll, Carta Avulsa, Absolvição, Sinalizador, Beque)
+│   ├── ShopMenu.java              # Loja (inclui Purificação do Mundo, slot 18)
 │   ├── DraftMenu.java             # Draft 1-de-3 (fechável, sessão preservada)
-│   └── HUD.java                   # HUD do jogador
-├── util/            ItemKeys, Text           # Utilitários
-└── integration/     MythicMobsBridge, ModelEngineBridge, AuraMobsIntegration
+│   └── HUD.java                   # Actionbar (mana+health) + BossBar (cooldowns/efeitos)
+├── util/              ItemKeys, Text, ItemBuilder  # Utilitários
+└── integration/       MythicMobsBridge, ModelEngineBridge, AuraMobsIntegration
 ```
 
 ## Serviços principais
@@ -57,6 +59,8 @@ com.project.rpgplugin
 | `MobSpawnService` | Spawn de bosses e elites configuráveis via YAML | `RPGPlugin.getMobSpawnService()` |
 | `EliteFactory` | Cria entidades boss/elite (MiniMessage display, BossBar, MythicMobs fallback) | via `MobSpawnService` |
 | `MayhemConfig` | Modificadores Mayhem, marcos e severidade | `RPGPlugin.getMayhemConfig()` |
+| `BossLootService` | Gera peças do set temático + loot aleatório, escala com nível do boss | `RPGPlugin.getBossLootService()` |
+| `MilestoneService` | Gerencia milestone boss (50% de chance a cada 10 níveis) | `RPGPlugin.getMilestoneService()` |
 
 ## LataCommand — extensibilidade
 
@@ -66,7 +70,7 @@ O `LataCommand` usa um switch no primeiro argumento para rotear subcomandos. Par
 2. Crie um método `handle<Nome>(Player, String[], String)`
 3. Adicione a entrada de ajuda em `sendHelp`
 
-Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `draft`.
+Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `craft`, `draft`.
 
 ## Como adicionar uma carta
 
@@ -95,6 +99,13 @@ Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `draft`.
 - **Migração veteran** na primeira join: níveis AuraSkills existentes são convertidos em pending drafts
 - **Draft não-bloqueante**: level-ups acumulam drafts, jogador abre manualmente
 - **Limpeza de estado** em quit/death para evitar leaks de UUID
+- **Boss level scaling**: vida = base * (1 + 0.15 × nível do invocador), dano = base * (1 + 0.10 × nível do invocador), ±20% RNG
+- **BossSet drops**: todo boss tem um loot_set em `loot_sets.yml` — itens customizados com nome, encantamentos e lore. A quantidade de peças dropadas escala com o nível do boss.
+- **Milestone boss**: em `mayhem.yml`, `boss_chance: 0.5` define 50% de chance de invocar um boss aleatório a cada 10 níveis ao invés de mayhem
+- **SonarSkill**: ativado por sneak + clique direito; glow contínuo em entidades até desativar (clique novamente)
+- **HUD split**: actionbar = mana + vida; BossBar = cooldowns e efeitos ativos
+- **Purificação**: ShopMenu slot 18, item Purificação do Mundo, custo 30 níveis, remove todas as entidades e efeitos mayhem do mundo
+- **BossLootService**: gera peças de set temático + loot aleatório (pérolas, drops raros), quantidade escalada por nível do boss
 
 ## Testes
 
@@ -102,4 +113,4 @@ Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `draft`.
 mvn test
 ```
 
-Atualmente 106+ testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression, ResetService, MilestoneService, SynergyService, AugmentCard, ManaService, ModifierRegistry, DraftService).
+Atualmente 106+ testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression, ResetService, MilestoneService, SynergyService, AugmentCard, ManaService, ModifierRegistry, DraftService, BossLootService).

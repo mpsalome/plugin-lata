@@ -1,6 +1,6 @@
-# RogueLata — Technical Briefing v3.1.0
+# RogueLata — Technical Briefing v3.2.0
 
-> **Gerado em:** 08/07/2026
+> **Gerado em:** 09/07/2026
 > **Propósito:** Raio-X arquitetural completo para consultor externo gerar código compatível sem acesso ao repositório.
 
 ---
@@ -82,25 +82,28 @@ mobSpawnService = new MobSpawnService(this, runManager, mythicMobsBridge, modelE
 // 11. Augment handlers (EPIC-10)
 augmentListener = new AugmentListener(runManager);
 
-// 12. HUD & Menu framework (EPIC-8)
-hudService = new HudService(this, manaService, runManager);
+// 12. Boss loot (v3.2.0)
+bossLootService = new BossLootService(this, cardRegistry);
+
+// 13. HUD & Menu framework (EPIC-8)
+hudService = new HudService(this, manaService, runManager, bossLootService);
 menuListener = new MenuListener();
 
-// 13. Persistence (EPIC-9)
+// 14. Persistence (EPIC-9)
 dataStore = new YamlDataStore(this, cardRegistry);
 
-// 14. Synergies (EPIC-10)
+// 15. Synergies (EPIC-10)
 synergyService = new SynergyService(cardRegistry);
 
-// 15. Passive task
+// 16. Passive task
 passiveTask = new PassiveTask();
 
-// 16. Skill dispatch listener (with RunManager)
+// 17. Skill dispatch listener (with RunManager)
 skillDispatchListener = new SkillDispatchListener(skillRegistry, skillServices, runManager, cardRegistry, this);
 skillDispatchListener.setManaService(manaService);
 auraSkillsIntegration.setManaService(manaService);
 
-// 17. Register event listeners (10 listeners)
+// 18. Register event listeners (10 listeners)
 getServer().getPluginManager().registerEvents(playerLevelListener, this);
 getServer().getPluginManager().registerEvents(draftMenuListener, this);
 getServer().getPluginManager().registerEvents(playerLifecycleListener, this);
@@ -111,12 +114,12 @@ getServer().getPluginManager().registerEvents(combatListener, this);
 getServer().getPluginManager().registerEvents(augmentListener, this);
 getServer().getPluginManager().registerEvents(menuListener, this);
 
-// 18. Start tasks
+// 19. Start tasks
 distanceTask.start(this, distanceTracker, augmentListener);
 passiveTask.start(this, runManager, synergyService, auraSkillsIntegration, skillRegistry, skillServices);
 hudService.startAll();
 
-// 19. Wire commands
+// 20. Wire commands
 getCommand("skills").setExecutor(this);
 getCommand("rpg").setExecutor(this);
 getCommand("run").setExecutor(runCommand);
@@ -135,6 +138,7 @@ getRunManager(), getMayhemService(), getMilestoneService(), getMayhemConfig()
 getResetService(), getDifficultyService(), getMobSpawnService()
 getDataStore(), getCooldownService(), getSynergyService()
 getHudService(), getGateRegistry(), getDistanceTracker()
+getBossLootService(),
 getPlayerLevelListener()
 createRpgBook() -> ItemStack  // BREAD com PDC rpg_book
 createBossBeacon() -> ItemStack // BEACON com PDC boss_beacon
@@ -148,7 +152,7 @@ commands:
   rpg:     /rpg [reload|reset|debug]
   run:     /run
   recall:  /recall
-  lata:    /lata [tp <jogador>|boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich>|loja|draft|book]
+  lata:    /lata [tp <jogador>|boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich|sir_creeper_a_lot|slime_shady|o_decapitador|guardiao_ancestral|senhor_da_guerra_piglin|rei_fantasma>|loja|draft|book]
            aliases: [rogue, pao, roguelata]
   rogue:   /rogue (sinonimo de /lata)
            aliases: [lata, pao, roguelata]
@@ -254,6 +258,9 @@ public abstract class AbstractSkill implements Skill {
     protected void consume(SkillContext ctx, int amount); // subtrai do ItemStack
     protected void feedback(SkillContext ctx, String message, Sound sound);
     protected ConfigurationSection cfg();         // da config.yml
+    protected int cfgInt(String path, int def);   // defesa contra seção faltante
+    protected double cfgDouble(String path, double def);
+    protected String cfgString(String path, String def);
 }
 ```
 
@@ -288,6 +295,8 @@ Implementações concretas de Trigger no pacote: `com.project.rpgplugin.core.ski
 // -> event.setCancelled(true) (se INTERACT ou CONSUME)
 // -> skill.activate(ctx)
 ```
+
+Skills toggleáveis (ex: SonarSkill) usam sneak right-click para ligar/desligar. Quando desligadas, o dispatch as pula via `run.isToggledOn(skillId)`. Quando ligadas com trigger PASSIVE, o efeito contínuo (ex: glowing reveal) persiste.
 
 ### 3.7 Card System (`com.project.rpgplugin.core.card`)
 
@@ -411,9 +420,10 @@ public void onClick(InventoryClickEvent e) {
 
 - Size: 27 (3 linhas)
 - Título: `<gradient:#ff8c00:#ff4500>🛒 Loja Pão em Lata</gradient>`
-- 5 slots de itens: 10 (Reroll 2 níveis - ENDER_EYE), 12 (Carta Avulsa 5 níveis - MAP), 14 (Absolvição 10 níveis - TOTEM_OF_UNDYING), 16 (Sinalizador 15 níveis - BEACON), 18 (Beque 30 níveis - HEART_OF_THE_SEA)
+- 5 slots de itens: 10 (Reroll 2 níveis - ENDER_EYE), 12 (Carta Avulsa 5 níveis - MAP), 14 (Absolvição 10 níveis - TOTEM_OF_UNDYING), 16 (Sinalizador 15 níveis - BEACON), 18 (Purificação do Mundo 30 níveis - HEART_OF_THE_SEA)
 - Validação: `player.getLevel() >= cost` senão `Sound.ENTITY_VILLAGER_NO` + actionbar
 - Sucesso: `Sound.ENTITY_EXPERIENCE_ORB_PICKUP` + dedução + ação
+- Purificação do Mundo: chama `mayhemService.clear(player, run)` removendo todos os mayhem effects globais
 
 ### 4.5 `HubMenu` — Menu Principal (`com.project.rpgplugin.ui.HubMenu`)
 
@@ -461,7 +471,8 @@ public void resetToBaseline(Player p)  // limpa todos modifiers RogueLata
 ### 5.2 `HudService` (`com.project.rpgplugin.ui.HudService`)
 
 - Actionbar contínua via `player.getScheduler().runAtFixedRate(plugin, st -> tick(player), ...)` a cada 4 ticks
-- `tick(player)`: compõe mana + health + cooldowns ativos via MiniMessage → `player.sendActionBar(Text.mm(composed))`
+- `tick(player)`: actionbar compõe mana + health via MiniMessage → `player.sendActionBar(Text.mm(composed))`
+- Cooldowns ativos + efeitos ativos são exibidos via BossBar separada (não na actionbar)
 - Cooldown display: `Map<UUID, Map<String, Long>> cooldownDisplays` — chave = nome da skill, valor = timestamp de expiração
 - Registro de cooldown manual: `setCooldown(Player, displayName, durationSeconds)` ou `registerCooldown(Player, skillId, displayName, durationMillis)`
 - Item cooldown nativo (hotbar): `static void setItemCooldown(Player, Material, int ticks)` e `static void setItemCooldownDelayed(Player, Material, int ticks, JavaPlugin)` (1 tick de delay para evitar desync)
@@ -530,6 +541,7 @@ public MayhemService(RPGPlugin plugin, ModifierRegistry registry,
 
 public void rollAndApply(RunState run, World world);
   // Sorteia modifier baseado no milestone atual, ativa globalmente ou por player
+  // Se milestone atinge threshold e random < 0.5: spawna boss aleatório em vez de modifier
 
 public void tryRelieveMayhem(Player deadPlayer, RunState run);
   // Se player morreu no nível >= 10: remove último modifier global, broadcast
@@ -552,6 +564,24 @@ public class ResetService {
 ```
 
 **`BuildResetService`** limpa: `AttributeModifier` de TODOS os 17 atributos com prefixo `"roguelata_"` (namespace `"roguelata"`), poções, mana, nível vanilla, itens com lore "Skill Item:", AuraSkills, e chama `run.reset()` + `persistence.clearRun(p)`.
+
+### 5.7 `BossLootService` (`com.project.rpgplugin.core.boss.BossLootService`)
+
+```java
+public BossLootService(RPGPlugin plugin, CardRegistry cardRegistry);
+
+public void giveLoot(Player player, BossDefinition boss, int invokerLevel);
+  // Dropa equipamento temático baseado no tier do boss (COMMON→EPIC por HP do boss)
+  // Quantidade de peças escala com invokerLevel
+public ItemStack createBossSetItem(BossDefinition boss, EquipmentSlot slot);
+  // Cria item com nome do boss, encantamentos e lore
+```
+
+- Boss tier determinado por max HP: 180-220 = COMMON, 250-280 = RARE, 300-350 = EPIC
+- XP reward escala com HP do boss: `boss.maxHp * 0.5`
+- BossSet items têm formato de nome: `<boss display name> <item type>`
+- BossSet items têm encantamentos que combinam com o tema do boss
+- BossSet items têm linha de lore: `<gray>Item do BossSet: <boss id></gray>`
 
 ---
 
@@ -662,7 +692,7 @@ public class LataCommand implements CommandExecutor {
 3. Tenta `mobSpawnService.getEliteFactory().spawnBoss(finalLoc, def)` com def do `bosses.yml`
 4. Se null: fallback `spawnTitanEmLata()` → WARDEN, 500 HP, Netherite armor, nome gradient
 5. `world.strikeLightningEffect(finalLoc)` + `Sound.ENTITY_WITHER_SPAWN`
-6. Broadcast global com coordenadas X/Y/Z
+6. Broadcast global com coordenadas X/Y/Z, nível do boss, e dica do loot possível
 
 ---
 
@@ -670,7 +700,7 @@ public class LataCommand implements CommandExecutor {
 
 ### 10.1 Boss Definitions
 
-4 bosses defined in `bosses.yml`:
+10 bosses defined in `bosses.yml`:
 
 | ID | Type | HP | Biome | Display Name (MiniMessage) |
 |---|---|---|---|---|
@@ -678,6 +708,12 @@ public class LataCommand implements CommandExecutor {
 | magma_tyrant | MAGMA_CUBE | 200 | BADLANDS | `<bold><red>Magma Tyrant <gray>\| <white>Soberano das Profundezas</white></gray></red></bold>` |
 | storm_wyvern | RAVAGER | 350 | PLAINS | `<bold><yellow>Storm Wyvern <gray>\| <white>Asa da Tempestade</white></gray></yellow></bold>` |
 | void_lich | WITHER_SKELETON | 250 | DARK_FOREST | `<bold><dark_purple>Void Lich <gray>\| <white>Senhor do Vazio</white></gray></dark_purple></bold>` |
+| sir_creeper_a_lot | CREEPER | 220 | TAIGA | `<bold><green>Sir Creeper-A-Lot <gray>\| <white>O Explosivo</white></gray></green></bold>` |
+| slime_shady | SLIME | 180 | SWAMP | `<bold><yellow>Slime Shady <gray>\| <white>Gosma Real</white></gray></yellow></bold>` |
+| o_decapitador | WITHER_SKELETON | 300 | NETHER_WASTES | `<bold><red>O Decapitador <gray>\| <white>Cabeça de Ferro</white></gray></red></bold>` |
+| guardiao_ancestral | ELDER_GUARDIAN | 350 | DEEP_OCEAN | `<bold><blue>Guardião Ancestral <gray>\| <white>Protetor das Profundezas</white></gray></blue></bold>` |
+| senhor_da_guerra_piglin | PIGLIN_BRUTE | 280 | CRIMSON_FOREST | `<bold><gold>Senhor da Guerra Piglin <gray>\| <white>Força Bruta</white></gray></gold></bold>` |
+| rei_fantasma | SKELETON | 320 | DARK_FOREST | `<bold><gray>Rei Fantasma <gray>\| <white>Soberano Eterno</white></gray></gray></bold>` |
 
 ### 10.2 Spawning Flow
 
@@ -687,10 +723,23 @@ public class LataCommand implements CommandExecutor {
 4. Biome mapping selects boss based on player's current biome
 5. Falls back to `LataCommand.spawnBossAtSafeLocation()` if biome doesn't match
 6. If `bosses.yml` is missing the entry, fallback spawns Titã em Lata (WARDEN, 500 HP)
+7. Milestone boss: at each mayhem milestone (every 10 levels), 50% chance a random boss spawns instead of mayhem modifier
+8. Boss stats scale by invoker's level: +15% HP and +10% damage per level, with ±20% random variance
 
 ### 10.3 BossBar
 
 `EliteFactory.trackBossBar()` creates a plain-text BossBar (stripTags removes MiniMessage tags from the display name). The entity's `customName` retains the MiniMessage Component for nametag display.
+
+### 10.4 BossSet — Themed Loot Drops
+
+Each boss drops equipment themed to its identity via `BossLootService`:
+
+- Loot tier determined by boss max HP: 180-220 = COMMON, 250-280 = RARE, 300-350 = EPIC
+- Items have custom name: `<boss display name> <item type>`
+- Items have enchantments matching the boss theme
+- Items have lore: `<gray>Item do BossSet: <boss id></gray>`
+- Number of pieces scales with invoker level (more pieces at higher levels)
+- XP reward scales with boss HP: `boss.maxHp * 0.5`
 
 ---
 

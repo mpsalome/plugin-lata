@@ -12,6 +12,12 @@
 - [ ] `/lata boss spawn magma_tyrant` spawna boss nomeado com BossBar
 - [ ] `/lata boss spawn storm_wyvern` spawna boss nomeado com BossBar
 - [ ] `/lata boss spawn void_lich` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn sir_creeper_a_lot` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn slime_shady` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn o_decapitador` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn guardiao_ancestral` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn senhor_da_guerra_piglin` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn rei_fantasma` spawna boss nomeado com BossBar
 - [ ] Draft não-bloqueante: fechar draft menu, drafts ficam na fila, reabrir via `/lata draft`
 - [ ] Draft abre a cada 3 níveis com 3 cartas distintas
 - [ ] Escolher uma carta no draft a adiciona à run
@@ -22,13 +28,20 @@
 - [ ] Mayhem clears on death (timers cancelled, entities removed)
 - [ ] Fênix revive 1x na run (se possuir a carta)
 - [ ] HUD mostra progresso do recall e mayhem ativos
+- [ ] Actionbar: só mana e health. BossBar separada para cooldowns + efeitos ativos
 - [ ] Mobs spawnam com dificuldade escalada (profundidade + players)
 - [ ] Mayhem ativa a cada milestone com broadcast MiniMessage
+- [ ] Milestone boss: 50% de chance de spawnar boss aleatório em vez de mayhem
 - [ ] Boss (qualquer um) kill conta como vitória e fecha a run
+- [ ] Boss kill drops loot temático (itens com nome do boss, encantamentos, lore)
+- [ ] Boss exibe nível no spawn + dica do possível loot
+- [ ] Boss stats escalam com nível do invocador (+15% HP, +10% damage por nível, ±20% random)
 - [ ] CollectionMenu tem setas de paginação e filtro de categoria
 - [ ] CollectionMenu has alphabetical sort
 - [ ] `mana_pool` NÃO aparece no draft (sem AuraSkills)
 - [ ] Respawn é totalmente vanilla
+- [ ] Loja item Purificação do Mundo (slot 18, 30 níveis) remove todos os efeitos Mayhem
+- [ ] SonarSkill é toggle (sneak right-click on/off), glowing reveal contínuo
 - [ ] `mvn clean package` verde
 - [ ] `mvn test` verde
 

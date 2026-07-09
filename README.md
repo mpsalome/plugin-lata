@@ -26,11 +26,13 @@ softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
 |---------|-----------|
 | `/lata` | Comando principal (aliases: `rogue`, `pao`, `roguelata`) |
 | `/lata tp <player>` | Teleporta ao jogador |
-| `/lata boss spawn <boss>` | Spawna um boss (frostmaw, magma_tyrant, storm_wyvern, void_lich) |
+| `/lata boss spawn <boss>` | Spawna um boss (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma) |
 | `/lata loja` | Abre a Loja (ShopMenu) |
 | `/lata draft` | Abre o Draft pendente (não-bloqueante) |
 | `/lata book` | Dá o RPG Book (`BREAD`); cai no chão se inventário cheio |
 | **Clique direito** no RPG Book | Abre o HubMenu (Coleção, Loja, Draft) |
+
+> **v3.2.0:** 10 bosses com loot temático (BossSet). BossBar separada do HUD (actionbar: mana+vida, BossBar: cooldowns+efeitos ativos). Novo item na Loja: **Purificação do Mundo** (slot 18, 30 níveis) — remove todos os efeitos Mayhem do mundo.
 
 ---
 
@@ -42,7 +44,7 @@ softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
 |--------|----------|
 | [Gameplay](docs/wiki/gameplay.md) | Regras: ciclo da run, draft, tiers, tags, sinergias, mayhem, recall, fênix, vitória |
 | [Comandos](docs/wiki/commands.md) | Referência completa de comandos e permissões |
-| [Cartas](docs/wiki/cards.md) | Catálogo: 35 habilidades + 53 augments = 88 cartas |
+| [Cartas](docs/wiki/cards.md) | Catálogo: 37 habilidades + 53 augments = 90 cartas |
 | [Integrações](docs/wiki/integrations.md) | AuraSkills (gates, draft bias, reset, veteran migration), AuraMobs, MythicMobs |
 | [Configuração](docs/wiki/config.md) | `config.yml`, `draft.yml`, `augments.yml`, `gates.yml`, `mayhem.yml`, `bosses.yml`, `messages/` |
 | [Desenvolvedores](docs/wiki/developers.md) | Build, arquitetura, serviços, como adicionar cartas |

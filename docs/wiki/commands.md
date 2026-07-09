@@ -49,7 +49,7 @@ Clique com o botão direito na **Lata de Pão** (RPG Book, item BREAD) para abri
 
 ### `/lata loja`
 
-Abre o **ShopMenu** com 5 itens compráveis com níveis de XP:
+Abre o **ShopMenu** com 6 itens compráveis com níveis de XP:
 
 | Item | Custo | Efeito |
 |------|-------|--------|
@@ -58,6 +58,7 @@ Abre o **ShopMenu** com 5 itens compráveis com níveis de XP:
 | Absolvição do Caos | 10 níveis | Reduz o Mayhem em 1 nível |
 | Sinalizador do Chefe | 15 níveis | Item consumível — clique direito para invocar um boss |
 | Beque | 30 níveis | Salva itens do inventário na morte |
+| Purificação do Mundo | 30 níveis | Remove TODO o mayhem do mundo |
 
 ### `/lata draft`
 
