@@ -1,11 +1,11 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
-import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.Text;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,12 +42,22 @@ public class PlayerLifecycleListener implements Listener {
             return;
         }
 
+        // Desativa modificadores do Mayhem antes de resetar a run
+        if (plugin.getMayhemService() != null) {
+            plugin.getMayhemService().clear(p, run);
+        }
+
         plugin.getResetService().resetBuild(p, run);
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
+
+        // Forca respawn no spawn do mundo (ignora cama)
+        Location worldSpawn = p.getWorld().getSpawnLocation();
+        e.setRespawnLocation(worldSpawn);
+
         if (!runManager.hasActiveRun(p)) {
             runManager.startRun(p);
             if (plugin.getHudService() != null) {
