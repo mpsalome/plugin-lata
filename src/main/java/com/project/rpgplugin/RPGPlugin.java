@@ -1,7 +1,7 @@
 package com.project.rpgplugin;
 
+import com.project.rpgplugin.command.LataCommand;
 import com.project.rpgplugin.command.RecallCommand;
-import com.project.rpgplugin.command.RogueCommand;
 import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.config.SkillsConfig;
@@ -256,7 +256,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         getCommand("rpg").setExecutor(this);
         getCommand("run").setExecutor(runCommand);
         getCommand("recall").setExecutor(recallCommand);
-        getCommand("rogue").setExecutor(new RogueCommand(this, runManager, mobSpawnService));
+        var lataExecutor = new LataCommand(this, runManager, mobSpawnService);
+        getCommand("lata").setExecutor(lataExecutor);
+        getCommand("rogue").setExecutor(lataExecutor);
 
         getLogger().info("SkillRegistry loaded: " + skillRegistry.size() + " skills registered.");
         getLogger().info("CardRegistry loaded: " + cardRegistry.size() + " cards registered.");

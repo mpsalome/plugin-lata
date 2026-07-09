@@ -22,9 +22,14 @@ commands:
   recall:
     description: Usa o Recall para teleportar ao spawn.
     usage: /recall
+  lata:
+    description: Comando principal do RogueLata (co-op, bosses, loja, draft).
+    usage: /lata [tp <jogador>|boss spawn <frostmaw|tyrant>|loja|draft]
+    aliases: [rogue, pao, roguelata]
   rogue:
-    description: Comando principal do RogueLata (co-op, bosses, loja).
+    description: Sinonimo de /lata.
     usage: /rogue [tp <jogador>|boss spawn <frostmaw|tyrant>|loja|draft]
+    aliases: [lata, pao, roguelata]
 permissions:
   rpg.admin:
     description: Permite recarregar/resetar o plugin RogueLata.

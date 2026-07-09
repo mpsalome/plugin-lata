@@ -1,6 +1,7 @@
 package com.project.rpgplugin.listener;
 
 import com.project.rpgplugin.RPGPlugin;
+import com.project.rpgplugin.command.LataCommand;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.CardTag;
 import com.project.rpgplugin.core.mana.ManaService;
@@ -218,10 +219,9 @@ public class SkillDispatchListener implements Listener {
 
         player.getScheduler().runDelayed(plugin, st -> {
             if (!player.isOnline()) return;
-            plugin.getMobSpawnService().spawnBoss(bossId, player.getLocation().add(5, 0, 5));
-            org.bukkit.Bukkit.broadcast(Text.mm(
-                "<red><bold>" + bossName + " surgiu!</bold></red>"
-            ));
+            // Reuse LataCommand safe spawn logic
+            LataCommand lataCmd = (LataCommand) plugin.getCommand("lata").getExecutor();
+            lataCmd.spawnBossAtSafeLocation(player, bossId, bossName);
         }, null, 100L);
     }
 

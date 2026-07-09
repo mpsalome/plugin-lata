@@ -85,6 +85,8 @@ public class MobSpawnService {
         }
     }
 
+    public EliteFactory getEliteFactory() { return eliteFactory; }
+
     public EliteFactory.BossDef getBossDef(String id) {
         return bossDefs.get(id);
     }

@@ -77,7 +77,7 @@ public class PlayerLifecycleListener implements Listener {
                 p.sendMessage(Text.mm(
                     "<gradient:#ffd700:#ff8c00>\uD83E\uDD56 Bem-vindo ao RogueLata!</gradient> <gray>Seus <white>" + levels
                     + " niveis</white> antigos foram convertidos em <yellow>" + levels
-                    + " Cartas de Build</yellow>! Digite <click:run_command:'/rogue draft'><b>/rogue draft</b></click> para abrir.</gray>"
+                    + " Cartas de Build</yellow>! Digite <click:run_command:'/lata draft'><b>/lata draft</b></click> para abrir.</gray>"
                 ));
             }
         }
