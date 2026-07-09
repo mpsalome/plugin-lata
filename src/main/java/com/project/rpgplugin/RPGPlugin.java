@@ -503,7 +503,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         ItemStack item = new ItemStack(Material.HAY_BLOCK, 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.mm("<gradient:#ffd700:#ff8c00>\uD83E\uDD56 Pao em Lata</gradient>"));
+            meta.displayName(Text.mm("<gradient:#ffd700:#ff8c00>Pao em Lata</gradient>"));
             meta.lore(List.of(
                     Text.mm("<gray>Clique com o direito para abrir a Loja Pao em Lata!"),
                     Text.mm("<yellow>Compre upgrades com seus niveis de XP!</yellow>")

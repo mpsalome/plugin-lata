@@ -174,15 +174,15 @@ public class DraftMenu extends Menu {
             case GOLD -> "<gradient:#FFD700:#FFA500>";
         };
 
-        String tierEmoji = switch (card.tier()) {
-            case BRONZE -> "\uD83E\uDD48";
-            case SILVER -> "\uD83E\uDD47";
-            case GOLD -> "\uD83C\uDFC6";
+        String tierIcon = switch (card.tier()) {
+            case BRONZE -> "[B]";
+            case SILVER -> "[S]";
+            case GOLD -> "[G]";
         };
 
         String kindIcon = switch (card.kind()) {
-            case ABILITY -> "\u26A1";
-            case AUGMENT -> "\u2726";
+            case ABILITY -> "[A]";
+            case AUGMENT -> "[+]";
         };
 
         String cardName = card.id().replace("_", " ");
@@ -190,7 +190,7 @@ public class DraftMenu extends Menu {
         meta.displayName(Text.mm(tierColor + "<bold>" + kindIcon + " " + cardName));
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Text.mm(tierColor + tierEmoji + " " + card.tier().name()));
+        lore.add(Text.mm(tierColor + tierIcon + " " + card.tier().name()));
         lore.add(Text.mm("<gray>" + card.kind().name()));
 
         StringBuilder tagsStr = new StringBuilder();

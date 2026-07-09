@@ -136,10 +136,10 @@ public class CombatListener implements Listener {
         for (Player nearby : bossLoc.getNearbyPlayers(64)) {
             nearby.giveExp(xpAmount);
             nearby.sendMessage(Text.mm(
-                "<gold><bold>\u2694 " + bossName + " derrotado por " + killer.getName() + "!</bold></gold>"
+                "<gold><bold>" + bossName + " derrotado por " + killer.getName() + "!</bold></gold>"
             ));
             nearby.sendMessage(Text.mm(
-                "<yellow>\u2728 +" + xpAmount + " XP pela vitoria!</yellow>"
+                "<yellow>+" + xpAmount + " XP pela vitoria!</yellow>"
             ));
         }
 
@@ -154,7 +154,7 @@ public class CombatListener implements Listener {
         }
 
         Bukkit.broadcast(Text.mm(
-            "<gold><bold>\uD83C\uDFC6 " + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
+            "<gold><bold>" + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
         ));
     }
 }

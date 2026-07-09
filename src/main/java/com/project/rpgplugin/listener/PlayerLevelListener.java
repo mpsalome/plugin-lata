@@ -53,7 +53,7 @@ public class PlayerLevelListener implements Listener {
         int draftsEarned = newLevel - oldLevel;
         if (draftsEarned > 0) {
             run.addPendingDrafts(draftsEarned);
-            p.sendActionBar(Text.mm("<gold>\uD83C\uDFB4 +" + draftsEarned + " draft(s)! Digite <white>/lata draft</white> para abrir."));
+            p.sendActionBar(Text.mm("<gold>+" + draftsEarned + " draft(s)! Digite <white>/lata draft</white> para abrir."));
         }
 
         // EPIC-4: Mayhem milestone check — 50% mayhem / 50% boss aleatorio
@@ -88,7 +88,7 @@ public class PlayerLevelListener implements Listener {
 
         String name = scaled.displayName().replaceAll("<[^>]+>", "").trim();
         p.sendMessage(Text.mm(
-            "<red><bold>\u2620 " + name + "</bold></red> <gray>|</gray> <yellow>Nivel " + level + "</yellow>\n"
+            "<red><bold>! " + name + "</bold></red> <gray>|</gray> <yellow>Nivel " + level + "</yellow>\n"
             + "<gray>O caos ao inves do mayhem...</gray>"
         ));
     }

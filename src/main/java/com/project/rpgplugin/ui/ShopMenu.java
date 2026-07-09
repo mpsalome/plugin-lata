@@ -26,7 +26,7 @@ public class ShopMenu extends Menu {
     private final RPGPlugin plugin;
 
     public ShopMenu(Player player, RPGPlugin plugin) {
-        super(SIZE, "<gradient:#ff8c00:#ff4500>\uD83D\uDED2 Loja Pao em Lata");
+        super(SIZE, "<gradient:#ff8c00:#ff4500>Loja Pao em Lata");
         this.player = player;
         this.plugin = plugin;
 
@@ -90,35 +90,35 @@ public class ShopMenu extends Menu {
         setItem(23, decorativePane(Material.LIME_STAINED_GLASS_PANE, null));
 
         setItem(10, buildShopItem(Material.ENDER_EYE,
-                "<light_purple><bold>\uD83C\uDFB2 Reroll de Sorte",
+                "<light_purple><bold>Reroll de Sorte",
                 List.of(
                         "<gray>Custo: <yellow>2 niveis</yellow></gray>",
                         "<gray>Ganha 1 reroll gratuito no proximo draft</gray>"
                 )));
 
         setItem(12, buildShopItem(Material.PAPER,
-                "<green><bold>\uD83C\uDFB4 Carta Avulsa",
+                "<green><bold>Carta Avulsa",
                 List.of(
                         "<gray>Custo: <yellow>5 niveis</yellow></gray>",
                         "<gray>Adiciona 1 carta de build e abre o draft</gray>"
                 )));
 
         setItem(14, buildShopItem(Material.FEATHER,
-                "<aqua><bold>\uD83D\uDD4A Absolvicao do Caos",
+                "<aqua><bold>Absolvicao do Caos",
                 List.of(
                         "<gray>Custo: <yellow>10 niveis</yellow></gray>",
                         "<gray>Reduz o Mayhem da sua regiao em 1 nivel</gray>"
                 )));
 
         setItem(16, buildShopItem(Material.NETHER_STAR,
-                "<red><bold>\uD83D\uDC51 Sinalizador do Chefe",
+                "<red><bold>Sinalizador do Chefe",
                 List.of(
                         "<gray>Custo: <yellow>15 niveis</yellow></gray>",
                         "<gray>Invoca um boss apos 5 segundos</gray>"
                 )));
 
         setItem(18, buildShopItem(Material.HEART_OF_THE_SEA,
-                "<dark_purple><bold>\uD83D\uDD25 Purificacao do Mundo",
+                "<dark_purple><bold>Purificacao do Mundo",
                 List.of(
                         "<gray>Custo: <yellow>30 niveis</yellow></gray>",
                         "<gray>Remove <red>TODOS</red> os efeitos mayhem do mundo.</gray>",
@@ -126,7 +126,7 @@ public class ShopMenu extends Menu {
                 )));
 
         setItem(22, buildShopItem(Material.EXPERIENCE_BOTTLE,
-                "<green><bold>\uD83D\uDCD8 Treinamento Acelerado",
+                "<green><bold>Treinamento Acelerado",
                 List.of(
                         "<gray>Custo: <yellow>3 niveis</yellow></gray>",
                         "<gray>Ganha XP em <yellow>TODAS</yellow> as habilidades AuraSkills</gray>",
@@ -137,7 +137,7 @@ public class ShopMenu extends Menu {
         ItemStack backBtn = new ItemStack(Material.GOLD_NUGGET);
         var backMeta = backBtn.getItemMeta();
         if (backMeta != null) {
-            backMeta.displayName(Text.mm("<gold>\uD83C\uDF7C Menu Principal"));
+            backMeta.displayName(Text.mm("<gold>Menu Principal"));
             backBtn.setItemMeta(backMeta);
         }
         setItem(20, backBtn);
@@ -159,7 +159,7 @@ public class ShopMenu extends Menu {
         player.setLevel(player.getLevel() - 2);
         run.addFreeReroll();
         successSound();
-        player.sendActionBar(Text.mm("<light_purple>\uD83C\uDFB2 Reroll de Sorte adquirido!"));
+        player.sendActionBar(Text.mm("<light_purple>Reroll de Sorte adquirido!"));
     }
 
     private void buyDraftToken(RunState run) {
@@ -167,7 +167,7 @@ public class ShopMenu extends Menu {
         player.setLevel(player.getLevel() - 5);
         run.addPendingDrafts(1);
         successSound();
-        player.sendActionBar(Text.mm("<green>\uD83C\uDFB4 Carta Avulsa adquirida!"));
+        player.sendActionBar(Text.mm("<green>Carta Avulsa adquirida!"));
         plugin.getPlayerLevelListener().openNextDraft(player, run);
     }
 
@@ -183,7 +183,7 @@ public class ShopMenu extends Menu {
         player.setLevel(player.getLevel() - 30);
         plugin.getMayhemService().clear(player, run);
         successSound();
-        player.sendActionBar(Text.mm("<dark_purple>\uD83D\uDD25 O caos foi purificado do mundo!</dark_purple>"));
+        player.sendActionBar(Text.mm("<dark_purple>O caos foi purificado do mundo!</dark_purple>"));
     }
 
     private void buyBeacon(RunState run) {
@@ -197,7 +197,7 @@ public class ShopMenu extends Menu {
             player.getWorld().dropItem(player.getLocation(), beacon);
             player.sendActionBar(Text.mm("<red>Inventario cheio! Sinalizador caiu no chao."));
         } else {
-            player.sendActionBar(Text.mm("<red>\uD83D\uDC51 Sinalizador do Chefe adicionado ao inventario!"));
+            player.sendActionBar(Text.mm("<red>Sinalizador do Chefe adicionado ao inventario!"));
         }
     }
 
@@ -258,7 +258,7 @@ public class ShopMenu extends Menu {
         ItemStack item = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.mm("<red>\uD83D\uDC51 Sinalizador do Chefe</red>"));
+            meta.displayName(Text.mm("<red>Sinalizador do Chefe</red>"));
             meta.lore(List.of(
                     Text.mm("<gray>Clique com o direito no chao para invocar um Chefe!</gray>"),
                     Text.mm("<dark_gray>5 segundos de aviso antes da invocacao</dark_gray>")
@@ -270,7 +270,7 @@ public class ShopMenu extends Menu {
     }
 
     private void fillBackground() {
-        ItemStack border = decorativePane(Material.ORANGE_STAINED_GLASS_PANE, "<gradient:#ff8c00:#ff4500>\uD83D\uDED2");
+        ItemStack border = decorativePane(Material.ORANGE_STAINED_GLASS_PANE, "<gradient:#ff8c00:#ff4500>Loja");
         for (int i = 0; i < 9; i++) {
             setItem(i, border);
             setItem(SIZE - 9 + i, border);

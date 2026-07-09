@@ -223,7 +223,7 @@ public class SkillDispatchListener implements Listener {
         };
 
         org.bukkit.Bukkit.broadcast(Text.mm(
-            "<gold><bold>\u26A0 " + bossName + "</bold></gold> <gray>|</gray> " + levelStr + "\n"
+            "<gold><bold>! " + bossName + "</bold></gold> <gray>|</gray> " + levelStr + "\n"
             + hint
         ));
         player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.5f);

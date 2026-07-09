@@ -24,7 +24,7 @@ public class HubMenu extends Menu {
     private final StatService statService;
 
     public HubMenu(Player player, RPGPlugin plugin, RunManager runManager, CardRegistry cardRegistry, StatService statService) {
-        super(SIZE, "<gold><bold>\uD83C\uDF7C Pao em Lata <gray>| Menu Principal");
+        super(SIZE, "<gold><bold>Pao em Lata <gray>| Menu Principal");
         this.player = player;
         this.plugin = plugin;
         this.runManager = runManager;
@@ -64,19 +64,19 @@ public class HubMenu extends Menu {
 
     private void buildItems() {
         setItem(10, hubItem(Material.ENCHANTED_BOOK,
-                "<light_purple><bold>\u2728 Colecao de Cartas",
+                "<light_purple><bold>Colecao de Cartas",
                 "<gray>Visualize e ative/desative suas cartas",
                 "<gray>Filtre por categoria e pagina"
         ));
 
         setItem(12, hubItem(Material.HAY_BLOCK,
-                "<gradient:#ffd700:#ff8c00><bold>\uD83D\uDED2 Loja Pao em Lata",
+                "<gradient:#ffd700:#ff8c00><bold>Loja Pao em Lata",
                 "<gray>Compre upgrades com seus niveis de XP!",
                 "<gray>Reroll, Carta Avulsa, Absolvicao, Sinalizador"
         ));
 
         setItem(14, hubItem(Material.ENDER_CHEST,
-                "<gold><bold>\uD83C\uDFB4 Draft de Cartas",
+                "<gold><bold>Draft de Cartas",
                 "<gray>Abra o proximo draft pendente",
                 "<gray>Escolha 1 entre 3 cartas aleatorias"
         ));

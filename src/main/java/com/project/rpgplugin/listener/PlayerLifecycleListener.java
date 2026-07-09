@@ -80,7 +80,7 @@ public class PlayerLifecycleListener implements Listener {
                 int levels = p.getLevel();
                 run.addPendingDrafts(levels);
                 p.sendMessage(Text.mm(
-                    "<gradient:#ffd700:#ff8c00>\uD83E\uDD56 Bem-vindo ao servidor!</gradient> <gray>Seus <white>" + levels
+                    "<gradient:#ffd700:#ff8c00>Bem-vindo ao servidor!</gradient> <gray>Seus <white>" + levels
                     + " niveis</white> antigos foram convertidos em <yellow>" + levels
                     + " Cartas de Build</yellow>! Digite <click:run_command:'/lata draft'><b>/lata draft</b></click> para abrir.</gray>"
                 ));

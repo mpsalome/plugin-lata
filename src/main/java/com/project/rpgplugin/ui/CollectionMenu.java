@@ -58,7 +58,7 @@ public class CollectionMenu extends Menu {
 
     private CollectionMenu(RPGPlugin plugin, Player p, RunState run, CardRegistry cardRegistry, StatService statService,
                            CardTag activeTag, CardKind activeKind, int page) {
-        super(SIZE, "<dark_purple><bold>\u2728 Sua Colecao");
+        super(SIZE, "<dark_purple><bold>Sua Colecao");
         this.plugin = plugin;
         this.player = p;
         this.run = run;
@@ -115,7 +115,7 @@ public class CollectionMenu extends Menu {
             meta.displayName(Text.mm(label));
             List<String> lore = new ArrayList<>();
             if (active) {
-                lore.add("<green>\u2713 Ativo");
+                lore.add("<green>[V] Ativo");
             } else {
                 lore.add("<gray>Clique para filtrar");
             }
@@ -234,7 +234,7 @@ public class CollectionMenu extends Menu {
         ItemStack hubBtn = new ItemStack(Material.GOLD_NUGGET);
         var hubMeta = hubBtn.getItemMeta();
         if (hubMeta != null) {
-            hubMeta.displayName(Text.mm("<gold>\uD83C\uDF7C Menu Principal"));
+            hubMeta.displayName(Text.mm("<gold>Menu Principal"));
             hubBtn.setItemMeta(hubMeta);
         }
         setItem(SLOT_HUB, hubBtn);

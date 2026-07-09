@@ -180,11 +180,11 @@ public class HudService {
         if (showMana) {
             double mana = manaService.getMana(player);
             double maxMana = manaService.getMaxMana(player, runManager.getRun(player));
-            sb.append("\u26a1 <aqua>").append((int) mana).append("/").append((int) maxMana).append("</aqua>");
+            sb.append("<aqua>Mana ").append((int) mana).append("/").append((int) maxMana).append("</aqua>");
             sb.append(" <dark_gray>|</dark_gray> ");
         }
 
-        sb.append("<green>\u2764 ").append((int) player.getHealth())
+        sb.append("<green>HP ").append((int) player.getHealth())
             .append("/").append((int) player.getMaxHealth()).append("</green>");
 
         return sb.toString();

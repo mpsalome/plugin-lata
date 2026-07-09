@@ -162,7 +162,7 @@ public class LataCommand implements CommandExecutor {
         };
 
         Bukkit.broadcast(Text.mm(
-            "<gold><bold>\u26A0 " + bossName + "</bold></gold> <gray>|</gray> <yellow>Nivel " + bossLevel + "</yellow>\n"
+                "<gold><bold>! " + bossName + "</bold></gold> <gray>|</gray> <yellow>Nivel " + bossLevel + "</yellow>\n"
             + hint
         ));
         player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.5f);
@@ -290,7 +290,7 @@ public class LataCommand implements CommandExecutor {
             String plainName = displayName.replaceAll("<[^>]+>", "").trim();
 
             Bukkit.broadcast(Text.mm(
-                "<red>\u26A1 <bold>O CAOS DESCEU DOS CEUS!</bold></red> <gray>O chefe <yellow>" + plainName
+                "<red><bold>O CAOS DESCEU DOS CEUS!</bold></red> <gray>O chefe <yellow>" + plainName
                 + "</yellow> foi invocado por <white>" + player.getName()
                 + "</white> nas coordenadas <green>X: " + x + ", Y: " + y + ", Z: " + z + "</green>!</gray>"
             ));
@@ -323,7 +323,7 @@ public class LataCommand implements CommandExecutor {
         if (world == null) return null;
 
         org.bukkit.entity.Warden titan = (org.bukkit.entity.Warden) world.spawnEntity(loc, org.bukkit.entity.EntityType.WARDEN);
-        titan.customName(Text.mm("<gradient:#ff0000:#ff8c00><bold>\uD83D\uDC51 CHEFE: O TITA EM LATA</bold></gradient>"));
+        titan.customName(Text.mm("<gradient:#ff0000:#ff8c00><bold>CHEFE: O TITA EM LATA</bold></gradient>"));
         titan.setCustomNameVisible(true);
 
         var attr = titan.getAttribute(Attribute.MAX_HEALTH);
