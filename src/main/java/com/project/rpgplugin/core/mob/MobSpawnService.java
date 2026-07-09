@@ -29,6 +29,7 @@ public class MobSpawnService {
     public MobSpawnService(JavaPlugin plugin, RunManager runManager, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
         this.eliteFactory = new EliteFactory(plugin, mythicMobs, modelEngine);
+        plugin.getServer().getPluginManager().registerEvents(eliteFactory, plugin);
         this.runManager = runManager;
         loadConfigs();
     }

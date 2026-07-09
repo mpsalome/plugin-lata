@@ -17,6 +17,7 @@ public class StandaloneDummyManaProvider implements ManaProvider {
 
     private final JavaPlugin plugin;
     private final Map<UUID, Double> manaMap = new ConcurrentHashMap<>();
+    private final Map<UUID, Double> bonusMaxMana = new ConcurrentHashMap<>();
 
     public StandaloneDummyManaProvider(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -48,7 +49,11 @@ public class StandaloneDummyManaProvider implements ManaProvider {
 
     @Override
     public double getMaxMana(Player player) {
-        return BASE_MAX_MANA;
+        return BASE_MAX_MANA + bonusMaxMana.getOrDefault(player.getUniqueId(), 0.0);
+    }
+
+    public void setBaseMaxMana(Player player, double bonus) {
+        bonusMaxMana.put(player.getUniqueId(), bonus);
     }
 
     @Override

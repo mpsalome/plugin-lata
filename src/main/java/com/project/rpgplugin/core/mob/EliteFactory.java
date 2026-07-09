@@ -13,6 +13,9 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -21,17 +24,28 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class EliteFactory {
+public class EliteFactory implements Listener {
 
     private final JavaPlugin plugin;
     private final MythicMobsBridge mythicMobs;
     private final ModelEngineBridge modelEngine;
+    private final Map<UUID, BossBar> trackedBossBars = new ConcurrentHashMap<>();
 
     public EliteFactory(JavaPlugin plugin, MythicMobsBridge mythicMobs, ModelEngineBridge modelEngine) {
         this.plugin = plugin;
         this.mythicMobs = mythicMobs;
         this.modelEngine = modelEngine;
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        BossBar bar = trackedBossBars.remove(entity.getUniqueId());
+        if (bar != null) {
+            bar.removeAll();
+        }
     }
 
     public LivingEntity spawnBoss(Location loc, BossDef def) {
@@ -97,12 +111,16 @@ public class EliteFactory {
         BossBar bar = Bukkit.createBossBar(stripTags(def.displayName()), BarColor.RED, BarStyle.SOLID);
         bar.setVisible(true);
         UUID bossId = boss.getUniqueId();
+        trackedBossBars.put(bossId, bar);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (boss.isDead() || !boss.isValid()) {
-                    bar.removeAll();
+                if (!boss.isValid() || boss.isDead()) {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        bar.removeAll();
+                        trackedBossBars.remove(bossId);
+                    });
                     cancel();
                     return;
                 }
@@ -116,7 +134,6 @@ public class EliteFactory {
                     }
                 }
 
-                // Phase triggers
                 if (pct <= 0.5 && pct > 0.25) {
                     bar.setColor(BarColor.YELLOW);
                     bar.setTitle(def.id() + " | Fase 2");

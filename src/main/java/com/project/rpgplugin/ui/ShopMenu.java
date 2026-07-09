@@ -149,6 +149,7 @@ public class ShopMenu extends Menu {
             footer.setItemMeta(footerMeta);
         }
         for (int i = 21; i < 26; i++) {
+            if (i == 22) continue;
             setItem(i, footer);
         }
         setItem(26, backBtn.clone());

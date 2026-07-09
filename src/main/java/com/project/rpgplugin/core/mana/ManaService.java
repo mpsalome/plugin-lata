@@ -73,6 +73,6 @@ public class ManaService {
     public double getMaxMana(Player p, RunState run) {
         double base = provider.isAvailable() ? provider.getMaxMana(p) : 100;
         double bonus = run != null ? run.getMultiplier("mana_max") : 0;
-        return Math.max(100, base + bonus);
+        return Math.max(base, base + bonus);
     }
 }
