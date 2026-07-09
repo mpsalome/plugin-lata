@@ -6,6 +6,9 @@ import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.menu.Menu;
 import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
+import dev.aurelium.auraskills.api.AuraSkillsApi;
+import dev.aurelium.auraskills.api.skill.Skills;
+import dev.aurelium.auraskills.api.user.SkillsUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -47,6 +50,7 @@ public class ShopMenu extends Menu {
                 case 14 -> buyAbsolution(run);
                 case 16 -> buyBeacon(run);
                 case 18 -> buyMayhemCleanse(run);
+                case 22 -> buyAuraTraining(run);
                 case 20, 26 -> new HubMenu(player, plugin, plugin.getRunManager(),
                     plugin.getCardRegistry(), plugin.getRunManager().statService());
             }
@@ -82,6 +86,9 @@ public class ShopMenu extends Menu {
             setItem(bgSlot + 1, decorativePane(bgColors[i], null));
         }
 
+        setItem(21, decorativePane(Material.LIME_STAINED_GLASS_PANE, null));
+        setItem(23, decorativePane(Material.LIME_STAINED_GLASS_PANE, null));
+
         setItem(10, buildShopItem(Material.ENDER_EYE,
                 "<light_purple><bold>\uD83C\uDFB2 Reroll de Sorte",
                 List.of(
@@ -116,6 +123,14 @@ public class ShopMenu extends Menu {
                         "<gray>Custo: <yellow>30 niveis</yellow></gray>",
                         "<gray>Remove <red>TODOS</red> os efeitos mayhem do mundo.</gray>",
                         "<dark_gray>A calma retorna... ate o proximo caos.</dark_gray>"
+                )));
+
+        setItem(22, buildShopItem(Material.EXPERIENCE_BOTTLE,
+                "<green><bold>\uD83D\uDCD8 Treinamento Acelerado",
+                List.of(
+                        "<gray>Custo: <yellow>3 niveis</yellow></gray>",
+                        "<gray>Ganha XP em <yellow>TODAS</yellow> as habilidades AuraSkills</gray>",
+                        "<dark_gray>Requer AuraSkills instalado.</dark_gray>"
                 )));
 
         // Row 2: footer
@@ -186,6 +201,35 @@ public class ShopMenu extends Menu {
         }
     }
 
+    private void buyAuraTraining(RunState run) {
+        if (!checkLevels(3)) return;
+
+        var integration = plugin.getAuraSkillsIntegration();
+        if (!integration.isEnabled()) {
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            player.sendActionBar(Text.mm("<red>AuraSkills nao esta instalado!"));
+            return;
+        }
+
+        player.setLevel(player.getLevel() - 3);
+
+        try {
+            AuraSkillsApi api = AuraSkillsApi.get();
+            SkillsUser user = api.getUser(player.getUniqueId());
+            double xpAmount = 100;
+
+            for (Skills skill : Skills.values()) {
+                double current = user.getSkillXp(skill);
+                user.setSkillXp(skill, current + xpAmount);
+            }
+
+            successSound();
+            player.sendActionBar(Text.mm("<green>+100 XP em todas as habilidades AuraSkills!"));
+        } catch (Exception e) {
+            player.sendActionBar(Text.mm("<red>Erro ao conceder XP."));
+        }
+    }
+
     private boolean checkLevels(int cost) {
         if (player.getLevel() < cost) {
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
@@ -238,7 +282,7 @@ public class ShopMenu extends Menu {
 
         ItemStack bg = decorativePane(Material.BLACK_STAINED_GLASS_PANE, null);
         for (int i = 9; i < SIZE - 9; i++) {
-            if (i != 10 && i != 12 && i != 14 && i != 16 && i != 18) {
+            if (i != 10 && i != 12 && i != 14 && i != 16 && i != 18 && i != 22) {
                 setItem(i, bg);
             }
         }
