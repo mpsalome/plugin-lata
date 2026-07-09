@@ -26,6 +26,7 @@ public class HudService {
     private final ManaService manaService;
     private final RunManager runManager;
     private final Map<UUID, PlayerHud> sessions = new ConcurrentHashMap<>();
+    private boolean bossBarEnabled = true;
 
     // Cooldown display: player UUID -> skill display name -> expiry timestamp
     private final Map<UUID, Map<String, Long>> cooldownDisplays = new ConcurrentHashMap<>();
@@ -81,11 +82,25 @@ public class HudService {
         }
     }
 
+    public void setBossBarEnabled(boolean enabled) {
+        this.bossBarEnabled = enabled;
+        if (!enabled) {
+            sessions.values().forEach(hud -> {
+                if (hud.skillBar != null) {
+                    hud.skillBar.removeAll();
+                    hud.skillBar.setVisible(false);
+                }
+            });
+        }
+    }
+
     public void startPlayer(Player player) {
         sessions.computeIfAbsent(player.getUniqueId(), k -> {
             var hud = new PlayerHud();
-            hud.skillBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
-            hud.skillBar.setVisible(false);
+            if (bossBarEnabled) {
+                hud.skillBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+                hud.skillBar.setVisible(false);
+            }
             hud.task = player.getScheduler().runAtFixedRate(plugin, st -> tick(player), () -> {}, 1L, TICK_INTERVAL);
             return hud;
         });
@@ -145,7 +160,9 @@ public class HudService {
         }
 
         // --- BossBar: cooldowns + active effects ---
-        updateSkillBar(player, hud, playerCooldowns, playerEffects);
+        if (bossBarEnabled) {
+            updateSkillBar(player, hud, playerCooldowns, playerEffects);
+        }
     }
 
     private void cleanup(Map<String, Long> map) {

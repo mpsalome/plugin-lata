@@ -9,6 +9,8 @@ softdepend:
   - AuraMobs
   - MythicMobs
   - ModelEngine
+  - BetterHud
+  - PlaceholderAPI
 commands:
   skills:
     description: Abre o menu visual de selecao de habilidades.
@@ -16,19 +18,16 @@ commands:
   rpg:
     description: Comando principal do RogueLata.
     usage: /rpg [reload|reset|debug]
-  run:
-    description: Mostra informacoes da run atual.
-    usage: /run
   recall:
     description: Usa o Recall para teleportar ao spawn.
     usage: /recall
   lata:
     description: Comando principal do RogueLata (co-op, bosses, loja, draft).
-    usage: /lata [tp <jogador>|boss spawn <frostmaw|tyrant>|loja|draft]
+    usage: /lata [tp <jogador>|boss spawn <id>|loja|draft|info]
     aliases: [rogue, pao, roguelata]
   rogue:
     description: Sinonimo de /lata.
-    usage: /rogue [tp <jogador>|boss spawn <frostmaw|tyrant>|loja|draft]
+    usage: /rogue [tp <jogador>|boss spawn <id>|loja|draft|info]
     aliases: [lata, pao, roguelata]
 permissions:
   rpg.admin:

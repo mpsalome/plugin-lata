@@ -64,7 +64,7 @@
 - DraftMenu: 54 slots, cards at 20/23/26/29, reroll at 40, skip at 44
 
 #### Bosses
-- 4 bosses: frostmaw, magma_tyrant, storm_wyvern, void_lich
+- 10 bosses: frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king
 - Each spawns with BossBar and named entity
 
 #### Respawn

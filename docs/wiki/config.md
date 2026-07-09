@@ -65,28 +65,26 @@ weight:
 ## `bosses.yml`
 
 ```yaml
-# Bosses configuracao — bosses da run (v3.2.0: 10 bosses)
+# Bosses configuracao — bosses da run (10 bosses)
 bosses:
   frostmaw:
-    base_type: POLAR_BEAR
+    base_type: ZOMBIE
     display_name: "<bold><aqua>Frostmaw <gray>| <white>Senhor do Gelo"
-    health: 300
+    health: 200
     damage: 12
     speed: 0.25
     scale: 2.5
     knockback_resist: 1.0
     victory: true
-    loot_set: frostmaw
   magma_tyrant:
     base_type: MAGMA_CUBE
     display_name: "<bold><red>Tirano Magmatico <gray>| <white>Coracao do Inferno"
-    health: 200
+    health: 300
     damage: 15
     speed: 0.3
     scale: 4.0
     knockback_resist: 0.8
     victory: true
-    loot_set: magma_tyrant
   storm_wyvern:
     base_type: RAVAGER
     display_name: "<bold><yellow>Furia Tempestuosa <gray>| <white>Asa do Ceu"
@@ -96,7 +94,6 @@ bosses:
     scale: 2.8
     knockback_resist: 0.9
     victory: true
-    loot_set: storm_wyvern
   void_lich:
     base_type: WITHER_SKELETON
     display_name: "<bold><dark_purple>Lich do Vazio <gray>| <white>A Noite Eterna"
@@ -106,67 +103,60 @@ bosses:
     scale: 2.0
     knockback_resist: 1.0
     victory: true
-    loot_set: void_lich
-  sir_creeper:
+  sir_creeper_alot:
     base_type: CREEPER
-    display_name: "<bold><green>Sir Creeper-A-Lot"
-    health: 280
-    damage: 16
-    speed: 0.3
+    display_name: "<bold><green>Sir Creeper-A-Lot <gray>| <white>O Cavaleiro Explosivo"
+    health: 220
+    damage: 0
+    speed: 0.35
     scale: 2.0
     knockback_resist: 0.5
-    victory: false
-    loot_set: sir_creeper
+    victory: true
   slime_shady:
     base_type: SLIME
-    display_name: "<bold><yellow>Slime Shady"
-    health: 220
+    display_name: "<bold><light_purple>Slime Shady <gray>| <white>A Gosma Real"
+    health: 180
     damage: 10
-    speed: 0.2
-    scale: 3.0
-    knockback_resist: 0.3
-    victory: false
-    loot_set: slime_shady
-  o_decapitador:
+    speed: 0.15
+    scale: 6.0
+    knockback_resist: 0.0
+    victory: true
+  the_beheader:
     base_type: WITHER_SKELETON
-    display_name: "<bold><dark_red>O Decapitador"
-    health: 320
-    damage: 22
-    speed: 0.35
+    display_name: "<bold><dark_red>O Decapitador <gray>| <white>O Carrasco do Nether"
+    health: 280
+    damage: 28
+    speed: 0.3
     scale: 2.2
-    knockback_resist: 0.9
-    victory: false
-    loot_set: decapitador
-  guardiao_ancestral:
-    base_type: IRON_GOLEM
-    display_name: "<bold><aqua>Guardiao Ancestral"
+    knockback_resist: 1.0
+    victory: true
+  ancient_guardian:
+    base_type: ELDER_GUARDIAN
+    display_name: "<bold><dark_aqua>Guardiao Ancestral <gray>| <white>A Muralha do Oceano"
     health: 400
     damage: 14
-    speed: 0.15
-    scale: 2.5
-    knockback_resist: 1.0
-    victory: false
-    loot_set: guardiao
-  senhor_da_guerra_piglin:
-    base_type: PIGLIN_BRUTE
-    display_name: "<bold><gold>Senhor da Guerra Piglin"
-    health: 300
-    damage: 18
-    speed: 0.3
-    scale: 2.0
+    speed: 0.2
+    scale: 3.5
     knockback_resist: 0.8
-    victory: false
-    loot_set: piglin_war
-  rei_fantasma:
-    base_type: SKELETON
-    display_name: "<bold><gray>Rei Fantasma"
-    health: 260
+    victory: true
+  piglin_warlord:
+    base_type: PIGLIN_BRUTE
+    display_name: "<bold><gold>Senhor da Guerra Piglin <gray>| <white>General do Nether"
+    health: 320
+    damage: 22
+    speed: 0.3
+    scale: 1.8
+    knockback_resist: 1.0
+    victory: true
+  phantom_king:
+    base_type: PHANTOM
+    display_name: "<bold><white>Rei Fantasma <gray>| <white>A Sombra Alada"
+    health: 200
     damage: 16
-    speed: 0.25
-    scale: 2.3
-    knockback_resist: 0.6
-    victory: false
-    loot_set: rei_fantasma
+    speed: 0.8
+    scale: 3.0
+    knockback_resist: 0.3
+    victory: true
 ```
 
 ## `loot_sets.yml`

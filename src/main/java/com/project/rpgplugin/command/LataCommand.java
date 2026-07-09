@@ -27,6 +27,7 @@ import org.bukkit.Material;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class LataCommand implements CommandExecutor {
 
@@ -61,6 +62,7 @@ public class LataCommand implements CommandExecutor {
             case "loja" -> handleShop(player);
             case "book", "pao", "bread" -> handleBook(player);
             case "draft" -> handleDraft(player, label);
+            case "info" -> handleInfo(player, label);
             default -> sendHelp(player, label);
         }
 
@@ -214,6 +216,37 @@ public class LataCommand implements CommandExecutor {
         plugin.getPlayerLevelListener().openNextDraft(player, run);
     }
 
+    private void handleInfo(Player player, String label) {
+        if (!runManager.hasActiveRun(player)) {
+            player.sendMessage(Text.mm("<red>Voce nao tem uma jornada ativa."));
+            return;
+        }
+
+        RunState run = runManager.getRun(player);
+        if (run == null) return;
+
+        player.sendMessage(Text.mm("<gold><bold>=== Informacoes do Personagem ==="));
+        player.sendMessage(Text.mm("<gray>Nivel: <white>" + run.level()));
+        player.sendMessage(Text.mm("<gray>Status: <white>" + run.outcome().name()));
+        player.sendMessage(Text.mm("<gray>Cartas: <white>" + run.ownedCards().size()));
+        player.sendMessage(Text.mm("<gray>Drafts pendentes: <white>" + run.pendingDrafts()));
+
+        long elapsed = System.currentTimeMillis() - run.startedAt();
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(elapsed);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsed) % 60;
+        player.sendMessage(Text.mm("<gray>Tempo decorrido: <white>" + minutes + "m " + seconds + "s"));
+
+        player.sendMessage(Text.mm("<gray>Milestones: <white>" + run.milestonesReached()));
+        if (!run.activeModifiers().isEmpty()) {
+            player.sendMessage(Text.mm("<red>Mayhem ativos: <white>" + String.join(", ", run.activeModifiers())));
+        }
+
+        player.sendMessage(Text.mm("<gray>Multiplicadores: "));
+        run.multipliers().forEach((key, val) ->
+            player.sendMessage(Text.mm("  <dark_gray>" + key + ": <white>" + String.format("%.2f", val)))
+        );
+    }
+
     private String bossDisplayName(String bossId) {
         EliteFactory.BossDef def = mobSpawnService.getBossDef(bossId);
         if (def != null) return def.displayName().replaceAll("<[^>]+>", "").trim();
@@ -336,7 +369,7 @@ public class LataCommand implements CommandExecutor {
         player.sendMessage(Text.mm("<yellow>/" + label + " loja</yellow> <gray>- Abre a Loja Pao em Lata</gray>"));
         player.sendMessage(Text.mm("<yellow>/" + label + " book</yellow> <gray>- Recebe uma Lata de Pao (caso tenha perdido)</gray>"));
         player.sendMessage(Text.mm("<yellow>/" + label + " draft</yellow> <gray>- Abre o proximo draft pendente</gray>"));
-        player.sendMessage(Text.mm("<yellow>/run</yellow> <gray>- Mostra informacoes da sua run</gray>"));
+        player.sendMessage(Text.mm("<yellow>/" + label + " info</yellow> <gray>- Mostra informacoes da sua run</gray>"));
         player.sendMessage(Text.mm("<yellow>/skills</yellow> <gray>- Abre o menu de habilidades</gray>"));
     }
 }

@@ -75,6 +75,48 @@ Permite criar **bosses com AI avançada** (skills, fases, drops). Sem ele, bosse
 
 > Todos os bosses do RogueLata funcionam sem MythicMobs — ele só adiciona tempero de IA.
 
+## BetterHud
+
+O [BetterHud](https://www.spigotmc.org/resources/betterhud.28330/) permite criar HUDs customizados no cliente via configuração YAML. Quando detectado pelo RogueLata:
+
+- A **BossBar nativa** que exibe cooldowns de habilidades e efeitos ativos é **desativada** automaticamente
+- O jogador vê apenas a **ActionBar** (mana + vida) vinda do RogueLata
+- A configuração do BetterHud pode consumir placeholders do RogueLata via PlaceholderAPI
+
+> Sem BetterHud, o RogueLata mantém o comportamento padrão: BossBar exibindo cooldowns e efeitos ativos.
+
+## PlaceholderAPI
+
+O [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) expõe dados internos do RogueLata para outros plugins (BetterHud, scoreboards, chat, etc.).
+
+### Placeholders disponíveis
+
+| Placeholder | Descrição | Exemplo |
+|-------------|-----------|---------|
+| `%roguelata_mana%` | Mana atual do jogador | `72` |
+| `%roguelata_max_mana%` | Mana máxima do jogador | `100` |
+| `%roguelata_mana_percent%` | Mana como porcentagem | `72` |
+| `%roguelata_level%` | Nível atual da run | `14` |
+| `%roguelata_health%` | Vida atual | `20` |
+| `%roguelata_max_health%` | Vida máxima | `20` |
+| `%roguelata_health_percent%` | Vida como porcentagem | `100` |
+| `%roguelata_has_run%` | Se o jogador tem uma run ativa | `true` |
+
+### Exemplo de configuração BetterHud + RogueLata
+
+```yaml
+# Exemplo: config.yml do BetterHud (parcial)
+hud:
+  mana:
+    enabled: true
+    text: "&b⚡ %roguelata_mana%/%roguelata_max_mana%"
+    condition: "%roguelata_has_run%=true"
+  level:
+    enabled: true
+    text: "&7Level: &f%roguelata_level%"
+    condition: "%roguelata_has_run%=true"
+```
+
 ## Detecção automática
 
 O RogueLata detecta cada plugin no boot e loga no console quais integrações foram ativadas:
@@ -83,6 +125,8 @@ O RogueLata detecta cada plugin no boot e loga no console quais integrações fo
 [RogueLata] AuraSkills integrado com sucesso! 38 skills registradas.
 [RogueLata] RogueLata + AuraMobs detectado.
 [RogueLata] RogueLata + MythicMobs detectado.
+[RogueLata] RogueLata + BetterHud detectado (BossBar desativada, HUD delegada ao BetterHud).
+[RogueLata] RogueLata + PlaceholderAPI integrado com sucesso!
 ```
 
 Se um plugin não estiver presente, o RogueLata simplesmente não usa aquela feature — sem erros, sem warnings.

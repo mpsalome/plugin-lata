@@ -18,7 +18,7 @@ com.project.rpgplugin
 ├── AuraSkillsIntegration.java      # Ponte AuraSkills (custom skills, gates, draft bias)
 ├── command/
 │   ├── LataCommand.java            # /lata e subcomandos (tp, boss, loja, craft, book)
-│   ├── RunCommand.java             # /run
+│   ├── LataCommand.java            # /lata (tp, boss, loja, draft, info)
 │   └── RecallCommand.java          # /recall
 ├── config/                         # SkillsConfig, ShopConfig
 ├── core/

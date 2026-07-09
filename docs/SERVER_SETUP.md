@@ -35,7 +35,7 @@ When an optional plugin is absent, features depending on it are gracefully disab
 | Command | Description |
 |---------|-------------|
 | `/lata tp <player>` | Teleport to a player |
-| `/lata boss spawn <boss>` | Spawn a boss (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma) |
+| `/lata boss spawn <id>` | Spawn a boss (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king) |
 | `/lata loja` | Open the ShopMenu |
 | `/lata draft` | Open pending draft (non-blocking) |
 | `/lata book` | Receive the RPG Book (drops to ground if inventory full) |
@@ -73,7 +73,7 @@ Generated on first run under `plugins/RogueLata/`:
 - `augments.yml` — Augment card definitions
 - `gates.yml` — AuraSkills level gates
 - `mayhem.yml` — Mayhem thresholds & config
-- `bosses.yml` — Boss definitions (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma)
+- `bosses.yml` — Boss definitions (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king)
 - `mobs.yml` — Elite mob definitions
 - `mana_abilities.yml` — Mana costs per ability
 - `runs/<uuid>.yml` — Per-player run persistence

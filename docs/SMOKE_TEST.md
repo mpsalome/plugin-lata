@@ -12,12 +12,12 @@
 - [ ] `/lata boss spawn magma_tyrant` spawna boss nomeado com BossBar
 - [ ] `/lata boss spawn storm_wyvern` spawna boss nomeado com BossBar
 - [ ] `/lata boss spawn void_lich` spawna boss nomeado com BossBar
-- [ ] `/lata boss spawn sir_creeper_a_lot` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn sir_creeper_alot` spawna boss nomeado com BossBar
 - [ ] `/lata boss spawn slime_shady` spawna boss nomeado com BossBar
-- [ ] `/lata boss spawn o_decapitador` spawna boss nomeado com BossBar
-- [ ] `/lata boss spawn guardiao_ancestral` spawna boss nomeado com BossBar
-- [ ] `/lata boss spawn senhor_da_guerra_piglin` spawna boss nomeado com BossBar
-- [ ] `/lata boss spawn rei_fantasma` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn the_beheader` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn ancient_guardian` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn piglin_warlord` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn phantom_king` spawna boss nomeado com BossBar
 - [ ] Draft não-bloqueante: fechar draft menu, drafts ficam na fila, reabrir via `/lata draft`
 - [ ] Draft abre a cada 3 níveis com 3 cartas distintas
 - [ ] Escolher uma carta no draft a adiciona à run

@@ -1,11 +1,11 @@
 # RogueLata
 
-**Addon roguelike para Minecraft Paper 1.21.4+** — cada morte é um recomeço, toda run é uma build nova.
+**Addon Action RPG para Minecraft Paper 1.21.4+** — cada morte é um recomeço, toda run é uma build nova.
 
-Inspirado no **ARAM Mayhem** e no **Modo Arena** do LoL. Roda **standalone** (só Paper) ou integrado a [AuraSkills](https://www.spigotmc.org/resources/auraskills.81069/), [AuraMobs](https://wiki.aurelium.dev/auramobs/) e [MythicMobs](https://www.spigotmc.org/resources/5702/).
+Inspirado no **ARAM Mayhem** e no **Modo Arena** do LoL. Roda **standalone** (só Paper) ou integrado a [AuraSkills](https://www.spigotmc.org/resources/auraskills.81069/), [AuraMobs](https://wiki.aurelium.dev/auramobs/), [MythicMobs](https://www.spigotmc.org/resources/5702/), [BetterHud](https://www.spigotmc.org/resources/betterhud.28330/) e [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/).
 
 ```yaml
-softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
+softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine, BetterHud, PlaceholderAPI]
 ```
 
 ---
@@ -26,13 +26,14 @@ softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
 |---------|-----------|
 | `/lata` | Comando principal (aliases: `rogue`, `pao`, `roguelata`) |
 | `/lata tp <player>` | Teleporta ao jogador |
-| `/lata boss spawn <boss>` | Spawna um boss (frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_a_lot, slime_shady, o_decapitador, guardiao_ancestral, senhor_da_guerra_piglin, rei_fantasma) |
+| `/lata boss spawn <id>` | Spawna um boss (ids: frostmaw, magma_tyrant, storm_wyvern, void_lich, sir_creeper_alot, slime_shady, the_beheader, ancient_guardian, piglin_warlord, phantom_king) |
 | `/lata loja` | Abre a Loja (ShopMenu) |
 | `/lata draft` | Abre o Draft pendente (não-bloqueante) |
 | `/lata book` | Dá o RPG Book (`BREAD`); cai no chão se inventário cheio |
+| `/lata info` | Exibe informações da jornada (nível, cartas, mayhem) |
 | **Clique direito** no RPG Book | Abre o HubMenu (Coleção, Loja, Draft) |
 
-> **v3.2.0:** 10 bosses com loot temático (BossSet). BossBar separada do HUD (actionbar: mana+vida, BossBar: cooldowns+efeitos ativos). Novo item na Loja: **Purificação do Mundo** (slot 18, 30 níveis) — remove todos os efeitos Mayhem do mundo.
+> **v3.3.0:** Integração BetterHud — se presente, a BossBar nativa (cooldowns/efeitos) é desativada e delegada ao BetterHud via PlaceholderAPI. Placeholders: `%roguelata_mana%`, `%roguelata_level%`, `%roguelata_health%`, etc. Draft automático (próximo draft abre ao escolher/skip). Item **Treinamento Acelerado** na loja (slot 22, 3 níveis, +100 XP AuraSkills). 10 bosses no `/lata boss spawn`. Mensagens renomeadas: "Jornada/Personagem", "Mundo Difícil".
 
 ---
 
@@ -45,7 +46,7 @@ softdepend: [AuraSkills, AuraMobs, MythicMobs, ModelEngine]
 | [Gameplay](docs/wiki/gameplay.md) | Regras: ciclo da run, draft, tiers, tags, sinergias, mayhem, recall, fênix, vitória |
 | [Comandos](docs/wiki/commands.md) | Referência completa de comandos e permissões |
 | [Cartas](docs/wiki/cards.md) | Catálogo: 37 habilidades + 53 augments = 90 cartas |
-| [Integrações](docs/wiki/integrations.md) | AuraSkills (gates, draft bias, reset, veteran migration), AuraMobs, MythicMobs |
+| [Integrações](docs/wiki/integrations.md) | AuraSkills (gates, draft bias, reset, veteran migration), AuraMobs, MythicMobs, BetterHud, PlaceholderAPI |
 | [Configuração](docs/wiki/config.md) | `config.yml`, `draft.yml`, `augments.yml`, `gates.yml`, `mayhem.yml`, `bosses.yml`, `messages/` |
 | [Desenvolvedores](docs/wiki/developers.md) | Build, arquitetura, serviços, como adicionar cartas |
 

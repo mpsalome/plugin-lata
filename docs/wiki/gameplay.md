@@ -144,20 +144,20 @@ Acessado clicando com o **botão direito na Lata de Pão** (RPG Book, item BREAD
 
 **10 bosses** disponíveis (4 originais + 6 novos), invocados via `/lata boss spawn <id>`, pelo item **Sinalizador do Chefe**, ou como **Milestone Boss** (50% de chance a cada 10 níveis).
 
-**Novos bosses da v3.2.0:** Sir Creeper-A-Lot (CREEPER), Slime Shady (SLIME), O Decapitador (WITHER_SKELETON), Guardião Ancestral (IRON_GOLEM), Senhor da Guerra Piglin (PIGLIN_BRUTE), Rei Fantasma (SKELETON).
+**10 bosses:** Frostmaw, Tirano Magmatico, Furia Tempestuosa, Lich do Vazio, Sir Creeper-A-Lot, Slime Shady, O Decapitador, Guardiao Ancestral, Senhor da Guerra Piglin, Rei Fantasma.
 
 | ID | Tipo | Display (MiniMessage) |
 |----|------|-----------------------|
-| `frostmaw` | POLAR_BEAR | Frostmaw, Senhor do Gelo |
-| `magma_tyrant` | MAGMA_CUBE | Tirano Magmático, Coração do Inferno |
-| `storm_wyvern` | RAVAGER | Fúria Tempestuosa, Asa do Céu |
+| `frostmaw` | ZOMBIE | Frostmaw, Senhor do Gelo |
+| `magma_tyrant` | MAGMA_CUBE | Tirano Magmatico, Coracao do Inferno |
+| `storm_wyvern` | RAVAGER | Furia Tempestuosa, Asa do Ceu |
 | `void_lich` | WITHER_SKELETON | Lich do Vazio, A Noite Eterna |
-| `sir_creeper` | CREEPER | Sir Creeper-A-Lot |
-| `slime_shady` | SLIME | Slime Shady |
-| `o_decapitador` | WITHER_SKELETON | O Decapitador |
-| `guardiao_ancestral` | IRON_GOLEM | Guardião Ancestral |
-| `senhor_da_guerra_piglin` | PIGLIN_BRUTE | Senhor da Guerra Piglin |
-| `rei_fantasma` | SKELETON | Rei Fantasma |
+| `sir_creeper_alot` | CREEPER | Sir Creeper-A-Lot, O Cavaleiro Explosivo |
+| `slime_shady` | SLIME | Slime Shady, A Gosma Real |
+| `the_beheader` | WITHER_SKELETON | O Decapitador, O Carrasco do Nether |
+| `ancient_guardian` | ELDER_GUARDIAN | Guardiao Ancestral, A Muralha do Oceano |
+| `piglin_warlord` | PIGLIN_BRUTE | Senhor da Guerra Piglin, General do Nether |
+| `phantom_king` | PHANTOM | Rei Fantasma, A Sombra Alada |
 
 - Ao invocar, o **nível do boss** é exibido + uma dica do loot (sneak peek)
 - Bosses usam **MiniMessage** para nomes com formatação (BossBar usa texto plano sem tags)

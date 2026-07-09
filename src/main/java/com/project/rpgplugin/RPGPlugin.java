@@ -2,13 +2,14 @@ package com.project.rpgplugin;
 
 import com.project.rpgplugin.command.LataCommand;
 import com.project.rpgplugin.command.RecallCommand;
-import com.project.rpgplugin.command.RunCommand;
 import com.project.rpgplugin.ui.ShopMenu;
 import com.project.rpgplugin.config.SkillsConfig;
 import com.project.rpgplugin.core.build.SynergyService;
 import com.project.rpgplugin.integration.AuraMobsBridge;
+import com.project.rpgplugin.integration.BetterHudIntegration;
 import com.project.rpgplugin.integration.ModelEngineBridge;
 import com.project.rpgplugin.integration.MythicMobsBridge;
+import com.project.rpgplugin.integration.RogueLataPapiExpansion;
 import com.project.rpgplugin.core.card.CardRegistry;
 import com.project.rpgplugin.core.card.StatService;
 import com.project.rpgplugin.core.card.ability.AbilityCardRegistration;
@@ -55,6 +56,7 @@ import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -72,6 +74,8 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private AuraMobsBridge auraMobsBridge;
     private MythicMobsBridge mythicMobsBridge;
     private ModelEngineBridge modelEngineBridge;
+    private BetterHudIntegration betterHudIntegration;
+    private RogueLataPapiExpansion papiExpansion;
 
     private SkillRegistry skillRegistry;
     private SkillServices skillServices;
@@ -97,7 +101,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
     private SpawnResolver spawnResolver;
     private ResetService resetService;
     private PlayerLifecycleListener playerLifecycleListener;
-    private RunCommand runCommand;
 
     // EPIC-5: Gameplay triggers
     private GateRegistry gateRegistry;
@@ -197,7 +200,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // EPIC-3: Run lifecycle
         this.playerLifecycleListener = new PlayerLifecycleListener(runManager, runPersistence);
-        this.runCommand = new RunCommand(runManager);
 
         // EPIC-5: Gameplay triggers
         this.distanceTracker = new DistanceTracker(runManager);
@@ -217,6 +219,13 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         // EPIC-8: HUD & Menu framework
         this.hudService = new HudService(this, manaService, runManager);
+
+        // BetterHud integration — disable RogueLata's BossBar if BetterHud is present
+        this.betterHudIntegration = new BetterHudIntegration();
+        if (betterHudIntegration.shouldDisableBossBar()) {
+            this.hudService.setBossBarEnabled(false);
+        }
+
         this.menuListener = new MenuListener();
 
         // EPIC-9: Persistence
@@ -254,7 +263,6 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
 
         getCommand("skills").setExecutor(this);
         getCommand("rpg").setExecutor(this);
-        getCommand("run").setExecutor(runCommand);
         getCommand("recall").setExecutor(recallCommand);
         var lataExecutor = new LataCommand(this, runManager, mobSpawnService);
         getCommand("lata").setExecutor(lataExecutor);
@@ -279,6 +287,21 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         if (modelEngineBridge.isEnabled()) {
             getLogger().info("RogueLata + ModelEngine detectado (modelos 3D).");
         }
+        if (betterHudIntegration.isEnabled()) {
+            getLogger().info("RogueLata + BetterHud detectado (BossBar desativada, HUD delegada ao BetterHud).");
+        }
+
+        // Register PlaceholderAPI expansion
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            try {
+                this.papiExpansion = new RogueLataPapiExpansion(runManager, manaService);
+                if (this.papiExpansion.register()) {
+                    getLogger().info("RogueLata + PlaceholderAPI integrado com sucesso!");
+                }
+            } catch (Exception e) {
+                getLogger().warning("Nao foi possivel registrar expansao PlaceholderAPI: " + e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -291,6 +314,9 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             for (Player p : getServer().getOnlinePlayers()) {
                 auraSkillsIntegration.removeSkillSlotAttachment(p);
             }
+        }
+        if (papiExpansion != null) {
+            papiExpansion.unregister();
         }
         getLogger().info("RogueLata Plugin desativado.");
     }
@@ -442,7 +468,7 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
             sender.sendMessage(Component.text("/rpg reload ").color(NamedTextColor.YELLOW).append(Component.text("- Recarrega config (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg reset ").color(NamedTextColor.YELLOW).append(Component.text("- Reseta todos os dados (Admin).").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.text("/rpg debug ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra dados internos (Admin).").color(NamedTextColor.WHITE)));
-            sender.sendMessage(Component.text("/run ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra informacoes do personagem.").color(NamedTextColor.WHITE)));
+            sender.sendMessage(Component.text("/lata info ").color(NamedTextColor.YELLOW).append(Component.text("- Mostra informacoes do personagem.").color(NamedTextColor.WHITE)));
             sender.sendMessage(Component.empty());
             sender.sendMessage(Component.text("=== MUNDO DIFICIL ===").color(NamedTextColor.RED));
             sender.sendMessage(Component.text("O mundo e perigoso. Morrer tem consequencias!").color(NamedTextColor.GRAY));

@@ -122,7 +122,6 @@ hudService.startAll();
 // 20. Wire commands
 getCommand("skills").setExecutor(this);
 getCommand("rpg").setExecutor(this);
-getCommand("run").setExecutor(runCommand);
 getCommand("recall").setExecutor(recallCommand);
 var lataExecutor = new LataCommand(this, runManager, mobSpawnService);
 getCommand("lata").setExecutor(lataExecutor);
@@ -150,9 +149,8 @@ createShopItem() -> ItemStack // HAY_BLOCK com PDC shop_item
 commands:
   skills:  /skills
   rpg:     /rpg [reload|reset|debug]
-  run:     /run
   recall:  /recall
-  lata:    /lata [tp <jogador>|boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich|sir_creeper_a_lot|slime_shady|o_decapitador|guardiao_ancestral|senhor_da_guerra_piglin|rei_fantasma>|loja|draft|book]
+  lata:    /lata [tp <jogador>|boss spawn <id>|loja|draft|info]
            aliases: [rogue, pao, roguelata]
   rogue:   /rogue (sinonimo de /lata)
            aliases: [lata, pao, roguelata]
@@ -704,16 +702,16 @@ public class LataCommand implements CommandExecutor {
 
 | ID | Type | HP | Biome | Display Name (MiniMessage) |
 |---|---|---|---|---|
-| frostmaw | POLAR_BEAR | 300 | SNOWY | `<bold><aqua>Frostmaw <gray>\| <white>Senhor do Gelo</white></gray></aqua></bold>` |
-| magma_tyrant | MAGMA_CUBE | 200 | BADLANDS | `<bold><red>Magma Tyrant <gray>\| <white>Soberano das Profundezas</white></gray></red></bold>` |
-| storm_wyvern | RAVAGER | 350 | PLAINS | `<bold><yellow>Storm Wyvern <gray>\| <white>Asa da Tempestade</white></gray></yellow></bold>` |
-| void_lich | WITHER_SKELETON | 250 | DARK_FOREST | `<bold><dark_purple>Void Lich <gray>\| <white>Senhor do Vazio</white></gray></dark_purple></bold>` |
-| sir_creeper_a_lot | CREEPER | 220 | TAIGA | `<bold><green>Sir Creeper-A-Lot <gray>\| <white>O Explosivo</white></gray></green></bold>` |
-| slime_shady | SLIME | 180 | SWAMP | `<bold><yellow>Slime Shady <gray>\| <white>Gosma Real</white></gray></yellow></bold>` |
-| o_decapitador | WITHER_SKELETON | 300 | NETHER_WASTES | `<bold><red>O Decapitador <gray>\| <white>Cabeça de Ferro</white></gray></red></bold>` |
-| guardiao_ancestral | ELDER_GUARDIAN | 350 | DEEP_OCEAN | `<bold><blue>Guardião Ancestral <gray>\| <white>Protetor das Profundezas</white></gray></blue></bold>` |
-| senhor_da_guerra_piglin | PIGLIN_BRUTE | 280 | CRIMSON_FOREST | `<bold><gold>Senhor da Guerra Piglin <gray>\| <white>Força Bruta</white></gray></gold></bold>` |
-| rei_fantasma | SKELETON | 320 | DARK_FOREST | `<bold><gray>Rei Fantasma <gray>\| <white>Soberano Eterno</white></gray></gray></bold>` |
+| frostmaw | ZOMBIE | 300 | SNOWY | `<bold><aqua>Frostmaw <gray>\| <white>Senhor do Gelo</white></gray></aqua></bold>` |
+| magma_tyrant | MAGMA_CUBE | 200 | BADLANDS | `<bold><red>Tirano Magmatico <gray>\| <white>Coracao do Inferno</white></gray></red></bold>` |
+| storm_wyvern | RAVAGER | 350 | PLAINS | `<bold><yellow>Furia Tempestuosa <gray>\| <white>Asa do Ceu</white></gray></yellow></bold>` |
+| void_lich | WITHER_SKELETON | 250 | DARK_FOREST | `<bold><dark_purple>Lich do Vazio <gray>\| <white>A Noite Eterna</white></gray></dark_purple></bold>` |
+| sir_creeper_alot | CREEPER | 220 | TAIGA | `<bold><green>Sir Creeper-A-Lot <gray>\| <white>O Cavaleiro Explosivo</white></gray></green></bold>` |
+| slime_shady | SLIME | 180 | SWAMP | `<bold><yellow>Slime Shady <gray>\| <white>A Gosma Real</white></gray></yellow></bold>` |
+| the_beheader | WITHER_SKELETON | 300 | NETHER_WASTES | `<bold><dark_red>O Decapitador <gray>\| <white>O Carrasco do Nether</white></gray></dark_red></bold>` |
+| ancient_guardian | ELDER_GUARDIAN | 350 | DEEP_OCEAN | `<bold><dark_aqua>Guardiao Ancestral <gray>\| <white>A Muralha do Oceano</white></gray></dark_aqua></bold>` |
+| piglin_warlord | PIGLIN_BRUTE | 280 | CRIMSON_FOREST | `<bold><gold>Senhor da Guerra Piglin <gray>\| <white>General do Nether</white></gray></gold></bold>` |
+| phantom_king | PHANTOM | 320 | DARK_FOREST | `<bold><gray>Rei Fantasma <gray>\| <white>A Sombra Alada</white></gray></gray></bold>` |
 
 ### 10.2 Spawning Flow
 
