@@ -5,7 +5,6 @@ import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunPersistenceService;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.util.Text;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,11 +52,7 @@ public class PlayerLifecycleListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
-
-        // Forca respawn no spawn do mundo (ignora cama)
-        Location worldSpawn = p.getWorld().getSpawnLocation();
-        e.setRespawnLocation(worldSpawn);
-
+        // Respawn vanilla — respeita cama do jogador ou world spawn
         if (!runManager.hasActiveRun(p)) {
             runManager.startRun(p);
             if (plugin.getHudService() != null) {

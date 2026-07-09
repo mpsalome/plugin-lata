@@ -331,6 +331,10 @@ public class RPGPlugin extends JavaPlugin implements CommandExecutor {
         return draftService;
     }
 
+    public DraftWeighting getDraftWeighting() {
+        return draftWeighting;
+    }
+
     public PlayerLevelListener getPlayerLevelListener() {
         return playerLevelListener;
     }

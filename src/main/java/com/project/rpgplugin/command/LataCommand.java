@@ -173,6 +173,18 @@ public class LataCommand implements CommandExecutor {
             player.sendMessage(Text.mm("<red>Erro ao iniciar run."));
             return;
         }
+
+        // Se o jogador fechou o menu sem escolher, reabre a sessao ativa
+        var draftService = plugin.getDraftService();
+        if (draftService != null) {
+            var session = draftService.getActiveSession(player.getUniqueId());
+            if (session != null && !session.isDecided()) {
+                new DraftMenu(player, session, draftService, run, runManager,
+                    plugin.getDraftWeighting(), plugin, plugin.getPlayerLevelListener()).open();
+                return;
+            }
+        }
+
         if (!run.hasPendingDrafts()) {
             player.sendMessage(Text.mm("<gray>Voce nao tem drafts pendentes. Upe de nivel ou compre uma Carta Avulsa na /" + label + " loja!</gray>"));
             return;

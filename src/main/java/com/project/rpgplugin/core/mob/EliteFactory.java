@@ -81,8 +81,12 @@ public class EliteFactory {
         return e;
     }
 
+    private String stripTags(String mm) {
+        return mm.replaceAll("<[^>]+>", "").trim();
+    }
+
     private void trackBossBar(LivingEntity boss, BossDef def) {
-        BossBar bar = Bukkit.createBossBar(def.displayName(), BarColor.RED, BarStyle.SOLID);
+        BossBar bar = Bukkit.createBossBar(stripTags(def.displayName()), BarColor.RED, BarStyle.SOLID);
         bar.setVisible(true);
         UUID bossId = boss.getUniqueId();
 

@@ -57,8 +57,9 @@ public class DraftMenu extends Menu {
                 playTierSound(player, card.tier());
                 draftService.applyChoice(player, run, session, index);
                 player.closeInventory();
-                if (run.hasPendingDrafts()) {
-                    levelListener.openNextDraft(player, run);
+                int remaining = run.pendingDrafts();
+                if (remaining > 0) {
+                    player.sendMessage(Text.mm("<gray>Voce tem mais <white>" + remaining + "</white> draft(s) pendente(s)! Use <click:run_command:'/lata draft'><white>/lata draft</white></click>."));
                 }
             } else if (slot == 40 && DraftWeighting.isRerollEnabled(plugin)) {
                 draftService.reroll(player, run, session);
@@ -66,8 +67,9 @@ public class DraftMenu extends Menu {
             } else if (slot == 44 && DraftWeighting.isSkipAllowed(plugin)) {
                 draftService.skipDraft(player, run, session);
                 player.closeInventory();
-                if (run.hasPendingDrafts()) {
-                    levelListener.openNextDraft(player, run);
+                int remaining = run.pendingDrafts();
+                if (remaining > 0) {
+                    player.sendMessage(Text.mm("<gray>Pulado! Voce tem mais <white>" + remaining + "</white> draft(s) pendente(s)! Use <click:run_command:'/lata draft'><white>/lata draft</white></click>."));
                 }
             }
         });

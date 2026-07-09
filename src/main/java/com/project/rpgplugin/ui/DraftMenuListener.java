@@ -27,16 +27,7 @@ public class DraftMenuListener implements Listener {
         if (!(e.getPlayer() instanceof Player p)) return;
         if (!(e.getInventory().getHolder() instanceof DraftMenu)) return;
 
-        if (!runManager.hasActiveRun(p)) return;
-        RunState run = runManager.getRun(p);
-        if (run == null) return;
-
-        DraftSession session = draftService.getActiveSession(p.getUniqueId());
-        if (session == null || session.isDecided()) return;
-
-        // Session wasn't decided - queue it back
-        if (run.hasPendingDrafts()) {
-            levelListener.openNextDraft(p, run);
-        }
+        // Nao reabre automaticamente — o jogador decide quando draftar
+        // Os drafts pendentes ficam na fila, acessiveis via /lata draft
     }
 }

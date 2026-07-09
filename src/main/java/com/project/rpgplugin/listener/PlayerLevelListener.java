@@ -8,6 +8,7 @@ import com.project.rpgplugin.core.mayhem.MilestoneService;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.DraftMenu;
+import com.project.rpgplugin.util.Text;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,11 +47,11 @@ public class PlayerLevelListener implements Listener {
 
         run.setLevel(newLevel);
 
-        // EPIC-2: Draft trigger — 1 augment per level
+        // EPIC-2: Draft trigger — 1 augment per level (nao bloqueante)
         int draftsEarned = newLevel - oldLevel;
         if (draftsEarned > 0) {
             run.addPendingDrafts(draftsEarned);
-            openNextDraft(p, run);
+            p.sendActionBar(Text.mm("<gold>\uD83C\uDFB4 +" + draftsEarned + " draft(s)! Digite <white>/lata draft</white> para abrir."));
         }
 
         // EPIC-4: Mayhem milestone check
