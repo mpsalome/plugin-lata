@@ -1,4 +1,4 @@
-# 🎲 RogueLata — Wiki
+# RogueLata — Wiki
 
 **RogueLata** transforma o Minecraft numa experiência **roguelike**: você não monta uma build fixa de uma vez — você a **drafta** ao longo da run, escolhendo cartas aleatórias. Quanto mais fundo você vai, mais forte fica... e mais o mundo enlouquece. **Ao morrer, você perde tudo e recomeça do zero — com uma build completamente diferente.**
 
@@ -6,9 +6,9 @@
 
 | Página | Descrição |
 |--------|-----------|
-| [Gameplay](gameplay.md) | Regras completas: ciclo da run, draft, tiers, tags, sinergias, mayhem, recall, fênix, dicas |
+| [Gameplay](gameplay.md) | Regras completas: ciclo da run, draft, tiers, tags, sinergias, mayhem, recall, fênix, loja, hub, dicas |
 | [Comandos](commands.md) | Todos os comandos e permissões |
-| [Cartas](cards.md) | Catálogo completo: 35 habilidades + 53 augments |
+| [Cartas](cards.md) | Catálogo completo: 37 habilidades + 53 augments |
 | [Integrações](integrations.md) | AuraSkills, AuraMobs, MythicMobs — como cada um afeta o jogo |
 | [Configuração](config.md) | Arquivos de configuração e o que cada um controla |
 | [Desenvolvedores](developers.md) | Build, arquitetura, como estender |
@@ -31,4 +31,4 @@ RogueLata roda **standalone** (só Paper 1.21.4+) e opcionalmente se integra a A
 | MythicMobs | ➖ Opcional | AI avançada para bosses |
 | ModelEngine | ➖ Opcional | Modelos 3D para bosses |
 
-> Sem os opcionais, o plugin funciona **completo** — o draft, reset na morte, mayhem, recall, bosses e HUD são nativos (API Paper vanilla).
+> Sem os opcionais, o plugin funciona **completo** — o draft, reset na morte, mayhem, recall, bosses e HUD são nativos (API Paper vanilla). Use `/lata` (aliases: `rogue`, `pao`, `roguelata`) como comando principal.

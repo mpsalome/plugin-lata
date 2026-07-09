@@ -10,7 +10,8 @@ RogueLata roda **standalone** (só Paper). Os plugins abaixo são opcionais e s�
 | Draft bias | Níveis altos em Mining favorecem cartas MINER no draft | Todas as classes com peso igual |
 | Reset na morte | Skills AuraSkills zeradas junto com o resto | Só XP vanilla é resetado |
 | Mana | Habilidades podem usar mana | Habilidades usam cooldown próprio |
-| Custom skills | 35 skills do RogueLata aparecem como skills custom no `/skills` do AuraSkills | Não aparecem (só existem como cartas) |
+| Custom skills | 38 skills do RogueLata aparecem como skills custom no `/skills` do AuraSkills | Não aparecem (só existem como cartas) |
+| Migração veteran | Na primeira join, níveis AuraSkills existentes são convertidos em drafts pendentes | Sem migração |
 
 ### Configuração recomendada (`plugins/AuraSkills/config.yml`)
 
@@ -22,6 +23,10 @@ on_death:
 ```
 
 > ⚠️ **Alinhamento com reset da Run:** O RogueLata já chama `resetAllAuraSkills()` na morte do jogador (via `PlayerLifecycleListener`). A config acima garante que o AuraSkills também zere skills/XP nativos no mesmo momento, evitando dessincronia entre os dois sistemas. Sem `reset_skills: true`, o jogador pode ressurgir com níveis AuraSkills que o RogueLata esperava que estivessem zerados.
+
+### Migração veteran
+
+Na primeira vez que um jogador entra no servidor com o RogueLata (não possui dados de run salvos), o plugin verifica se ele tem **níveis vanilla de XP** acumulados. Se sim, esses níveis são convertidos em **drafts pendentes** (1 draft por nível), e o jogador recebe uma mensagem no chat com o link `/lata draft` para abrir seus drafts.
 
 ### Gates (exemplo de `gates.yml`)
 
@@ -75,7 +80,7 @@ Permite criar **bosses com AI avançada** (skills, fases, drops). Sem ele, bosse
 O RogueLata detecta cada plugin no boot e loga no console quais integrações foram ativadas:
 
 ```
-[RogueLata] AuraSkills integrado com sucesso! 35 skills registradas.
+[RogueLata] AuraSkills integrado com sucesso! 38 skills registradas.
 [RogueLata] RogueLata + AuraMobs detectado.
 [RogueLata] RogueLata + MythicMobs detectado.
 ```

@@ -38,6 +38,33 @@
 
 ## Menu Patterns
 
-- Draft menu: 27 slots, cards at slots 11/14/17, reroll at 22, skip at 26
-- Collection menu: 54 slots, cards from slot 10, summary at 4, mayhem at 49
-- Fill empty slots with `GRAY_STAINED_GLASS_PANE` (no display name)
+- All menus fill borders with `BLACK_STAINED_GLASS_PANE` (no display name)
+
+### DraftMenu
+- Size: 54 slots
+- Cards at slots 20, 23, 26, 29
+- Reroll at slot 40
+- Skip at slot 44
+
+### CollectionMenu
+- Size: 54 slots
+- Cards start at slot 10 (with pagination, 36 cards/page)
+- Category filter toggles at slots 3-6
+- "Menu Principal" button at slot 49
+- Alphabetical sort
+
+### ShopMenu
+- Size: 27 slots
+- Items at slots 10, 12, 14, 16, 18
+- Items:
+  - Carta Avulsa = `MAP`
+  - Reroll = `ENDER_EYE`
+  - Absolvição = `TOTEM_OF_UNDYING`
+  - Sinalizador = `BEACON`
+  - Beque = `HEART_OF_THE_SEA`
+
+### HubMenu
+- Size: 27 slots
+- Navigation items at slots 11 (Coleção), 13 (Loja), 15 (Draft)
+- "Fechar" button at slot 22
+- Fill borders with `BLACK_STAINED_GLASS_PANE`

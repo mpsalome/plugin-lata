@@ -16,23 +16,32 @@ O JAR é gerado em `target/RogueLata-<versão>.jar` (shaded).
 com.project.rpgplugin
 ├── RPGPlugin.java                  # Bootstrap + DI manual
 ├── AuraSkillsIntegration.java      # Ponte AuraSkills (custom skills, gates, draft bias)
-├── command/                        # RunCommand, RecallCommand
+├── command/
+│   ├── LataCommand.java            # /lata e subcomandos (tp, boss, loja, draft, book)
+│   ├── RunCommand.java             # /run
+│   └── RecallCommand.java          # /recall
 ├── config/                         # SkillsConfig
 ├── core/
 │   ├── build/       SynergyService           # Sinergias por tags
-│   ├── card/        Card, CardRegistry...    # 88 cartas (35 ability + 53 augment)
+│   ├── card/        Card, CardRegistry...    # 90 cartas (37 ability + 53 augment)
 │   ├── difficulty/  DifficultyService        # Escala vanilla (profundidade + players)
-│   ├── draft/       DraftService, Weighting  # Motor do draft 1-de-3
-│   ├── mayhem/      MayhemService, 8 mods    # Modificadores cumulativos
-│   ├── mob/         EliteFactory             # Bosses/elites vanilla
+│   ├── draft/       DraftService, Weighting  # Motor do draft 1-de-3 (não-bloqueante)
+│   ├── mayhem/      MayhemService, 8+ mods   # Modificadores cumulativos (limpos na morte)
+│   ├── mob/         EliteFactory, MobSpawnService  # Bosses/elites via bosses.yml/mobs.yml
 │   ├── progression/ GateRegistry, Recall     # Gates, recall, distância
-│   ├── run/         RunState, RunManager     # Ciclo da run
-│   └── skill/       Skill, 35 impls          # Sistema de skills data-driven
-├── data/            YamlDataStore            # Persistência runs/{uuid}.yml
-├── listener/        CombatListener, etc.     # Eventos
+│   ├── run/         RunState, RunManager     # Ciclo da run, persistência, migração veteran
+│   └── skill/       Skill, 38 impls          # Sistema de skills data-driven (cfgInt/cfgDouble/cfgString)
+├── data/            YamlDataStore, RunPersistenceService  # Persistência runs/{uuid}.yml
+├── listener/        CombatListener, PlayerLifecycleListener, SkillDispatchListener
 ├── task/            DistanceTask             # Tasks periódicas
-├── ui/              CollectionMenu, HUD      # Interfaces
-└── util/            ItemKeys, Text           # Utilitários
+├── ui/
+│   ├── HubMenu.java               # Menu principal (Coleção, Loja, Draft)
+│   ├── CollectionMenu.java        # Coleção paginada (36 cards/página, filtros)
+│   ├── ShopMenu.java              # Loja (Reroll, Carta Avulsa, Absolvição, Sinalizador, Beque)
+│   ├── DraftMenu.java             # Draft 1-de-3 (fechável, sessão preservada)
+│   └── HUD.java                   # HUD do jogador
+├── util/            ItemKeys, Text           # Utilitários
+└── integration/     MythicMobsBridge, ModelEngineBridge, AuraMobsIntegration
 ```
 
 ## Serviços principais
@@ -40,11 +49,24 @@ com.project.rpgplugin
 | Serviço | Função | Acesso |
 |---------|--------|--------|
 | `RunManager` | Iniciar/terminar runs, obter RunState | `RPGPlugin.getRunManager()` |
-| `CardRegistry` | 88 cartas registradas, consulta por tag/tier | `RPGPlugin.getCardRegistry()` |
+| `CardRegistry` | 90 cartas registradas, consulta por tag/tier | `RPGPlugin.getCardRegistry()` |
 | `DraftService` | Rolar draft, aplicar escolha, reroll, pular | `RPGPlugin.getDraftService()` |
 | `AuraSkillsIntegration` | Ponte com AuraSkills (se ativo) | `RPGPlugin.getAuraSkillsIntegration()` |
 | `PlayerDataStore` | Salvar/carregar runs do disco | `RPGPlugin.getDataStore()` |
 | `DifficultyService` | Multiplicadores de dificuldade | `RPGPlugin.getDifficultyService()` |
+| `MobSpawnService` | Spawn de bosses e elites configuráveis via YAML | `RPGPlugin.getMobSpawnService()` |
+| `EliteFactory` | Cria entidades boss/elite (MiniMessage display, BossBar, MythicMobs fallback) | via `MobSpawnService` |
+| `MayhemConfig` | Modificadores Mayhem, marcos e severidade | `RPGPlugin.getMayhemConfig()` |
+
+## LataCommand — extensibilidade
+
+O `LataCommand` usa um switch no primeiro argumento para rotear subcomandos. Para adicionar um novo subcomando:
+
+1. Adicione um `case` no `onCommand`
+2. Crie um método `handle<Nome>(Player, String[], String)`
+3. Adicione a entrada de ajuda em `sendHelp`
+
+Subcomandos atuais: `tp`, `boss spawn`, `loja`, `book`, `draft`.
 
 ## Como adicionar uma carta
 
@@ -52,8 +74,9 @@ com.project.rpgplugin
 
 1. Crie uma classe em `core/skill/impl/` estendendo `AbstractSkill`
 2. Implemente `id()`, `type()`, `tier()`, `icon()`, `trigger()`, `activate()`
-3. Registre em `SkillRegistration.registerAll()`
-4. Adicione as tags em `AbilityCardRegistration.SKILL_TAGS`
+3. Use `cfgInt()`, `cfgDouble()`, `cfgString()` para leitura defensiva de valores do YAML (nunca hardcode)
+4. Registre em `SkillRegistration.registerAll()`
+5. Adicione as tags em `AbilityCardRegistration.SKILL_TAGS`
 
 ### Augment
 
@@ -65,8 +88,12 @@ com.project.rpgplugin
 - **Adventure/MiniMessage** para todo texto (nunca `ChatColor`/`§`)
 - **Sem switch por carta** — tudo via CardRegistry + handlers
 - **Toda constante de gameplay** vem de YAML (nunca hardcoded)
+- **Leitura defensiva**: `cfgInt(path, def)`, `cfgDouble(path, def)`, `cfgString(path, def)` com fallback e log de warning
 - **Standalone-first** — AuraSkills/AuraMobs são soft-deps
-- **Reset total na morte** é sagrado
+- **Reset total na morte** + **Mayhem limpo** (timers cancelados, entidades removidas)
+- **Respawn vanilla** — o plugin não sobrescreve `setRespawnLocation`
+- **Migração veteran** na primeira join: níveis AuraSkills existentes são convertidos em pending drafts
+- **Draft não-bloqueante**: level-ups acumulam drafts, jogador abre manualmente
 - **Limpeza de estado** em quit/death para evitar leaks de UUID
 
 ## Testes
@@ -75,4 +102,4 @@ com.project.rpgplugin
 mvn test
 ```
 
-Atualmente 106 testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression, ResetService, MilestoneService, SynergyService, AugmentCard).
+Atualmente 106+ testes (CardRegistry, DraftWeighting, RunState, Mayhem, SkillRegistry, Progression, ResetService, MilestoneService, SynergyService, AugmentCard, ManaService, ModifierRegistry, DraftService).

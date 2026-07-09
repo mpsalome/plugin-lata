@@ -12,6 +12,9 @@ Arquivos em `plugins/RogueLata/` (gerados automaticamente na primeira execução
 | `gates.yml` | Gates: quais skills/níveis do AuraSkills liberam quais cartas | GateRegistry |
 | `mayhem.yml` | Modificadores Mayhem, marcos e severidade | MayhemConfig |
 | `run.yml` | Configuração de spawn da run | RunManager |
+| `bosses.yml` | Definições dos bosses (tipo, vida, dano, escala, equipamento) | MobSpawnService |
+| `mobs.yml` | Definições de mobs elites | MobSpawnService |
+
 ## Uso
 
 Edite os arquivos desejados e execute `/rpg reload` para aplicar as mudanças sem reiniciar o servidor.
@@ -57,4 +60,45 @@ weight:
   epic: 10
 ```
 
+## `bosses.yml`
 
+```yaml
+# Bosses configuracao — bosses da run
+bosses:
+  frostmaw:
+    base_type: POLAR_BEAR
+    display_name: "<bold><aqua>Frostmaw <gray>| <white>Senhor do Gelo"
+    health: 300
+    damage: 12
+    speed: 0.25
+    scale: 2.5
+    knockback_resist: 1.0
+    victory: true
+  magma_tyrant:
+    base_type: MAGMA_CUBE
+    display_name: "<bold><red>Tirano Magmatico <gray>| <white>Coracao do Inferno"
+    health: 200
+    damage: 15
+    speed: 0.3
+    scale: 4.0
+    knockback_resist: 0.8
+    victory: true
+  storm_wyvern:
+    base_type: RAVAGER
+    display_name: "<bold><yellow>Furia Tempestuosa <gray>| <white>Asa do Ceu"
+    health: 350
+    damage: 18
+    speed: 0.35
+    scale: 2.8
+    knockback_resist: 0.9
+    victory: true
+  void_lich:
+    base_type: WITHER_SKELETON
+    display_name: "<bold><dark_purple>Lich do Vazio <gray>| <white>A Noite Eterna"
+    health: 250
+    damage: 20
+    speed: 0.2
+    scale: 2.0
+    knockback_resist: 1.0
+    victory: true
+```

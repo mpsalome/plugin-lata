@@ -4,22 +4,31 @@
 
 - [ ] Servidor sobe sem erro no console
 - [ ] Ao entrar, jogador recebe a "Lata de Pão" (`BREAD`) no inventário
-- [ ] `/skills` abre o CollectionMenu (run atual)
-- [ ] `/run` mostra informações da run
-- [ ] `/rpg debug` mostra estado interno da run
+- [ ] Right-click BREAD abre HubMenu com botões Coleção/Loja/Draft
+- [ ] `/lata loja` abre ShopMenu (3 linhas, gradiente no header)
+- [ ] `/lata draft` abre draft se houver pendente; reabre sessão ativa se fechada sem decidir
+- [ ] `/lata book` dá o RPG Book; cai no chão se inventário cheio
+- [ ] `/lata boss spawn frostmaw` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn magma_tyrant` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn storm_wyvern` spawna boss nomeado com BossBar
+- [ ] `/lata boss spawn void_lich` spawna boss nomeado com BossBar
+- [ ] Draft não-bloqueante: fechar draft menu, drafts ficam na fila, reabrir via `/lata draft`
 - [ ] Draft abre a cada 3 níveis com 3 cartas distintas
 - [ ] Escolher uma carta no draft a adiciona à run
 - [ ] Escolher reroll re-sorteia as 3 cartas (consome 1 nível)
 - [ ] Escolher skip concede cura (6 corações) e fecha o draft
 - [ ] Ativar uma skill (ex: Dash com flor) aplica efeito e cooldown
 - [ ] Morrer reseta cartas/XP e teleporta ao spawn
+- [ ] Mayhem clears on death (timers cancelled, entities removed)
 - [ ] Fênix revive 1x na run (se possuir a carta)
 - [ ] HUD mostra progresso do recall e mayhem ativos
 - [ ] Mobs spawnam com dificuldade escalada (profundidade + players)
 - [ ] Mayhem ativa a cada milestone com broadcast MiniMessage
-- [ ] Boss (Frostmaw) spawna no milestone 5 com BossBar
-- [ ] Boss kill conta como vitória e fecha a run
+- [ ] Boss (qualquer um) kill conta como vitória e fecha a run
+- [ ] CollectionMenu tem setas de paginação e filtro de categoria
+- [ ] CollectionMenu has alphabetical sort
 - [ ] `mana_pool` NÃO aparece no draft (sem AuraSkills)
+- [ ] Respawn é totalmente vanilla
 - [ ] `mvn clean package` verde
 - [ ] `mvn test` verde
 
@@ -32,6 +41,7 @@
 - [ ] Mana system ativo: habilidades com custo consomem mana
 - [ ] `mana_pool` aparece no draft
 - [ ] Morte reseta XP/skills do AuraSkills também
+- [ ] Veteran migration: ao entrar, níveis AuraSkills são convertidos em drafts pendentes
 - [ ] Log: `RogueLata + AuraSkills integrado com sucesso!`
 
 ## C. +AuraMobs

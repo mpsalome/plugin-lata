@@ -1,4 +1,4 @@
-# RogueLata — Technical Briefing v3.0.0
+# RogueLata — Technical Briefing v3.1.0
 
 > **Gerado em:** 08/07/2026
 > **Propósito:** Raio-X arquitetural completo para consultor externo gerar código compatível sem acesso ao repositório.
@@ -130,13 +130,14 @@ getCommand("rogue").setExecutor(lataExecutor);
 ```java
 getAuraSkillsIntegration(), getAuraMobsBridge(), getMythicMobsBridge(), getModelEngineBridge()
 getSkillRegistry(), getSkillServices(), getSkillsConfig()
-getCardRegistry(), getStatService(), getDraftService()
+getCardRegistry(), getStatService(), getDraftService(), getDraftWeighting()
 getRunManager(), getMayhemService(), getMilestoneService(), getMayhemConfig()
 getResetService(), getDifficultyService(), getMobSpawnService()
 getDataStore(), getCooldownService(), getSynergyService()
 getHudService(), getGateRegistry(), getDistanceTracker()
-getPlayerLevelListener()  // <-- added for LataCommand/shop
+getPlayerLevelListener()
 createRpgBook() -> ItemStack  // BREAD com PDC rpg_book
+createBossBeacon() -> ItemStack // BEACON com PDC boss_beacon
 createShopItem() -> ItemStack // HAY_BLOCK com PDC shop_item
 ```
 
@@ -147,7 +148,7 @@ commands:
   rpg:     /rpg [reload|reset|debug]
   run:     /run
   recall:  /recall
-  lata:    /lata [tp <jogador>|boss spawn <frostmaw|tyrant>|loja|draft]
+  lata:    /lata [tp <jogador>|boss spawn <frostmaw|magma_tyrant|storm_wyvern|void_lich>|loja|draft|book]
            aliases: [rogue, pao, roguelata]
   rogue:   /rogue (sinonimo de /lata)
            aliases: [lata, pao, roguelata]
@@ -404,17 +405,25 @@ public void onClick(InventoryClickEvent e) {
 - Slots de carta: 20, 23, 26 (3 opções padrão) + 29 (4ª se extraDraftSlots > 0)
 - Slots de ação: 40 (Reroll — se habilitado), 44 (Skip — se habilitado)
 - Click handler: cancela evento, identifica slot, chama `draftService.applyChoice()`, `draftService.reroll()` ou `draftService.skipDraft()`
-- Ao fechar sem decisão: `DraftMenuListener` reabre próximo draft pendente
+- Ao fechar sem decisão: sessão fica ativa; jogador reabre via `/lata draft`
 
 ### 4.3 `ShopMenu` — implementado (`com.project.rpgplugin.ui.ShopMenu`)
 
 - Size: 27 (3 linhas)
 - Título: `<gradient:#ff8c00:#ff4500>🛒 Loja Pão em Lata</gradient>`
-- 4 slots de itens: 10 (Reroll 2 níveis), 12 (Carta Avulsa 5 níveis), 14 (Absolvição 10 níveis), 16 (Sinalizador 15 níveis)
+- 5 slots de itens: 10 (Reroll 2 níveis - ENDER_EYE), 12 (Carta Avulsa 5 níveis - MAP), 14 (Absolvição 10 níveis - TOTEM_OF_UNDYING), 16 (Sinalizador 15 níveis - BEACON), 18 (Beque 30 níveis - HEART_OF_THE_SEA)
 - Validação: `player.getLevel() >= cost` senão `Sound.ENTITY_VILLAGER_NO` + actionbar
 - Sucesso: `Sound.ENTITY_EXPERIENCE_ORB_PICKUP` + dedução + ação
 
-### 4.4 Criando um novo Menu — padrão:
+### 4.5 `HubMenu` — Menu Principal (`com.project.rpgplugin.ui.HubMenu`)
+
+- Size: 27 (3 linhas)
+- Título: `<gold><bold>Menu Principal`
+- 3 navigation buttons: slot 11 (Coleção), 13 (Loja), 15 (Draft)
+- Close button at slot 22 (BARRIER)
+- Opened by right-clicking the RPG Book (BREAD with ItemKeys.isRpgBook()) in SkillDispatchListener.onInteract
+
+### 4.6 Criando um novo Menu — padrão:
 
 ```java
 public class MeuMenu extends Menu {
@@ -640,10 +649,12 @@ public static String legacyToMiniMessage(String legacy); // traduz § codes para
 
 ```java
 public class LataCommand implements CommandExecutor {
-    // Subcomandos: tp, boss, loja, draft
+    // Subcomandos: tp, boss, loja, draft, book
     public void spawnBossAtSafeLocation(Player player, String bossId, String bossName);
 }
 ```
+
+- `/lata book` → `plugin.createRpgBook()`: entrega um RPG Book ao jogador
 
 **`spawnBossAtSafeLocation`** — método público reusável (chamado pelo item Sinalizador via `SkillDispatchListener`):
 1. `computeSafeLocation(Location origin)`: 15-20 blocos na direção do jogador, `world.getHighestBlockYAt(bx, bz)` + 1
@@ -655,6 +666,34 @@ public class LataCommand implements CommandExecutor {
 
 ---
 
+## 10. Bosses (`bosses.yml`)
+
+### 10.1 Boss Definitions
+
+4 bosses defined in `bosses.yml`:
+
+| ID | Type | HP | Biome | Display Name (MiniMessage) |
+|---|---|---|---|---|
+| frostmaw | POLAR_BEAR | 300 | SNOWY | `<bold><aqua>Frostmaw <gray>\| <white>Senhor do Gelo</white></gray></aqua></bold>` |
+| magma_tyrant | MAGMA_CUBE | 200 | BADLANDS | `<bold><red>Magma Tyrant <gray>\| <white>Soberano das Profundezas</white></gray></red></bold>` |
+| storm_wyvern | RAVAGER | 350 | PLAINS | `<bold><yellow>Storm Wyvern <gray>\| <white>Asa da Tempestade</white></gray></yellow></bold>` |
+| void_lich | WITHER_SKELETON | 250 | DARK_FOREST | `<bold><dark_purple>Void Lich <gray>\| <white>Senhor do Vazio</white></gray></dark_purple></bold>` |
+
+### 10.2 Spawning Flow
+
+1. Player buys Sinalizador from ShopMenu (15 levels)
+2. Right-clicks the beacon item → `SkillDispatchListener.handleBossBeacon()`
+3. Hand detection: checks main hand first, then off-hand
+4. Biome mapping selects boss based on player's current biome
+5. Falls back to `LataCommand.spawnBossAtSafeLocation()` if biome doesn't match
+6. If `bosses.yml` is missing the entry, fallback spawns Titã em Lata (WARDEN, 500 HP)
+
+### 10.3 BossBar
+
+`EliteFactory.trackBossBar()` creates a plain-text BossBar (stripTags removes MiniMessage tags from the display name). The entity's `customName` retains the MiniMessage Component for nametag display.
+
+---
+
 ## 🔑 Convenções e Regras de Ouro
 
 1. **Folia:** Sempre usar `player.getScheduler()`, `entity.getScheduler()`, ou `world.getChunkAtAsync()`. Evitar `Bukkit.getScheduler()`. Usar `SchedulerUtil` apenas para timers globais.
@@ -662,3 +701,7 @@ public class LataCommand implements CommandExecutor {
 3. **PDC Namespace:** Todas as chaves de attribute modifier usam `namespace = "roguelata"`, key prefix `"roguelata_"`.
 4. **Item PDC:** Toda interação com item customizado no `SkillDispatchListener.onInteract()` antes do dispatch.
 5. **Run lifecycle:** `RunPersistences.loadRun()` (PDC) → `RunManager.restoreRun()` no join. `saveRun()` + `removeRun()` no quit.
+6. **Defensive cfg reads:** usar `cfgInt()`/`cfgDouble()`/`cfgString()` do `AbstractSkill` em vez de `cfg().getInt()` direto.
+7. **Respawn vanilla:** plugin não chama `setRespawnLocation()`.
+8. **Veteran migration:** `onJoin` converte níveis existentes em pending drafts.
+9. **Mayhem clear on death:** `mayhemService.clear()` antes de `resetBuild()`.

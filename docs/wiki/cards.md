@@ -1,66 +1,71 @@
-# 🃏 Catálogo de Cartas
+# Catálogo de Cartas
 
-**Total: 35 habilidades + 53 augments = 88 cartas**
+**Total: 37 habilidades + 53 augments = 90 cartas**
 
 ---
 
-## ⚡ Habilidades (Ability Cards)
+## Habilidades (Ability Cards)
 
-### 🥉 Bronze (11)
+### Bronze (12)
 
 | Carta | Tipo | Tags | Efeito |
 |-------|------|------|--------|
-| Dash das Flores | Explorador | EXPLORER, MOBILITY | Speed II + Invisibilidade temporária |
-| Hidratação | Explorador | EXPLORER, SUSTAIN | Garrafa d'água enche fome e saturação |
-| Passo Ágil | Explorador | EXPLORER, MOBILITY | Speed II por 15s |
-| Salto Escalador | Explorador | EXPLORER, MOBILITY | Impulso pra frente e pra cima |
-| Dieta de Carvão | Minerador | MINER, SUSTAIN | Coma carvão para recuperar fome |
-| Quebra-Pedra | Minerador | MINER | Quebra pedra mais rápido |
+| Dash das Flores | Explorador | EXPLORER, MOBILITY | Dash 6 blocos + Speed II 3s |
+| Hidratação | Explorador | EXPLORER, SUSTAIN | Ao tocar água/chuva: +1 comida, +0.5 saturação, Speed I |
+| Passo Ágil | Explorador | EXPLORER, MOBILITY | Lança o jogador para frente |
+| Dieta de Carvão | Minerador | MINER, SUSTAIN | +4 comida, +2 saturação |
+| Quebra-Pedra | Minerador | MINER | Haste ao quebrar pedra (acumula até III) |
 | Luz de Tocha | Minerador | MINER, UTILITY | Visão Noturna por 30s |
-| Banquete de Folhas | Construtor | BUILDER, SUSTAIN | Coma folhas para recuperar fome |
-| Lenhador Rápido | Construtor | BUILDER | Haste I com machado |
-| Toque de Seda Manual | Construtor | BUILDER, UTILITY | Coleta blocos frágeis com a mão |
-| Salto do Andaime | Construtor | BUILDER, MOBILITY | Salto + bloco temporário |
+| Núcleo Instável | Minerador | MINER, DPS, RISK | 15% chance de explodir ao quebrar minério: dano AOE + drop extra |
+| Banquete de Folhas | Construtor | BUILDER, SUSTAIN | +2 comida, +0.8 saturação |
+| Toque de Seda Manual | Construtor | BUILDER, UTILITY | Toque de Seda sem encantamento |
+| Salto do Andaime | Construtor | BUILDER, MOBILITY | Lança para cima + coloca feno temporário |
+| Lenhador Rápido | Construtor | BUILDER | Treecapitator: quebra todos os troncos conectados |
+| Escudo Anti-Queda | Explorador | EXPLORER, TANK | Queda lenta + 50% redução de dano de queda (passivo) |
 
-### 🥈 Prata (11)
+### Prata (11)
 
 | Carta | Tipo | Tags | Efeito |
 |-------|------|------|--------|
-| Escudo Anti-Queda | Explorador | EXPLORER, TANK | Anula/reduz dano de queda |
-| Respiração Aquática | Explorador | EXPLORER, UTILITY | Respira embaixo d'água |
-| Super Salto | Explorador | EXPLORER, MOBILITY | Pulo aumentado permanente |
-| Escudo de Lava | Explorador | EXPLORER, TANK | Resistência a fogo por 15s |
-| Radar de Minério | Minerador | MINER, UTILITY | Marca minérios próximos |
-| Febre do Ouro | Minerador | MINER | Haste II ao minerar |
-| Passo da Canópia | Construtor | BUILDER, MOBILITY | Speed II em folhas/grama |
+| Respiração Aquática | Explorador | EXPLORER, UTILITY | Respiração subaquática + Golfinho (passivo na água) |
+| Super Salto | Explorador | EXPLORER, MOBILITY | Salto Elevado II (passivo enquanto se move) |
+| Escudo de Lava | Explorador | EXPLORER, TANK | Ao sofrer dano de fogo/lava: Fire Resist 8s (CD 30s) |
+| Dança das Lâminas | Explorador | EXPLORER, DPS, MOBILITY | Após 3 mobility skills: próximo hit causa AOE + lifesteal 5% |
+| Fisgada do Arpão | Explorador | EXPLORER, DPS, MOBILITY | Fisgue e puxe um inimigo com a Vara de Pesca (dano + stun) |
+| Radar de Minério | Minerador | MINER, UTILITY | Revela minérios (Ferro/Ouro/Diamante) num raio de 8 blocos |
+| Febre do Ouro | Minerador | MINER | Ao quebrar minérios: Haste II + Speed I 10s (CD 20s) |
+| Pancada Sísmica | Minerador | MINER, DPS | Onda de choque 8b: dano AOE + Slow II 3s |
+| Passo da Canópia | Construtor | BUILDER, MOBILITY | Speed II ao andar sobre blocos naturais (passivo) |
 | Adubo Verde | Construtor | BUILDER, ECONOMY | Faz plantas crescerem ao redor |
-| Escudo Floral | Construtor | BUILDER, SUSTAIN | Cura ao consumir flor |
-| Foco do Arquiteto | Construtor | BUILDER, TANK, RISK | Resistência IV (com penalidade) |
-| Desafio Gravitacional | Construtor | BUILDER, MOBILITY | Flutua brevemente |
+| Escudo Floral | Construtor | BUILDER, SUSTAIN | Cura 4 corações |
+| Foco do Arquiteto | Construtor | BUILDER, TANK, RISK | Resistência III 10s (colocar 8 blocos em <5s) |
+| Desafio Gravitacional | Construtor | BUILDER, MOBILITY | Ao sofrer KB/dano de queda: anula e dá voo temporário 4s |
+| Raízes Emaranhadas | Construtor | BUILDER, DPS, TANK | Raízes prendem inimigos num raio de 4b (Slowness IV + dano) |
 
-### 🥇 Ouro (13)
+### Ouro (14)
 
 | Carta | Tipo | Tags | Efeito |
 |-------|------|------|--------|
-| Recall do Dragão | Explorador | EXPLORER, UTILITY | Teleporta ao spawn (distância progressiva) |
-| Sonar de Eco | Explorador | EXPLORER, UTILITY | Revela entidades próximas |
-| Mudança Dimensional | Explorador | EXPLORER, MOBILITY, RISK | Teleporte + Speed IV (com penalidades) |
-| Explosão de Vento | Explorador | EXPLORER, MOBILITY | Lançado para o alto |
-| Visão Noturna | Minerador | MINER, UTILITY | Visão noturna permanente |
-| Reparo de Minério | Minerador | MINER, UTILITY | Repara 30% da picareta |
-| Toque de Fusão | Minerador | MINER, ECONOMY | Funde minérios automaticamente |
-| Transmutação | Minerador | MINER, ECONOMY | Converte metais (5 ferro→ouro, 5 ouro→diamante) |
-| Escudo Gravitacional | Minerador | MINER, TANK | Resistência III |
-| Sobrecarga do Núcleo | Minerador | MINER, RISK, DPS | Haste III + Força II (com penalidade) |
+| Recall do Dragão | Explorador | EXPLORER, UTILITY | Teleporta ao spawn do mundo |
+| Sonar de Eco | Explorador | EXPLORER, UTILITY | Revela entidades num raio de 20b com Glowing 10s |
+| Mudança Dimensional | Explorador | EXPLORER, MOBILITY, RISK | Teleporta 8b para frente + Speed IV + Invisibilidade 10s (com penalidades) |
+| Explosão de Vento | Explorador | EXPLORER, MOBILITY | Lança para cima + knockback em área |
+| Visão Noturna | Minerador | MINER, UTILITY | Visão Noturna permanente (passivo enquanto se move) |
+| Reparo de Minério | Minerador | MINER, UTILITY | Ao quebrar Fe/Au/Dia: repara 5% durabilidade (passivo) |
+| Transmutação | Minerador | MINER, ECONOMY | 5 Ferro → 1 Ouro, ou 5 Ouro → 1 Diamante |
+| Escudo Gravitacional | Minerador | MINER, TANK | Ao sofrer >4 corações: Resist III + anti-kb 6s (CD 30s) |
+| Sobrecarga do Núcleo | Minerador | MINER, RISK, DPS | Haste III + Strength II + Speed II 15s (+25% dano recebido) |
+| Escudo do Filão Dourado | Minerador | MINER, TANK, ECONOMY | Ao sofrer dano fatal: absorve consumindo ouro do inventário |
 | Graça da Pena | Construtor | BUILDER, MOBILITY | Super salto + queda lenta |
-| Golpe do Lenhador | Construtor | BUILDER | Haste IV por 5s |
-| Bloco Reforçado | Construtor | BUILDER, UTILITY | Torna um bloco indestrutível por 15s |
+| Bloco Reforçado | Construtor | BUILDER, TANK, UTILITY | Barreira 3x3 de obsidiana por 10s |
+| Torreta Sentinela | Construtor | BUILDER, DPS, UTILITY | Invoca torreta de flechas por 15s |
+| Protocolo Fortaleza | Construtor | BUILDER, TANK, SUSTAIN | Quando HP <30%: gaiola de ferro + regen + empurra inimigos |
 
 ---
 
-## ✦ Augments
+## Augments
 
-### 🥉 Bronze (14)
+### Bronze (14)
 
 | Carta | Efeito |
 |-------|--------|
@@ -79,7 +84,7 @@
 | Areia nos Olhos | Chance de cegar quem te ataca |
 | Regeneração Leve | Regeneração lenta fora de combate |
 
-### 🥈 Prata (20)
+### Prata (20)
 
 | Carta | Efeito |
 |-------|--------|
@@ -104,7 +109,7 @@
 | Adrenalina | +velocidade ao tomar dano |
 | Bateria de Escudo | Absorção extra ao usar escudo |
 
-### 🥇 Ouro (19)
+### Ouro (19)
 
 | Carta | Efeito |
 |-------|--------|

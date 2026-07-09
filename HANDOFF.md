@@ -1,12 +1,56 @@
 # Handoff — RogueLata Plugin
 
-## Estado Atual (2026-07-06)
+## Estado Atual (2026-07-08)
 
-- **Versão:** `1.5.0` (pom.xml)
-- **Build:** `mvn clean package` — 148 source files, 106 testes, 0 falhas
+- **Versão:** `3.1.0` (pom.xml)
+- **Build:** `mvn clean package` — 161 source files
 - **CI:** `.github/workflows/ci.yml` roda `mvn clean package` + `mvn test` em push/PR
+- **Release:** `.github/workflows/release.yml` triggered on tag `v*`
 
 ## O que foi feito
+
+### v3.1.0 — New Features
+
+#### Commands
+- Main command is now `/lata` with subcommands: `tp <player>`, `boss spawn <boss>`, `loja`, `draft`, `book`
+- Aliases: `rogue`, `pao`, `roguelata`
+- Right-click the RPG Book (`BREAD`) opens the HubMenu
+
+#### HubMenu
+- Central menu with navigation: Coleção, Loja, Draft
+- 27 slots, items at 11/13/15, "Fechar" at 22
+- Fill: `BLACK_STAINED_GLASS_PANE` for borders
+
+#### ShopMenu
+- 5 items: Carta Avulsa (MAP), Reroll (ENDER_EYE), Absolvição (TOTEM_OF_UNDYING), Sinalizador (BEACON), Beque (HEART_OF_THE_SEA)
+- Each costs levels
+- 27 slots, items at 10/12/14/16/18
+
+#### CollectionMenu improvements
+- Pagination: 36 cards per page
+- Category filters (toggle at slots 3-6)
+- Alphabetical sort
+- "Menu Principal" button at slot 49
+
+#### Draft (não-bloqueante)
+- Level-ups add pending drafts silently
+- Player opens via `/lata draft` or HubMenu
+- DraftMenu: 54 slots, cards at 20/23/26/29, reroll at 40, skip at 44
+
+#### Bosses
+- 4 bosses: frostmaw, magma_tyrant, storm_wyvern, void_lich
+- Each spawns with BossBar and named entity
+
+#### Respawn
+- Fully vanilla (no custom respawn handling)
+
+#### Mayhem
+- Clears on death (timers cancelled, entities removed)
+
+#### Veteran Migration
+- On join, converts AuraSkills levels to pending drafts
+
+### v1.5.0 — Anterior
 
 ### Bloco 1 — Ascendant Cards (T10.2)
 - `SynergyService.applySynergies()` agora lê multiplicadores `explorer_ascendant`, `miner_ascendant`, `builder_ascendant`
@@ -25,7 +69,6 @@
 - `AugmentCardTest` — 7 testes: lifecycle, offerable, effects, registry
 - `CardRegistryTest` — 11 testes (novos: offerable/offerableByTier)
 - `SynergyServiceTest` — 10 testes (novos: ascendant multiplier)
-- Total: **106 testes** (de 57)
 
 ### Bloco 4 — CI Workflow (T10.26)
 - `.github/workflows/ci.yml` — `actions/setup-java@v4` (JDK 21, temurin), `mvn clean package`, `mvn test`
@@ -58,6 +101,9 @@
 ### Plugin entry
 - `src/main/java/com/project/rpgplugin/RPGPlugin.java` — onEnable/onDisable, wiring
 
+### Commands
+- `command/LataCommand.java` — `/lata` main command with subcommands (tp, boss spawn, loja, draft, book)
+
 ### Core packages
 - `core/card/` — `Card` interface, `CardRegistry`, `AugmentCard`, `AbilityCard`
 - `core/card/augment/` — `AugmentEffect`, `PotionEffectAugment`, `GiantEffect`, `MultiplierEffect`, etc
@@ -67,6 +113,7 @@
 - `core/mayhem/` — 8 modifiers, `MilestoneService`
 - `core/build/` — `SynergyService` (inclui ascendant cards)
 - `core/mana/` — `ManaService`
+- `core/boss/` — Boss definitions, spawn logic (frostmaw, magma_tyrant, storm_wyvern, void_lich)
 
 ### Tasks
 - `task/PassiveTask.java` — periodic potion effect maintenance + synergy application
@@ -76,10 +123,14 @@
 - `listener/AugmentListener.java` — 11 augment event handlers
 - `listener/CombatListener.java` — crit, execute, thorns, lifesteal, boss kill
 - `listener/SkillDispatchListener.java` — skill activation + mana check
+- `listener/HubMenuListener.java` — right-click BREAD opens HubMenu
+- `listener/DeathListener.java` — mayhem clear on death
 
 ### UI
-- `ui/DraftMenu.java` — extends Menu, strings hardcoded
-- `ui/CollectionMenu.java` — extends Menu, strings hardcoded
+- `ui/DraftMenu.java` — 54 slots, cards at 20/23/26/29, reroll at 40, skip at 44
+- `ui/CollectionMenu.java` — 54 slots, pagination 36/page, category filters, "Menu Principal" at 49
+- `ui/ShopMenu.java` — 27 slots, 5 items at 10/12/14/16/18
+- `ui/HubMenu.java` — 27 slots, items at 11/13/15, "Fechar" at 22
 - `ui/HudService.java` — action bar
 - `ui/menu/Menu.java`, `MenuHolder.java`, `MenuListener.java`
 
@@ -90,6 +141,10 @@
 ### Util
 - `util/SchedulerUtil.java` — Folia-aware scheduler wrapper
 - `util/ItemKeys.java`, `util/Text.java`
+
+### Config
+- `config/BossConfig.java` — bosses.yml loader
+- `config/ShopConfig.java` — shop item definitions
 
 ## O que NÃO foi feito (propositalmente não incluído no escopo)
 
