@@ -35,11 +35,16 @@ public class EliteFactory {
     }
 
     public LivingEntity spawnBoss(Location loc, BossDef def) {
+        return spawnBoss(loc, def, 1);
+    }
+
+    public LivingEntity spawnBoss(Location loc, BossDef def, int bossLevel) {
         if (mythicMobs.isEnabled()) {
             LivingEntity mm = mythicMobs.trySpawnMob(def.id(), loc).orElse(null);
             if (mm != null) {
                 mm.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
                 mm.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
+                mm.getPersistentDataContainer().set(ItemKeys.withKey("boss_level"), PersistentDataType.INTEGER, bossLevel);
                 modelEngine.applyModel(mm, def.id());
                 trackBossBar(mm, def);
                 return mm;
@@ -74,6 +79,7 @@ public class EliteFactory {
 
         e.getPersistentDataContainer().set(ItemKeys.eliteId(), PersistentDataType.STRING, def.id());
         e.getPersistentDataContainer().set(ItemKeys.isBoss(), PersistentDataType.BYTE, (byte) (def.victory() ? 1 : 0));
+        e.getPersistentDataContainer().set(ItemKeys.withKey("boss_level"), PersistentDataType.INTEGER, bossLevel);
 
         modelEngine.applyModel(e, def.id());
         trackBossBar(e, def);

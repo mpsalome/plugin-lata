@@ -40,6 +40,12 @@ public class BossLootService {
 
     private final Random rng = ThreadLocalRandom.current();
 
+    public List<ItemStack> generateLoot(String bossId, int bossLevel, double bossMaxHealth) {
+        List<ItemStack> loot = BossSet.generateSetLoot(bossId, bossLevel);
+        loot.addAll(generateLoot(bossMaxHealth));
+        return loot;
+    }
+
     public List<ItemStack> generateLoot(double bossMaxHealth) {
         LootTier tier = LootTier.forHp(bossMaxHealth);
         List<ItemStack> loot = new ArrayList<>();

@@ -5,10 +5,12 @@ import com.project.rpgplugin.core.draft.DraftService;
 import com.project.rpgplugin.core.draft.DraftSession;
 import com.project.rpgplugin.core.draft.DraftWeighting;
 import com.project.rpgplugin.core.mayhem.MilestoneService;
+import com.project.rpgplugin.core.mob.EliteFactory;
 import com.project.rpgplugin.core.run.RunManager;
 import com.project.rpgplugin.core.run.RunState;
 import com.project.rpgplugin.ui.DraftMenu;
 import com.project.rpgplugin.util.Text;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -54,12 +56,41 @@ public class PlayerLevelListener implements Listener {
             p.sendActionBar(Text.mm("<gold>\uD83C\uDFB4 +" + draftsEarned + " draft(s)! Digite <white>/lata draft</white> para abrir."));
         }
 
-        // EPIC-4: Mayhem milestone check
+        // EPIC-4: Mayhem milestone check — 50% mayhem / 50% boss aleatorio
         if (milestoneService.reachedNewMilestone(run, oldLevel, newLevel)) {
             int newMilestones = milestoneService.milestonesReached(run);
             run.setMilestonesReached(newMilestones);
-            plugin.getMayhemService().rollAndApply(run, p.getWorld());
+
+            if (Math.random() < 0.5) {
+                plugin.getMayhemService().rollAndApply(run, p.getWorld());
+            } else {
+                spawnMilestoneBoss(p, run);
+            }
         }
+    }
+
+    private void spawnMilestoneBoss(Player p, RunState run) {
+        String[] bossIds = {"frostmaw", "magma_tyrant", "storm_wyvern", "void_lich",
+            "sir_creeper_alot", "slime_shady", "the_beheader",
+            "ancient_guardian", "piglin_warlord", "phantom_king"};
+        String bossId = bossIds[(int) (Math.random() * bossIds.length)];
+
+        EliteFactory.BossDef def = plugin.getMobSpawnService().getBossDef(bossId);
+        if (def == null) return;
+
+        int level = run.level();
+        EliteFactory.BossDef scaled = def.scaleByLevel(level);
+
+        Location loc = p.getLocation().clone().add(Math.random() * 30 - 15, 0, Math.random() * 30 - 15);
+        loc.setY(loc.getWorld().getHighestBlockYAt(loc) + 1);
+
+        plugin.getMobSpawnService().getEliteFactory().spawnBoss(loc, scaled, level);
+
+        String name = scaled.displayName().replaceAll("<[^>]+>", "").trim();
+        p.sendMessage(Text.mm(
+            "<red><bold>\u2620 " + name + "</bold></red> <gray>|</gray> <yellow>Nivel " + level + "</yellow>\n"
+            + "<gray>O caos ao inves do mayhem...</gray>"
+        ));
     }
 
     public void openNextDraft(Player p, RunState run) {

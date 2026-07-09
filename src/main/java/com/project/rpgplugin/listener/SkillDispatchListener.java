@@ -208,8 +208,24 @@ public class SkillDispatchListener implements Listener {
             default -> "Frostmaw, Senhor do Gelo";
         };
 
+        String levelStr = "<yellow>Nivel " + playerLevel + "</yellow>";
+        String hint = switch (bossId) {
+            case "frostmaw" -> "<aqua>Dizem que guarda equipamentos congelados...</aqua>";
+            case "magma_tyrant" -> "<red>Reza a lenda que carrega o calor do nucleo...</red>";
+            case "storm_wyvern" -> "<yellow>Contam que suas asas guardam segredos eletricos...</yellow>";
+            case "void_lich" -> "<dark_purple>Sussurros falam de armaduras do esquecimento...</dark_purple>";
+            case "sir_creeper_alot" -> "<green>Dizem que sua armadura e tao famosa quanto ele...</green>";
+            case "slime_shady" -> "<light_purple>Boato que seus pertences sao bem... escorregadios...</light_purple>";
+            case "the_beheader" -> "<dark_red>Falam que seu machado nunca erra o alvo...</dark_red>";
+            case "ancient_guardian" -> "<dark_aqua>Lendas contam de tesouros das profundezas...</dark_aqua>";
+            case "piglin_warlord" -> "<gold>Segundo os piglins, seu ouro e amaldicoado...</gold>";
+            case "phantom_king" -> "<white>Historias de tesouros que flutuam entre ceu e terra...</white>";
+            default -> "<gray>Ninguem sabe o que este boss carrega...</gray>";
+        };
+
         org.bukkit.Bukkit.broadcast(Text.mm(
-            "<gold><bold>\u26A0 " + bossName + " sera invocado por " + player.getName() + " em 5 segundos!</bold></gold>"
+            "<gold><bold>\u26A0 " + bossName + "</bold></gold> <gray>|</gray> " + levelStr + "\n"
+            + hint
         ));
         player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.5f);
 

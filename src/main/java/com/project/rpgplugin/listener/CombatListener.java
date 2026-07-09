@@ -9,7 +9,7 @@ import com.project.rpgplugin.util.ItemKeys;
 import com.project.rpgplugin.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -139,16 +139,15 @@ public class CombatListener implements Listener {
             ));
         }
 
-        // Gerar loot baseado na vida maxima do boss
+        String bossId = target.getPersistentDataContainer().get(ItemKeys.eliteId(), PersistentDataType.STRING);
+        int bossLevel = target.getPersistentDataContainer().getOrDefault(ItemKeys.withKey("boss_level"), PersistentDataType.INTEGER, 1);
+
         if (lootService != null) {
-            List<ItemStack> loot = lootService.generateLoot(target.getMaxHealth());
+            List<ItemStack> loot = lootService.generateLoot(bossId, bossLevel, target.getMaxHealth());
             for (ItemStack item : loot) {
                 bossLoc.getWorld().dropItemNaturally(bossLoc, item);
             }
         }
-
-        // Base loot sempre cai
-        bossLoc.getWorld().dropItemNaturally(bossLoc, new ItemStack(Material.DIAMOND, 4 + (int)(Math.random() * 5)));
 
         Bukkit.broadcast(Text.mm(
             "<gold><bold>\uD83C\uDFC6 " + killer.getName() + " e sua equipe derrotaram " + bossName + "!</bold></gold>"
